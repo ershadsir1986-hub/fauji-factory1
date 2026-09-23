@@ -219,6 +219,7 @@
     border-radius: 8px;
     border: 1px solid var(--border);
     margin-bottom: 1.25rem;
+    overflow-x: auto;
   }
   .sub-nav-btn {
     flex: 1;
@@ -230,6 +231,7 @@
     padding: 0.5rem;
     border-radius: 6px;
     cursor: pointer;
+    white-space: nowrap;
   }
   .sub-nav-btn.active { background: var(--primary); color: white; }
 
@@ -662,11 +664,12 @@
     <div id="section-academics" class="app-section active">
       <div class="card">
         <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.3rem;">🎓 Academics Command Desk</h2>
-        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem;">Access weekly timetable routine and track course units.</p>
+        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem;">Access weekly timetable routine, exam schedules, and unit progress.</p>
 
         <!-- Sub Tabs -->
         <div class="sub-nav-bar">
           <button class="sub-nav-btn active" id="sub-btn-routine" onclick="switchAcademicSubTab('sub-routine')">📅 WEEKLY ROUTINE</button>
+          <button class="sub-nav-btn" id="sub-btn-exams" onclick="switchAcademicSubTab('sub-exams')">📝 EXAM SCHEDULE</button>
           <button class="sub-nav-btn" id="sub-btn-units" onclick="switchAcademicSubTab('sub-units')">🎯 UNIT TRACKING (84 UNITS)</button>
         </div>
 
@@ -725,7 +728,72 @@
           </div>
         </div>
 
-        <!-- SUB-SECTION 2: UNIT TRACKING -->
+        <!-- SUB-SECTION 2: EXAM SCHEDULE -->
+        <div id="sub-exams" style="display: none;">
+          <!-- Official Exam Formulation Form -->
+          <div id="exam-schedule-editor" class="no-print" style="display: none; background: #000000; border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
+            <h3 style="color: #ffffff; font-size: 1.05rem; margin-bottom: 0.85rem;">📝 Prepare & Publish Exam Schedule</h3>
+            <form onsubmit="handleExamScheduleSubmit(event)">
+              <div class="form-grid">
+                <div>
+                  <label>Name of the Exam</label>
+                  <input type="text" id="exam-sched-name" placeholder="e.g. Combined Defence Mock Test - Phase I" required>
+                </div>
+                <div>
+                  <label>Date of the Exam</label>
+                  <input type="date" id="exam-sched-date" required>
+                </div>
+                <div>
+                  <label>Time of the Exam</label>
+                  <input type="text" id="exam-sched-time" placeholder="e.g. 10:00 AM - 01:00 PM" required>
+                </div>
+                <div>
+                  <label>Target Batch</label>
+                  <select id="exam-sched-batch" required>
+                    <option value="All Batches">All Batches (G1-G4 & H1-H4)</option>
+                    <option value="G1">General - G1</option>
+                    <option value="G2">General - G2</option>
+                    <option value="G3">General - G3</option>
+                    <option value="G4">General - G4</option>
+                    <option value="H1">Hostel - H1</option>
+                    <option value="H2">Hostel - H2</option>
+                    <option value="H3">Hostel - H3</option>
+                    <option value="H4">Hostel - H4</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label>Syllabus of the Exam</label>
+                <textarea id="exam-sched-syllabus" rows="2" placeholder="List subjects, units (e.g. Math: U1-U10, GK: Current Affairs & History)" required></textarea>
+              </div>
+              <button type="submit" class="btn-submit" style="margin-top: 0.5rem;">📢 Record Schedule & Broadcast to All Registered Students</button>
+            </form>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <span style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">Scheduled Academy Examinations</span>
+            <span class="badge badge-active" id="exam-count-badge">0 Scheduled</span>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name of the Exam</th>
+                  <th>Date of Exam</th>
+                  <th>Time of Exam</th>
+                  <th>Batch</th>
+                  <th>Syllabus of the Exam</th>
+                  <th>Scheduled By</th>
+                  <th class="no-print">Action</th>
+                </tr>
+              </thead>
+              <tbody id="exam-schedule-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SUB-SECTION 3: UNIT TRACKING -->
         <div id="sub-units" style="display: none;">
           <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1rem;">
             <div>
@@ -1037,6 +1105,7 @@ let cadetList = [];
 let financeRecords = [];
 let routines = {};
 let unitData = {};
+let examSchedules = [];
 let currentUser = null;
 let superAdminPin = '1234';
 let superAdminRecoveryPhone = '9876543210';
@@ -1118,10 +1187,20 @@ db.ref('units').on('value', snapshot => {
   renderUnitGrid();
 });
 
+// Exam Schedules listener
+db.ref('exam_schedules').on('value', snapshot => {
+  const data = snapshot.val();
+  examSchedules = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderExamScheduleTable();
+});
+
 window.addEventListener('DOMContentLoaded', () => {
   const todayStr = new Date().toISOString().split('T')[0];
   document.getElementById('adm-date').value = todayStr;
   document.getElementById('fin-date').value = todayStr;
+  const examDateInput = document.getElementById('exam-sched-date');
+  if (examDateInput) examDateInput.value = todayStr;
+
   document.getElementById('super-admin-current-phone').value = superAdminRecoveryPhone;
   updateSectionDropdown();
   updateFinancePurposeDropdown();
@@ -1159,13 +1238,16 @@ function switchSection(secId) {
 
 function switchAcademicSubTab(subId) {
   document.getElementById('sub-routine').style.display = subId === 'sub-routine' ? 'block' : 'none';
+  document.getElementById('sub-exams').style.display = subId === 'sub-exams' ? 'block' : 'none';
   document.getElementById('sub-units').style.display = subId === 'sub-units' ? 'block' : 'none';
+
   document.getElementById('sub-btn-routine').classList.toggle('active', subId === 'sub-routine');
+  document.getElementById('sub-btn-exams').classList.toggle('active', subId === 'sub-exams');
   document.getElementById('sub-btn-units').classList.toggle('active', subId === 'sub-units');
 }
 
 // -------------------------------------------------------------
-// WEEKLY ROUTINE CORE LOGIC WITH EDITABLE PRECISE TIMING
+// ACADEMIC PERMISSIONS & ROUTINES
 // -------------------------------------------------------------
 function canEditAcademics() {
   if (!currentUser) return false;
@@ -1182,10 +1264,8 @@ function loadRoutineForBatch() {
   const batchRoutine = (routines && routines[batch]) ? routines[batch] : {};
   const isEditable = canEditAcademics();
 
-  // Load or fallback to default session timings
   const sessionTimings = batchRoutine.timings || DEFAULT_TIMINGS;
 
-  // Render timing header controls
   ['s1', 's2', 's3', 's4'].forEach(s => {
     const box = document.getElementById(`header-timing-${s}-box`);
     if (box) {
@@ -1251,9 +1331,85 @@ function saveRoutineChanges() {
 
   db.ref('routines/' + batch).set(updatedBatchRoutine).then(() => {
     notifySuperAdminAction(`[ROUTINE UPDATED] Weekly Routine & Timings for batch ${batch} updated by ${currentUser ? currentUser.name : 'SuperAdmin'}.`);
-
     broadcastNoticeToAllStudents(`📢 *FAUJI FACTORY - WEEKLY TIMETABLE UPDATE*\n\nWeekly Routine for Batch *${batch}* (Sunday to Saturday) with updated session timings has been published.\nPlease check the Academics section on the portal.`);
     alert(`Weekly routine & timings for ${batch} saved and notification sent to students!`);
+  });
+}
+
+// -------------------------------------------------------------
+// EXAM SCHEDULE CORE LOGIC
+// -------------------------------------------------------------
+function handleExamScheduleSubmit(e) {
+  e.preventDefault();
+  const name = document.getElementById('exam-sched-name').value.trim();
+  const dateVal = document.getElementById('exam-sched-date').value;
+  const timeVal = document.getElementById('exam-sched-time').value.trim();
+  const batch = document.getElementById('exam-sched-batch').value;
+  const syllabus = document.getElementById('exam-sched-syllabus').value.trim();
+  const scheduledBy = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'Official') + ']') : 'Official';
+
+  const scheduleData = {
+    name: name,
+    date: dateVal,
+    time: timeVal,
+    batch: batch,
+    syllabus: syllabus,
+    scheduledBy: scheduledBy,
+    timestamp: Date.now()
+  };
+
+  db.ref('exam_schedules').push(scheduleData).then(() => {
+    notifySuperAdminAction(`[EXAM SCHEDULED]\nExam: ${name}\nDate: ${dateVal}\nTime: ${timeVal}\nBatch: ${batch}\nScheduled By: ${scheduledBy}`);
+
+    const broadcastMsg = `📝 *FAUJI FACTORY - OFFICIAL EXAMINATION SCHEDULE*\n\n• *Exam Name:* ${name}\n• *Date of Exam:* ${dateVal}\n• *Time of Exam:* ${timeVal}\n• *Batch:* ${batch}\n• *Syllabus:* ${syllabus}\n\nAll cadets are instructed to report on time in proper uniform.\n- Academic Examination Desk`;
+    broadcastNoticeToAllStudents(broadcastMsg);
+
+    alert(`Exam "${name}" successfully recorded and dispatched to all registered students!`);
+    e.target.reset();
+    document.getElementById('exam-sched-date').value = new Date().toISOString().split('T')[0];
+  });
+}
+
+function renderExamScheduleTable() {
+  const tbody = document.getElementById('exam-schedule-table-body');
+  const countBadge = document.getElementById('exam-count-badge');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  countBadge.textContent = `${examSchedules.length} Scheduled`;
+  const isEditable = canEditAcademics();
+
+  // Sort descending by date
+  examSchedules.sort((a, b) => (b.date > a.date ? 1 : -1));
+
+  examSchedules.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${item.name}</b></td>
+      <td>📅 ${item.date}</td>
+      <td>⏰ <span style="color:#38bdf8; font-weight:700;">${item.time}</span></td>
+      <td><span class="badge" style="background:#27272a; color:#fff;">${item.batch}</span></td>
+      <td style="max-width: 250px; font-size:0.8rem; line-height:1.4;">${item.syllabus}</td>
+      <td><small style="color:var(--muted);">${item.scheduledBy}</small></td>
+      <td class="no-print">
+        ${isEditable ? `<button class="btn-action btn-block" onclick="deleteExamSchedule('${item.id}', '${item.name}')">Delete</button>` : `<span style="color:var(--muted); font-size:0.75rem;">View Only</span>`}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if (examSchedules.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:2rem;">No examination schedules published yet.</td></tr>`;
+  }
+}
+
+function deleteExamSchedule(id, name) {
+  if (!confirm(`Are you sure you want to delete the schedule for "${name}"?`)) return;
+  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'Official') + ']') : 'Official';
+
+  db.ref('exam_schedules/' + id).remove().then(() => {
+    notifySuperAdminAction(`[EXAM SCHEDULE REMOVED]\nSchedule for "${name}" removed by ${operator}`);
+    alert(`Exam schedule for "${name}" removed.`);
   });
 }
 
@@ -1896,6 +2052,7 @@ function evaluateUserAccessState() {
   const dash = document.getElementById('screen-dashboard');
   const adminCtrl = document.getElementById('super-admin-controls');
   const routineCtrl = document.getElementById('routine-official-controls');
+  const examEditor = document.getElementById('exam-schedule-editor');
 
   if (currentUser.role === 'SuperAdmin') {
     badge.innerHTML = `👤 <b>Super Admin (${superAdminRecoveryPhone})</b> <button class="header-btn" onclick="openChangePinModal()">🔑 PIN</button> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
@@ -1903,6 +2060,7 @@ function evaluateUserAccessState() {
     dash.style.display = 'block';
     adminCtrl.style.display = 'flex';
     if (routineCtrl) routineCtrl.style.display = 'flex';
+    if (examEditor) examEditor.style.display = 'block';
     document.getElementById('dash-access-level').textContent = 'Super Admin (Full Access)';
     document.getElementById('nav-btn-academics').style.display = 'inline-block';
     document.getElementById('nav-btn-admission').style.display = 'inline-block';
@@ -1918,6 +2076,7 @@ function evaluateUserAccessState() {
     const perms = currentUser.permissions || {};
     document.getElementById('nav-btn-academics').style.display = 'inline-block';
     if (routineCtrl) routineCtrl.style.display = (perms.academics === true) ? 'flex' : 'none';
+    if (examEditor) examEditor.style.display = (perms.academics === true) ? 'block' : 'none';
 
     document.getElementById('nav-btn-admission').style.display = perms.admission ? 'inline-block' : 'none';
     document.getElementById('nav-btn-roster').style.display = perms.roster ? 'inline-block' : 'none';
@@ -1932,6 +2091,7 @@ function evaluateUserAccessState() {
 
   loadRoutineForBatch();
   renderUnitGrid();
+  renderExamScheduleTable();
 }
 
 function handleRegistrationRequest() {
