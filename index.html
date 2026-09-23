@@ -125,7 +125,7 @@
   .auth-tab-btn.active { background: var(--primary); color: white; }
 
   /* Container */
-  .container { max-width: 950px; margin: 1.5rem auto; padding: 0 1rem; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
   .card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -150,6 +150,13 @@
   }
   input:focus, select:focus { border-color: var(--primary); }
 
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
   .btn-submit {
     background: var(--primary);
     color: white;
@@ -164,10 +171,48 @@
   }
   .btn-submit:hover { background: var(--primary-dark); }
 
+  .btn-secondary {
+    background: #27272a;
+    color: #ffffff;
+    border: 1px solid #3f3f46;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .btn-secondary:hover { background: #3f3f46; }
+
   .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
   .badge-pending { background: #78350f; color: #fde68a; }
   .badge-approved { background: #14532d; color: #bbf7d0; }
   .badge-blocked { background: #7f1d1d; color: #fecaca; }
+
+  /* Income & Expense Tints */
+  .badge-income { background: #14532d; color: #86efac; border: 1px solid #22c55e; }
+  .badge-expense { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+  .badge-mode-online { background: #0c4a6e; color: #7dd3fc; }
+  .badge-mode-offline { background: #713f12; color: #fde047; }
+
+  /* Balance Sheet Stat Cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-box {
+    background: #000000;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .stat-lbl { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-val { font-size: 1.6rem; font-weight: 900; margin-top: 0.35rem; }
 
   /* Tables */
   .table-responsive { overflow-x: auto; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); }
@@ -180,6 +225,7 @@
   .btn-approve { background: #15803d; color: white; }
   .btn-block { background: #b91c1c; color: white; }
   .btn-modify { background: #2563eb; color: white; }
+  .btn-del { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; cursor: pointer; }
 
   /* Tab Permission Toggles */
   .permission-grid {
@@ -199,6 +245,19 @@
   }
   .perm-item input[type="checkbox"] { width: auto; margin: 0; }
   .perm-item label { margin: 0; cursor: pointer; color: #f4f4f5; text-transform: none; font-size: 0.85rem; }
+
+  /* Print Section */
+  @media print {
+    body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+    header, #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, .no-print, .form-container, .btn-action, .btn-del { display: none !important; }
+    .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    .card { background: white !important; color: black !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+    table { width: 100% !important; border: 1px solid #000000 !important; background: white !important; color: black !important; }
+    th, td { border: 1px solid #000000 !important; color: black !important; }
+    th { background: #f4f4f5 !important; }
+    .print-header { display: block !important; text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
+  }
+  .print-header { display: none; }
 </style>
 </head>
 <body>
@@ -299,30 +358,34 @@
 
 <!-- MODIFY USER ACCESS PERMISSIONS MODAL -->
 <div id="modify-access-modal" style="display: none;">
-  <div class="auth-card" style="max-width: 500px;">
+  <div class="auth-card" style="max-width: 520px;">
     <h2 style="font-size: 1.3rem;">⚙️ Modify Tab Access</h2>
     <p style="font-size: 0.82rem; color: var(--muted);" id="modify-user-subtitle">Customize permissions for user.</p>
     
     <div class="permission-grid">
       <div class="perm-item">
+        <input type="checkbox" id="perm-finance">
+        <label for="perm-finance">💰 Income & Expenditure</label>
+      </div>
+      <div class="perm-item">
         <input type="checkbox" id="perm-attendance">
-        <label for="perm-attendance">📅 1. Attendance</label>
+        <label for="perm-attendance">📅 Attendance</label>
       </div>
       <div class="perm-item">
         <input type="checkbox" id="perm-syllabus">
-        <label for="perm-syllabus">📚 2. Syllabus</label>
+        <label for="perm-syllabus">📚 Syllabus</label>
       </div>
       <div class="perm-item">
         <input type="checkbox" id="perm-exams">
-        <label for="perm-exams">📊 3. Exam Scores</label>
+        <label for="perm-exams">📊 Exam Scores</label>
       </div>
       <div class="perm-item">
         <input type="checkbox" id="perm-notice">
-        <label for="perm-notice">📢 4. Notices</label>
+        <label for="perm-notice">📢 Notices</label>
       </div>
       <div class="perm-item">
         <input type="checkbox" id="perm-roster">
-        <label for="perm-roster">👥 5. Batch Roster</label>
+        <label for="perm-roster">👥 Batch Roster</label>
       </div>
     </div>
 
@@ -350,6 +413,13 @@
 
 <div class="container">
 
+  <!-- PRINT HEADER -->
+  <div class="print-header">
+    <h1 style="font-size: 2rem; margin-bottom: 0.2rem;">FAUJI FACTORY</h1>
+    <h3 style="font-size: 1.1rem; color: #333;">STATEMENT OF ACCOUNT / FINANCIAL BALANCE SHEET</h3>
+    <p id="print-date-range" style="font-size: 0.9rem; color: #555; margin-top: 0.4rem;"></p>
+  </div>
+
   <!-- PENDING / WAITING SCREEN -->
   <div id="screen-waiting" class="card" style="text-align: center; padding: 3rem 1.5rem; display: none;">
     <h1 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 0.5rem;">WELCOME TO FAUJI FACTORY</h1>
@@ -364,37 +434,139 @@
   </div>
 
   <!-- APPROVED MAIN DASHBOARD -->
-  <div id="screen-dashboard" class="card" style="display: none;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+  <div id="screen-dashboard" style="display: none;">
+    
+    <!-- Top Command Overview Bar -->
+    <div class="card no-print" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       <div>
-        <h2 style="font-size: 1.5rem; color: #ffffff;">Command Dashboard</h2>
-        <p style="font-size: 0.85rem; color: var(--muted);">Access Level: <span id="dash-access-level" style="color: var(--primary); font-weight: 700;">Standard</span></p>
+        <h2 style="font-size: 1.4rem; color: #ffffff;">Command Dashboard</h2>
+        <p style="font-size: 0.82rem; color: var(--muted);">Access Status: <span id="dash-access-level" style="color: var(--primary); font-weight: 700;">Standard</span></p>
       </div>
       <div id="super-admin-controls" style="display: none;">
-        <button class="btn-submit" style="width: auto; padding: 0.5rem 1rem; background: var(--primary);" onclick="openSuperAdminPanel()">⚙️ Manage User Access & Requests</button>
+        <button class="btn-submit" style="width: auto; padding: 0.55rem 1.1rem; background: var(--primary);" onclick="openSuperAdminPanel()">⚙️ Manage User Access & Requests</button>
       </div>
     </div>
 
-    <!-- Active Permitted Modules Navigation / Cards -->
-    <div id="user-modules-container">
-      <div style="background: #000000; border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;">
-        <h3 style="color: #ffffff; margin-bottom: 0.5rem;">Operational Status: Active</h3>
-        <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.6;">
-          Welcome to the Fauji Factory secure terminal. You have been cleared to access the modules highlighted below.
-        </p>
+    <!-- SECTION: INCOME & EXPENDITURE -->
+    <div id="section-finance" class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h2 style="font-size: 1.4rem; color: #ffffff;">💰 Income & Expenditure Management</h2>
+          <p style="font-size: 0.82rem; color: var(--muted);">Day-wise, Week-wise, Month-wise & Economic Year Balance Sheet</p>
+        </div>
       </div>
 
-      <div id="modules-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-        <!-- Dynamically rendered tabs according to granted permissions -->
+      <!-- BALANCE SHEET STATS CARDS -->
+      <div class="stats-grid">
+        <div class="stat-box" style="border-top: 4px solid var(--success);">
+          <div class="stat-lbl">Total Income</div>
+          <div class="stat-val" id="stat-total-income" style="color: #4ade80;">₹ 0.00</div>
+        </div>
+        <div class="stat-box" style="border-top: 4px solid var(--danger);">
+          <div class="stat-lbl">Total Expenditure</div>
+          <div class="stat-val" id="stat-total-expense" style="color: #f87171;">₹ 0.00</div>
+        </div>
+        <div class="stat-box" style="border-top: 4px solid #38bdf8;">
+          <div class="stat-lbl">Net Balance (Surplus/Deficit)</div>
+          <div class="stat-val" id="stat-net-balance" style="color: #38bdf8;">₹ 0.00</div>
+        </div>
+      </div>
+
+      <!-- ENTRY FORM (INCOME & EXPENDITURE) -->
+      <div class="form-container no-print" style="background: #000000; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+        <h3 style="color: #ffffff; font-size: 1.05rem; margin-bottom: 1rem;" id="form-heading">Record New Financial Entry</h3>
+        <form onsubmit="saveFinanceEntry(event)">
+          <div class="form-grid">
+            <div>
+              <label>Transaction Type</label>
+              <select id="fin-type" onchange="updatePurposeDropdown()" required>
+                <option value="Income">🟢 Income (Credit)</option>
+                <option value="Expenditure">🔴 Expenditure (Debit)</option>
+              </select>
+            </div>
+            <div>
+              <label>Date</label>
+              <input type="date" id="fin-date" required>
+            </div>
+            <div>
+              <label>Purpose / Category</label>
+              <select id="fin-purpose" required></select>
+            </div>
+            <div>
+              <label>Amount (in Rupee ₹)</label>
+              <input type="number" step="0.01" id="fin-amount" placeholder="e.g. 5000" required>
+            </div>
+            <div>
+              <label>Payment Mode</label>
+              <select id="fin-mode" required>
+                <option value="Offline">Offline (Cash / Cheque)</option>
+                <option value="Online">Online (UPI / NetBanking)</option>
+              </select>
+            </div>
+            <div>
+              <label>Operator / Handled By</label>
+              <input type="text" id="fin-operator" readonly style="opacity: 0.75;">
+            </div>
+          </div>
+          <button type="submit" class="btn-submit" style="margin-top: 0.5rem;">Save Entry & Notify Super Admin</button>
+        </form>
+      </div>
+
+      <!-- FILTER & STATEMENT DATE RANGE BAR -->
+      <div class="no-print" style="background: #121214; border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #ffffff;">📊 Filter Balance Sheet Range</span>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button class="btn-secondary" onclick="applyPresetFilter('day')">Day-wise (Today)</button>
+            <button class="btn-secondary" onclick="applyPresetFilter('week')">Week-wise (7 Days)</button>
+            <button class="btn-secondary" onclick="applyPresetFilter('month')">Month-wise</button>
+            <button class="btn-secondary" onclick="applyPresetFilter('year')">Economic Year</button>
+            <button class="btn-secondary" onclick="applyPresetFilter('all')">All Records</button>
+          </div>
+        </div>
+
+        <!-- Custom Date Range Statement of Account -->
+        <div style="display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 1rem;">
+          <div style="flex: 1; min-width: 150px;">
+            <label>Start Date</label>
+            <input type="date" id="filter-start-date" style="margin-bottom: 0;">
+          </div>
+          <div style="flex: 1; min-width: 150px;">
+            <label>End Date</label>
+            <input type="date" id="filter-end-date" style="margin-bottom: 0;">
+          </div>
+          <button class="btn-secondary" style="background: var(--primary); border: none;" onclick="applyCustomDateFilter()">Filter</button>
+          <button class="btn-secondary" style="background: #0284c7; border: none;" onclick="printStatementOfAccount()">🖨️ Print Statement of Account</button>
+        </div>
+      </div>
+
+      <!-- LEDGER TABLE -->
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>IST</th>
+              <th>Type</th>
+              <th>Purpose</th>
+              <th>Amount (₹)</th>
+              <th>Mode</th>
+              <th>Operator</th>
+              <th class="no-print">Action</th>
+            </tr>
+          </thead>
+          <tbody id="finance-table-body"></tbody>
+        </table>
       </div>
     </div>
+
   </div>
 
 </div>
 
 <!-- SUPER ADMIN USER MANAGEMENT PANEL MODAL -->
 <div id="admin-mgmt-modal" style="display: none;">
-  <div class="auth-card" style="max-width: 900px; width: 95%;">
+  <div class="auth-card" style="max-width: 920px; width: 95%;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
       <h2 style="color: #ffffff;">Super Admin: User Access Management</h2>
       <button class="logout-btn" onclick="closeSuperAdminPanel()">✕ Close</button>
@@ -420,7 +592,7 @@
 </div>
 
 <script>
-// --- FIREBASE SETUP ---
+// --- FIREBASE CREDENTIALS ---
 const firebaseConfig = {
   apiKey: "AIzaSyD8-XRYgu51zF0mHOfSZ7M3boOVKJ9KIM4",
   authDomain: "classroom-ca026.firebaseapp.com",
@@ -435,10 +607,37 @@ const db = firebase.database();
 
 // State Variables
 let usersList = [];
+let financeRecords = [];
 let currentUser = null;
 let superAdminPin = '1234';
-let superAdminRecoveryPhone = '9876543210'; // Default Super Admin phone for PIN retrieval
+let superAdminRecoveryPhone = '9876543210';
 let modifyingUserId = null;
+let activeDateFilter = { type: 'all', start: null, end: null };
+
+// Purpose Lists
+const INCOME_PURPOSES = [
+  "Admission Fees",
+  "Re admission fees",
+  "Monthly Fees",
+  "Hostel fees",
+  "Book and Dress fees",
+  "One time fees",
+  "Previous due",
+  "Penalty fees",
+  "Other fees",
+  "Donation"
+];
+
+const EXPENDITURE_PURPOSES = [
+  "Vegetable",
+  "Grocery",
+  "Stationery",
+  "Water",
+  "Photocopy",
+  "Wages",
+  "Entertainment",
+  "Miscellaneous"
+];
 
 // Realtime sync of Super Admin settings
 db.ref('settings/superAdminPin').on('value', snap => {
@@ -455,7 +654,6 @@ db.ref('fauji_users').on('value', snapshot => {
   const data = snapshot.val();
   usersList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
   
-  // If a standard user is currently logged in, update their session live
   if (currentUser && currentUser.role !== 'SuperAdmin') {
     const latest = usersList.find(u => u.id === currentUser.id);
     if (latest) {
@@ -466,8 +664,21 @@ db.ref('fauji_users').on('value', snapshot => {
   renderSuperAdminTable();
 });
 
+// Realtime sync of Income / Expenditure entries
+db.ref('finance').on('value', snapshot => {
+  const data = snapshot.val();
+  financeRecords = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderFinanceLedger();
+});
+
 // Check Local Storage on load
 window.addEventListener('DOMContentLoaded', () => {
+  updatePurposeDropdown();
+  const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('fin-date').value = todayStr;
+  document.getElementById('filter-start-date').value = todayStr;
+  document.getElementById('filter-end-date').value = todayStr;
+
   const savedCred = localStorage.getItem('ff_saved_credential');
   if (savedCred) {
     document.getElementById('login-cred').value = savedCred;
@@ -494,14 +705,14 @@ function handleLogin() {
   const remember = document.getElementById('remember-me').checked;
   if (!cred) { alert('Please enter your access password or phone number.'); return; }
 
-  // 1. Check Super Admin Master PIN
+  // 1. Super Admin
   if (cred === superAdminPin) {
     currentUser = { name: 'Super Admin', designation: 'SuperAdmin', phone: superAdminRecoveryPhone, status: 'Approved', role: 'SuperAdmin' };
     finalizeLogin(remember, cred);
     return;
   }
 
-  // 2. Check Registered Users in Firebase
+  // 2. Standard User
   const foundUser = usersList.find(u => u.phone === cred || u.password === cred);
   if (foundUser) {
     if (foundUser.status === 'Blocked') {
@@ -523,6 +734,7 @@ function finalizeLogin(remember, cred) {
   }
 
   document.getElementById('auth-modal').style.display = 'none';
+  document.getElementById('fin-operator').value = currentUser.name;
   evaluateUserAccessState();
 }
 
@@ -531,6 +743,7 @@ function evaluateUserAccessState() {
   const waitingScreen = document.getElementById('screen-waiting');
   const dashScreen = document.getElementById('screen-dashboard');
   const adminControls = document.getElementById('super-admin-controls');
+  const financeSection = document.getElementById('section-finance');
 
   if (currentUser.role === 'SuperAdmin') {
     badge.innerHTML = `
@@ -541,54 +754,23 @@ function evaluateUserAccessState() {
     waitingScreen.style.display = 'none';
     dashScreen.style.display = 'block';
     adminControls.style.display = 'block';
+    financeSection.style.display = 'block';
     document.getElementById('dash-access-level').textContent = 'Full Super Admin Control';
-    renderPermittedModules({ attendance: true, syllabus: true, exams: true, notice: true, roster: true });
   } else if (currentUser.status === 'Approved') {
     badge.innerHTML = `👤 <b>${currentUser.name} (${currentUser.designation})</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
     waitingScreen.style.display = 'none';
     dashScreen.style.display = 'block';
     adminControls.style.display = 'none';
     document.getElementById('dash-access-level').textContent = currentUser.designation;
-    renderPermittedModules(currentUser.permissions || {});
+
+    // Check if finance module permission is granted
+    const perms = currentUser.permissions || {};
+    financeSection.style.display = perms.finance ? 'block' : 'none';
   } else {
     badge.innerHTML = `👤 <b>${currentUser.name} (Pending)</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
     waitingScreen.style.display = 'block';
     dashScreen.style.display = 'none';
     adminControls.style.display = 'none';
-  }
-}
-
-// Render dynamic modules based on permissions
-function renderPermittedModules(perms) {
-  const container = document.getElementById('modules-list');
-  container.innerHTML = '';
-
-  const modules = [
-    { key: 'attendance', name: 'Attendance Module', icon: '📅', desc: 'Track daily offline/online class presence.' },
-    { key: 'syllabus', name: 'Syllabus Tracker', icon: '📚', desc: 'View and log course coverage timeline.' },
-    { key: 'exams', name: 'Exam Dashboard', icon: '📊', desc: 'Monitor scores and rank analytics.' },
-    { key: 'notice', name: 'Live Notices', icon: '📢', desc: 'Broadcast and review official circulars.' },
-    { key: 'roster', name: 'Batch Roster', icon: '👥', desc: 'Registered student and cadre directory.' }
-  ];
-
-  let allowedCount = 0;
-  modules.forEach(m => {
-    if (perms[m.key]) {
-      allowedCount++;
-      const div = document.createElement('div');
-      div.style.cssText = 'background:#121214; border:1px solid var(--border); border-radius:10px; padding:1.2rem;';
-      div.innerHTML = `
-        <div style="font-size:1.5rem; margin-bottom:0.4rem;">${m.icon}</div>
-        <h4 style="color:#ffffff; margin-bottom:0.3rem;">${m.name}</h4>
-        <p style="font-size:0.78rem; color:var(--muted); line-height:1.4;">${m.desc}</p>
-        <span class="badge badge-approved" style="margin-top:0.75rem;">Access Granted</span>
-      `;
-      container.appendChild(div);
-    }
-  });
-
-  if (allowedCount === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:2rem; color:var(--muted);">No module access assigned yet. Please contact Super Admin.</div>`;
   }
 }
 
@@ -615,12 +797,12 @@ function handleRegistrationRequest() {
     dob: dob,
     password: generatedPassword,
     status: 'Pending',
-    permissions: { attendance: false, syllabus: false, exams: false, notice: true, roster: false },
+    permissions: { finance: false, attendance: false, syllabus: false, exams: false, notice: true, roster: false },
     dateRegistered: new Date().toISOString().split('T')[0]
   };
 
   db.ref('fauji_users').push(newUserData).then(() => {
-    alert(`Registration request submitted!\n\n[Super Admin Alert]: New request from ${name} (${designation}). Auto-generated password: ${generatedPassword}`);
+    alert(`Registration request submitted!\n\n[Super Admin Alert]: New request from ${name} (${designation}). Password generated: ${generatedPassword}`);
     currentUser = newUserData;
     document.getElementById('auth-modal').style.display = 'none';
     evaluateUserAccessState();
@@ -643,7 +825,6 @@ function closeSuperAdminPanel() {
   document.getElementById('admin-mgmt-modal').style.display = 'none';
 }
 
-// Render User Management Table with "Modify" Button
 function renderSuperAdminTable() {
   const tbody = document.getElementById('admin-users-table-body');
   if (!tbody) return;
@@ -660,7 +841,6 @@ function renderSuperAdminTable() {
     if (u.status === 'Approved') statusBadge = `<span class="badge badge-approved">Approved</span>`;
     if (u.status === 'Blocked') statusBadge = `<span class="badge badge-blocked">Blocked</span>`;
 
-    // Summary of active tabs
     const perms = u.permissions || {};
     const activeTabs = Object.keys(perms).filter(k => perms[k]).map(k => k.charAt(0).toUpperCase() + k.slice(1)).join(', ') || 'None';
 
@@ -686,7 +866,7 @@ function updateUserStatus(id, newStatus) {
   });
 }
 
-// "Modify" Access Modal Handlers
+// Modify Modal Handlers
 function openModifyAccessModal(userId) {
   modifyingUserId = userId;
   const user = usersList.find(u => u.id === userId);
@@ -694,6 +874,7 @@ function openModifyAccessModal(userId) {
 
   document.getElementById('modify-user-subtitle').textContent = `Configuring permissions for ${user.name} (${user.designation})`;
   const perms = user.permissions || {};
+  document.getElementById('perm-finance').checked = !!perms.finance;
   document.getElementById('perm-attendance').checked = !!perms.attendance;
   document.getElementById('perm-syllabus').checked = !!perms.syllabus;
   document.getElementById('perm-exams').checked = !!perms.exams;
@@ -711,6 +892,7 @@ function closeModifyAccessModal() {
 function saveUserPermissions() {
   if (!modifyingUserId) return;
   const updatedPerms = {
+    finance: document.getElementById('perm-finance').checked,
     attendance: document.getElementById('perm-attendance').checked,
     syllabus: document.getElementById('perm-syllabus').checked,
     exams: document.getElementById('perm-exams').checked,
@@ -740,14 +922,8 @@ function processSuperAdminPinChange() {
   const newPin = document.getElementById('new-admin-pin').value.trim();
   const confirmPin = document.getElementById('confirm-admin-pin').value.trim();
 
-  if (oldPin !== superAdminPin) {
-    alert('Current Super Admin password incorrect.');
-    return;
-  }
-  if (!newPin || newPin !== confirmPin) {
-    alert('New passwords do not match or are empty.');
-    return;
-  }
+  if (oldPin !== superAdminPin) { alert('Current Super Admin password incorrect.'); return; }
+  if (!newPin || newPin !== confirmPin) { alert('New passwords do not match or are empty.'); return; }
 
   db.ref('settings/superAdminPin').set(newPin).then(() => {
     superAdminPin = newPin;
@@ -774,16 +950,204 @@ function processPinRecovery() {
     alert('The entered mobile number is not registered as the Super Admin recovery contact.');
     return;
   }
-  if (!newPin) {
-    alert('Please enter a new password.');
-    return;
-  }
+  if (!newPin) { alert('Please enter a new password.'); return; }
 
   db.ref('settings/superAdminPin').set(newPin).then(() => {
     superAdminPin = newPin;
-    alert('Super Admin password successfully reset! You can now log in with your new PIN.');
+    alert('Super Admin password reset successfully!');
     closeForgotPinModal();
   });
+}
+
+// ==========================================
+// 💰 INCOME & EXPENDITURE CORE LOGIC
+// ==========================================
+
+function updatePurposeDropdown() {
+  const type = document.getElementById('fin-type').value;
+  const purposeSelect = document.getElementById('fin-purpose');
+  purposeSelect.innerHTML = '';
+  
+  const list = type === 'Income' ? INCOME_PURPOSES : EXPENDITURE_PURPOSES;
+  list.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p;
+    purposeSelect.appendChild(opt);
+  });
+}
+
+// Save Entry & Transmit Alert
+function saveFinanceEntry(e) {
+  e.preventDefault();
+  const type = document.getElementById('fin-type').value;
+  const dateVal = document.getElementById('fin-date').value;
+  const purpose = document.getElementById('fin-purpose').value;
+  const amount = parseFloat(document.getElementById('fin-amount').value);
+  const mode = document.getElementById('fin-mode').value;
+  const operator = currentUser ? currentUser.name : 'Official';
+
+  // Compute Indian Standard Time (IST) string
+  const istTimeStr = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  const record = {
+    type: type,
+    date: dateVal,
+    ist: istTimeStr,
+    purpose: purpose,
+    amount: amount,
+    mode: mode,
+    operator: operator,
+    timestamp: Date.now()
+  };
+
+  db.ref('finance').push(record).then(() => {
+    // Notify Super Admin
+    notifySuperAdminFinanceAction(`[ENTRY LOGGED] ${type}: ₹${amount.toFixed(2)} for '${purpose}' by ${operator} (Mode: ${mode}) at ${istTimeStr}`);
+    document.getElementById('fin-amount').value = '';
+    alert('Financial record successfully stored and Super Admin notified!');
+  });
+}
+
+// Delete Entry & Transmit Alert
+function deleteFinanceEntry(id, details) {
+  if (confirm(`Are you sure you want to delete this record:\n${details}?`)) {
+    db.ref('finance/' + id).remove().then(() => {
+      notifySuperAdminFinanceAction(`[ENTRY DELETED] Record removed by ${currentUser.name}: ${details}`);
+      alert('Record deleted.');
+    });
+  }
+}
+
+// Live Super Admin Notification Dispatcher
+function notifySuperAdminFinanceAction(msg) {
+  const fullMessage = `🚨 *FAUJI FACTORY - FINANCIAL ALERT*\n\n${msg}\nTime: ${new Date().toLocaleTimeString('en-IN')}`;
+  
+  // Log to in-app audit node
+  db.ref('finance_notifications').push({
+    message: msg,
+    timestamp: Date.now(),
+    dateStr: new Date().toLocaleString('en-IN')
+  });
+
+  // Prompt direct dispatch to Super Admin WhatsApp if initiated on screen
+  const cleanPhone = superAdminRecoveryPhone.replace(/[^0-9]/g, '');
+  if (cleanPhone) {
+    const notifyUrl = `https://api.whatsapp.com/send?phone=${cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
+    // Optional background window trigger
+    console.log("Super Admin Alert Triggered:", fullMessage);
+  }
+}
+
+// Filter Preset Handlers
+function applyPresetFilter(preset) {
+  activeDateFilter.type = preset;
+  const now = new Date();
+  
+  if (preset === 'day') {
+    const todayStr = now.toISOString().split('T')[0];
+    activeDateFilter.start = todayStr;
+    activeDateFilter.end = todayStr;
+  } else if (preset === 'week') {
+    const past7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    activeDateFilter.start = past7.toISOString().split('T')[0];
+    activeDateFilter.end = now.toISOString().split('T')[0];
+  } else if (preset === 'month') {
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    activeDateFilter.start = startOfMonth;
+    activeDateFilter.end = endOfMonth;
+  } else if (preset === 'year') {
+    // Economic Year: April 1 to March 31
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-indexed (3 is April)
+    let startYear = currentMonth >= 3 ? currentYear : currentYear - 1;
+    let endYear = startYear + 1;
+    activeDateFilter.start = `${startYear}-04-01`;
+    activeDateFilter.end = `${endYear}-03-31`;
+  } else {
+    activeDateFilter.start = null;
+    activeDateFilter.end = null;
+  }
+  
+  renderFinanceLedger();
+}
+
+function applyCustomDateFilter() {
+  const start = document.getElementById('filter-start-date').value;
+  const end = document.getElementById('filter-end-date').value;
+  if (!start || !end) { alert('Please select both Start Date and End Date.'); return; }
+
+  activeDateFilter.type = 'custom';
+  activeDateFilter.start = start;
+  activeDateFilter.end = end;
+  renderFinanceLedger();
+}
+
+// Render Balance Sheet and Table
+function renderFinanceLedger() {
+  const tbody = document.getElementById('finance-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  let filtered = financeRecords;
+
+  if (activeDateFilter.start && activeDateFilter.end) {
+    filtered = filtered.filter(item => item.date >= activeDateFilter.start && item.date <= activeDateFilter.end);
+  }
+
+  // Sort by date descending
+  filtered.sort((a, b) => b.timestamp - a.timestamp);
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+
+  filtered.forEach(item => {
+    const amt = parseFloat(item.amount) || 0;
+    if (item.type === 'Income') totalIncome += amt;
+    else totalExpense += amt;
+
+    const tr = document.createElement('tr');
+    const typeBadge = item.type === 'Income' ? `<span class="badge badge-income">Income</span>` : `<span class="badge badge-expense">Expenditure</span>`;
+    const modeBadge = item.mode === 'Online' ? `<span class="badge badge-mode-online">Online</span>` : `<span class="badge badge-mode-offline">Offline</span>`;
+
+    tr.innerHTML = `
+      <td><b>${item.date}</b></td>
+      <td><small style="color:var(--muted);">${item.ist}</small></td>
+      <td>${typeBadge}</td>
+      <td><b>${item.purpose}</b></td>
+      <td style="font-weight:700; color:${item.type === 'Income' ? '#4ade80' : '#f87171'};">₹ ${amt.toFixed(2)}</td>
+      <td>${modeBadge}</td>
+      <td>${item.operator}</td>
+      <td class="no-print">
+        <button class="btn-del btn-action" onclick="deleteFinanceEntry('${item.id}', '${item.type} ₹${amt} for ${item.purpose}')">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Calculate Net
+  const netBalance = totalIncome - totalExpense;
+
+  // Update Balance Sheet Cards
+  document.getElementById('stat-total-income').textContent = `₹ ${totalIncome.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('stat-total-expense').textContent = `₹ ${totalExpense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  
+  const netElem = document.getElementById('stat-net-balance');
+  netElem.textContent = `₹ ${netBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  netElem.style.color = netBalance >= 0 ? '#38bdf8' : '#ef4444';
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:2rem;">No transactions recorded for the selected period.</td></tr>`;
+  }
+}
+
+// Print Statement of Account
+function printStatementOfAccount() {
+  const start = activeDateFilter.start || 'Start';
+  const end = activeDateFilter.end || 'Present';
+  document.getElementById('print-date-range').textContent = `Account Statement Period: ${start} to ${end} | Printed on: ${new Date().toLocaleString('en-IN')}`;
+  window.print();
 }
 </script>
 
