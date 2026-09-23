@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FAUJI FACTORY | Official Portal</title>
+<title>FAUJI FACTORY | Official Command Portal</title>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -11,29 +11,29 @@
 
 <style>
   :root {
-    --primary: #dc2626; /* Red */
+    --primary: #dc2626;
     --primary-dark: #b91c1c;
     --primary-gradient: linear-gradient(135deg, #000000 0%, #dc2626 100%);
-    --bg: #09090b; /* Deep Black */
-    --card: #18181b; /* Charcoal Card */
-    --text: #f4f4f5; /* Pure White */
+    --bg: #09090b;
+    --card: #18181b;
+    --text: #f4f4f5;
     --muted: #a1a1aa;
     --border: #27272a;
     --danger: #ef4444;
     --success: #22c55e;
+    --warning: #f59e0b;
     --radius: 12px;
     --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-  body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; -webkit-font-smoothing: antialiased; }
+  body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
 
-  /* Header */
   header {
     background: #000000;
     color: #ffffff;
     border-bottom: 2px solid var(--primary);
-    padding: 1rem 1.5rem;
+    padding: 0.85rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -51,9 +51,9 @@
     border-radius: 8px;
     letter-spacing: 1px;
   }
-  .app-title { font-size: 1.25rem; font-weight: 900; letter-spacing: 0.5px; color: #ffffff; }
-  .app-sub { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  
+  .app-title { font-size: 1.2rem; font-weight: 900; letter-spacing: 0.5px; color: #ffffff; }
+  .app-sub { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
   .user-badge {
     display: flex;
     align-items: center;
@@ -63,7 +63,6 @@
     padding: 0.4rem 0.85rem;
     border-radius: 20px;
     font-size: 0.82rem;
-    flex-wrap: wrap;
   }
   .header-btn {
     background: #27272a;
@@ -74,9 +73,7 @@
     font-weight: 700;
     font-size: 0.72rem;
     cursor: pointer;
-    transition: background 0.15s;
   }
-  .header-btn:hover { background: #3f3f46; }
   .logout-btn {
     background: var(--primary);
     color: white;
@@ -88,8 +85,130 @@
     cursor: pointer;
   }
 
-  /* Modals */
-  #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal {
+  nav.main-nav {
+    background: #121214;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    overflow-x: auto;
+    position: sticky;
+    top: 55px;
+    z-index: 90;
+  }
+  nav.main-nav button {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  nav.main-nav button.active {
+    background: #000000;
+    color: #ffffff;
+    border-color: var(--primary);
+  }
+
+  .container { max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .app-section { display: none; }
+  .app-section.active { display: block; animation: fadeIn 0.2s ease-in-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+
+  label { font-size: 0.75rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    background: #000000;
+    color: #ffffff;
+    margin-bottom: 1rem;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .btn-submit {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-submit:hover { background: var(--primary-dark); }
+  .btn-secondary {
+    background: #27272a;
+    color: #ffffff;
+    border: 1px solid #3f3f46;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .btn-action { padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer; border: none; margin-right: 4px; }
+  .btn-approve { background: #15803d; color: white; }
+  .btn-block { background: #b91c1c; color: white; }
+  .btn-modify { background: #2563eb; color: white; }
+  .btn-readmit { background: #0284c7; color: white; }
+  .btn-readmit:disabled { background: #3f3f46; color: #71717a; cursor: not-allowed; }
+
+  .photo-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+    background: #000000;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px dashed var(--border);
+  }
+  .photo-preview {
+    width: 90px;
+    height: 100px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    object-fit: cover;
+    background: #18181b;
+  }
+
+  .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+  .badge-active { background: #14532d; color: #bbf7d0; }
+  .badge-inactive { background: #3f3f46; color: #d4d4d8; }
+  .badge-left { background: #713f12; color: #fde047; }
+  .badge-suspended { background: #7f1d1d; color: #fecaca; }
+
+  .table-responsive { overflow-x: auto; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; background: #000000; }
+  th, td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  th { background: #121214; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  tr:hover td { background: #18181b; }
+
+  #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.85);
@@ -104,7 +223,7 @@
     border: 1px solid var(--border);
     border-radius: 16px;
     width: 92%;
-    max-width: 460px;
+    max-width: 480px;
     padding: 2rem;
     box-shadow: var(--shadow-lg);
   }
@@ -120,114 +239,9 @@
     color: var(--muted);
     cursor: pointer;
     border-radius: 6px;
-    transition: all 0.15s;
   }
   .auth-tab-btn.active { background: var(--primary); color: white; }
 
-  /* Container */
-  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.75rem;
-    margin-bottom: 1.25rem;
-    box-shadow: var(--shadow-lg);
-  }
-
-  /* Form Elements */
-  label { font-size: 0.75rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.5px; }
-  input, select {
-    width: 100%;
-    padding: 0.7rem 0.9rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.92rem;
-    outline: none;
-    background: #000000;
-    color: #ffffff;
-    margin-bottom: 1rem;
-  }
-  input:focus, select:focus { border-color: var(--primary); }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.85rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .btn-submit {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.9rem;
-    cursor: pointer;
-    width: 100%;
-    transition: background 0.15s;
-  }
-  .btn-submit:hover { background: var(--primary-dark); }
-
-  .btn-secondary {
-    background: #27272a;
-    color: #ffffff;
-    border: 1px solid #3f3f46;
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .btn-secondary:hover { background: #3f3f46; }
-
-  .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
-  .badge-pending { background: #78350f; color: #fde68a; }
-  .badge-approved { background: #14532d; color: #bbf7d0; }
-  .badge-blocked { background: #7f1d1d; color: #fecaca; }
-
-  /* Income & Expense Tints */
-  .badge-income { background: #14532d; color: #86efac; border: 1px solid #22c55e; }
-  .badge-expense { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
-  .badge-mode-online { background: #0c4a6e; color: #7dd3fc; }
-  .badge-mode-offline { background: #713f12; color: #fde047; }
-
-  /* Balance Sheet Stat Cards */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .stat-box {
-    background: #000000;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-    text-align: center;
-  }
-  .stat-lbl { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .stat-val { font-size: 1.6rem; font-weight: 900; margin-top: 0.35rem; }
-
-  /* Tables */
-  .table-responsive { overflow-x: auto; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; background: #000000; }
-  th, td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-  th { background: #121214; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
-  tr:hover td { background: #18181b; }
-
-  .btn-action { padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer; border: none; margin-right: 4px; margin-bottom: 4px; }
-  .btn-approve { background: #15803d; color: white; }
-  .btn-block { background: #b91c1c; color: white; }
-  .btn-modify { background: #2563eb; color: white; }
-  .btn-del { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; cursor: pointer; }
-
-  /* Tab Permission Toggles */
   .permission-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -246,10 +260,9 @@
   .perm-item input[type="checkbox"] { width: auto; margin: 0; }
   .perm-item label { margin: 0; cursor: pointer; color: #f4f4f5; text-transform: none; font-size: 0.85rem; }
 
-  /* Print Section */
   @media print {
     body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
-    header, #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, .no-print, .form-container, .btn-action, .btn-del { display: none !important; }
+    header, nav.main-nav, .no-print, .btn-action, button, input, select { display: none !important; }
     .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
     .card { background: white !important; color: black !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
     table { width: 100% !important; border: 1px solid #000000 !important; background: white !important; color: black !important; }
@@ -262,24 +275,23 @@
 </head>
 <body>
 
-<!-- AUTHENTICATION / REGISTRATION MODAL -->
+<!-- AUTH MODAL -->
 <div id="auth-modal">
   <div class="auth-card">
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;">
       <div class="app-logo-badge">FF</div>
       <h2>FAUJI FACTORY</h2>
     </div>
-    <p style="font-size: 0.82rem; color: var(--muted);">Restricted Secure Access Portal</p>
+    <p style="font-size: 0.82rem; color: var(--muted);">Official Command & Cadet Portal</p>
     
     <div class="auth-tabs">
       <button class="auth-tab-btn active" onclick="switchAuthTab('login')">Existing Login</button>
-      <button class="auth-tab-btn" onclick="switchAuthTab('register')">First-Time Registration</button>
+      <button class="auth-tab-btn" onclick="switchAuthTab('register')">New Registration</button>
     </div>
 
-    <!-- Login View -->
     <div id="auth-login-view">
       <label>Registered Mobile Number or Password</label>
-      <input type="password" id="login-cred" placeholder="Enter your entry password">
+      <input type="password" id="login-cred" placeholder="Enter password or mobile">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
           <input type="checkbox" id="remember-me" style="width: auto; margin: 0;">
@@ -287,49 +299,40 @@
         </div>
         <a href="javascript:void(0)" onclick="openForgotPinModal()" style="font-size: 0.75rem; color: var(--primary); text-decoration: none; font-weight: 700;">Forgot Super Admin PIN?</a>
       </div>
-      <button class="btn-submit" onclick="handleLogin()">Access Portal</button>
-      <p style="font-size: 0.74rem; color: var(--muted); margin-top: 0.8rem; text-align: center;">Default Master PIN is <b>1234</b></p>
+      <button class="btn-submit" style="width: 100%;" onclick="handleLogin()">Access Portal</button>
+      <p style="font-size: 0.74rem; color: var(--muted); margin-top: 0.8rem; text-align: center;">Super Admin default PIN: <b>1234</b></p>
     </div>
 
-    <!-- First-Time Registration View -->
     <div id="auth-register-view" style="display: none;">
       <label>Full Name</label>
       <input type="text" id="reg-name" placeholder="Enter full name">
-
       <label>Designation</label>
       <select id="reg-designation">
         <option value="Official">Official</option>
         <option value="Faculty">Faculty</option>
-        <option value="Student">Student</option>
+        <option value="Student">Cadet / Student</option>
       </select>
-
-      <label>Mobile Number (Primary ID)</label>
-      <input type="tel" id="reg-phone" placeholder="10-digit mobile number">
-
-      <label>Date of Birth (DOB)</label>
-      <input type="date" id="reg-dob">
-
-      <button class="btn-submit" onclick="handleRegistrationRequest()" style="background: #18181b; border: 1px solid var(--primary);">Submit Registration Request</button>
-      <p style="font-size: 0.74rem; color: var(--muted); margin-top: 0.8rem; text-align: center;">Credentials will be forwarded to Super Admin for authorization.</p>
+      <label>Mandatory Mobile Number (For Entry & SMS)</label>
+      <input type="tel" id="reg-phone" placeholder="10-digit primary mobile number" required>
+      <label>Date of Birth</label>
+      <input type="date" id="reg-dob" required>
+      <button class="btn-submit" style="width: 100%; background: #18181b; border: 1px solid var(--primary);" onclick="handleRegistrationRequest()">Submit Registration</button>
+      <p style="font-size: 0.72rem; color: var(--muted); margin-top: 0.75rem; text-align: center;">Registration notice will be transmitted to Super Admin.</p>
     </div>
   </div>
 </div>
 
-<!-- CHANGE SUPER ADMIN PASSWORD MODAL -->
+<!-- CHANGE SUPER ADMIN PIN MODAL -->
 <div id="change-pin-modal" style="display: none;">
   <div class="auth-card">
     <h2 style="font-size: 1.3rem;">🔐 Change Super Admin Password</h2>
-    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem;">Verify your current password to set a new Master PIN.</p>
-    
+    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem;">Verify old password to save a new Master PIN.</p>
     <label>Current Master Password</label>
     <input type="password" id="old-admin-pin" placeholder="Enter old password">
-
     <label>New Master Password</label>
     <input type="password" id="new-admin-pin" placeholder="Enter new password">
-
     <label>Confirm New Password</label>
     <input type="password" id="confirm-admin-pin" placeholder="Re-enter new password">
-
     <div style="display: flex; gap: 0.5rem;">
       <button class="btn-submit" onclick="processSuperAdminPinChange()">Save Password</button>
       <button class="btn-submit" style="background: #27272a;" onclick="closeChangePinModal()">Cancel</button>
@@ -337,18 +340,29 @@
   </div>
 </div>
 
-<!-- FORGOT SUPER ADMIN PASSWORD / RECOVERY MODAL -->
+<!-- SUPER ADMIN REGISTERED PHONE SETTINGS MODAL -->
+<div id="super-admin-phone-modal" style="display: none;">
+  <div class="auth-card">
+    <h2 style="font-size: 1.3rem;">📱 Super Admin Notification Number</h2>
+    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem;">All live input and modification alerts will be dispatched to this mobile number.</p>
+    <label>Super Admin Registered Mobile Number</label>
+    <input type="tel" id="super-admin-current-phone" placeholder="Enter 10-digit mobile number">
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="btn-submit" onclick="saveSuperAdminPhone()">Save Number</button>
+      <button class="btn-submit" style="background: #27272a;" onclick="closeSuperAdminPhoneModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT SUPER ADMIN PIN MODAL -->
 <div id="forgot-pin-modal" style="display: none;">
   <div class="auth-card">
     <h2 style="font-size: 1.3rem;">🆘 Super Admin Password Recovery</h2>
     <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem;">Verify registered Super Admin recovery mobile number.</p>
-    
-    <label>Registered Super Admin Mobile Number</label>
-    <input type="tel" id="recovery-mobile" placeholder="Enter 10-digit registered number">
-
+    <label>Registered Super Admin Mobile</label>
+    <input type="tel" id="recovery-mobile" placeholder="Enter 10-digit number">
     <label>New Master Password</label>
     <input type="password" id="recovery-new-pin" placeholder="Enter new password">
-
     <div style="display: flex; gap: 0.5rem;">
       <button class="btn-submit" onclick="processPinRecovery()">Verify & Reset</button>
       <button class="btn-submit" style="background: #27272a;" onclick="closeForgotPinModal()">Cancel</button>
@@ -359,36 +373,22 @@
 <!-- MODIFY USER ACCESS PERMISSIONS MODAL -->
 <div id="modify-access-modal" style="display: none;">
   <div class="auth-card" style="max-width: 520px;">
-    <h2 style="font-size: 1.3rem;">⚙️ Modify Tab Access</h2>
-    <p style="font-size: 0.82rem; color: var(--muted);" id="modify-user-subtitle">Customize permissions for user.</p>
-    
+    <h2 style="font-size: 1.3rem;">⚙️ Modify User Tab Access</h2>
+    <p style="font-size: 0.82rem; color: var(--muted);" id="modify-user-subtitle">Set permissions for user.</p>
     <div class="permission-grid">
+      <div class="perm-item">
+        <input type="checkbox" id="perm-admission">
+        <label for="perm-admission">📝 Student Admission</label>
+      </div>
+      <div class="perm-item">
+        <input type="checkbox" id="perm-roster">
+        <label for="perm-roster">👥 Student Directory</label>
+      </div>
       <div class="perm-item">
         <input type="checkbox" id="perm-finance">
         <label for="perm-finance">💰 Income & Expenditure</label>
       </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-attendance">
-        <label for="perm-attendance">📅 Attendance</label>
-      </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-syllabus">
-        <label for="perm-syllabus">📚 Syllabus</label>
-      </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-exams">
-        <label for="perm-exams">📊 Exam Scores</label>
-      </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-notice">
-        <label for="perm-notice">📢 Notices</label>
-      </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-roster">
-        <label for="perm-roster">👥 Batch Roster</label>
-      </div>
     </div>
-
     <div style="display: flex; gap: 0.5rem;">
       <button class="btn-submit" onclick="saveUserPermissions()">Save Permissions</button>
       <button class="btn-submit" style="background: #27272a;" onclick="closeModifyAccessModal()">Cancel</button>
@@ -396,190 +396,32 @@
   </div>
 </div>
 
-<!-- HEADER -->
-<header>
-  <div class="app-branding">
-    <div class="app-logo-badge">FF</div>
-    <div>
-      <div class="app-title">FAUJI FACTORY</div>
-      <div class="app-sub">Secure Command Portal</div>
+<!-- STUDENT LIFETIME AUDIT & PROFILE MODAL -->
+<div id="student-profile-modal" style="display: none;">
+  <div class="auth-card" style="max-width: 800px; width: 95%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2 style="color: #ffffff;" id="modal-student-name">Cadet Lifetime Dossier</h2>
+      <button class="logout-btn" onclick="closeStudentProfileModal()">✕ Close</button>
     </div>
+    <div id="modal-student-content" style="max-height: 480px; overflow-y: auto;"></div>
   </div>
-  <div class="user-badge" id="user-display-badge">
-    <span>🔒 Authenticating...</span>
-    <button class="logout-btn" onclick="handleLogout()">Logout</button>
-  </div>
-</header>
-
-<div class="container">
-
-  <!-- PRINT HEADER -->
-  <div class="print-header">
-    <h1 style="font-size: 2rem; margin-bottom: 0.2rem;">FAUJI FACTORY</h1>
-    <h3 style="font-size: 1.1rem; color: #333;">STATEMENT OF ACCOUNT / FINANCIAL BALANCE SHEET</h3>
-    <p id="print-date-range" style="font-size: 0.9rem; color: #555; margin-top: 0.4rem;"></p>
-  </div>
-
-  <!-- PENDING / WAITING SCREEN -->
-  <div id="screen-waiting" class="card" style="text-align: center; padding: 3rem 1.5rem; display: none;">
-    <h1 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 0.5rem;">WELCOME TO FAUJI FACTORY</h1>
-    <div style="background: #000000; border: 1px solid var(--primary); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; display: inline-block; max-width: 500px; width: 100%;">
-      <p style="font-size: 1.05rem; font-weight: 700; color: #fde68a; line-height: 1.5;">
-        ⏳ WAIT WHILE THE SUPER ADMIN SETTLE YOUR SCORE AND ACCESS.
-      </p>
-      <p style="font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem;">
-        An authentication request has been transmitted to the Super Admin. Once reviewed, your permanent entry password and assigned tabs will be activated.
-      </p>
-    </div>
-  </div>
-
-  <!-- APPROVED MAIN DASHBOARD -->
-  <div id="screen-dashboard" style="display: none;">
-    
-    <!-- Top Command Overview Bar -->
-    <div class="card no-print" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <h2 style="font-size: 1.4rem; color: #ffffff;">Command Dashboard</h2>
-        <p style="font-size: 0.82rem; color: var(--muted);">Access Status: <span id="dash-access-level" style="color: var(--primary); font-weight: 700;">Standard</span></p>
-      </div>
-      <div id="super-admin-controls" style="display: none;">
-        <button class="btn-submit" style="width: auto; padding: 0.55rem 1.1rem; background: var(--primary);" onclick="openSuperAdminPanel()">⚙️ Manage User Access & Requests</button>
-      </div>
-    </div>
-
-    <!-- SECTION: INCOME & EXPENDITURE -->
-    <div id="section-finance" class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
-        <div>
-          <h2 style="font-size: 1.4rem; color: #ffffff;">💰 Income & Expenditure Management</h2>
-          <p style="font-size: 0.82rem; color: var(--muted);">Day-wise, Week-wise, Month-wise & Economic Year Balance Sheet</p>
-        </div>
-      </div>
-
-      <!-- BALANCE SHEET STATS CARDS -->
-      <div class="stats-grid">
-        <div class="stat-box" style="border-top: 4px solid var(--success);">
-          <div class="stat-lbl">Total Income</div>
-          <div class="stat-val" id="stat-total-income" style="color: #4ade80;">₹ 0.00</div>
-        </div>
-        <div class="stat-box" style="border-top: 4px solid var(--danger);">
-          <div class="stat-lbl">Total Expenditure</div>
-          <div class="stat-val" id="stat-total-expense" style="color: #f87171;">₹ 0.00</div>
-        </div>
-        <div class="stat-box" style="border-top: 4px solid #38bdf8;">
-          <div class="stat-lbl">Net Balance (Surplus/Deficit)</div>
-          <div class="stat-val" id="stat-net-balance" style="color: #38bdf8;">₹ 0.00</div>
-        </div>
-      </div>
-
-      <!-- ENTRY FORM (INCOME & EXPENDITURE) -->
-      <div class="form-container no-print" style="background: #000000; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
-        <h3 style="color: #ffffff; font-size: 1.05rem; margin-bottom: 1rem;" id="form-heading">Record New Financial Entry</h3>
-        <form onsubmit="saveFinanceEntry(event)">
-          <div class="form-grid">
-            <div>
-              <label>Transaction Type</label>
-              <select id="fin-type" onchange="updatePurposeDropdown()" required>
-                <option value="Income">🟢 Income (Credit)</option>
-                <option value="Expenditure">🔴 Expenditure (Debit)</option>
-              </select>
-            </div>
-            <div>
-              <label>Date</label>
-              <input type="date" id="fin-date" required>
-            </div>
-            <div>
-              <label>Purpose / Category</label>
-              <select id="fin-purpose" required></select>
-            </div>
-            <div>
-              <label>Amount (in Rupee ₹)</label>
-              <input type="number" step="0.01" id="fin-amount" placeholder="e.g. 5000" required>
-            </div>
-            <div>
-              <label>Payment Mode</label>
-              <select id="fin-mode" required>
-                <option value="Offline">Offline (Cash / Cheque)</option>
-                <option value="Online">Online (UPI / NetBanking)</option>
-              </select>
-            </div>
-            <div>
-              <label>Operator / Handled By</label>
-              <input type="text" id="fin-operator" readonly style="opacity: 0.75;">
-            </div>
-          </div>
-          <button type="submit" class="btn-submit" style="margin-top: 0.5rem;">Save Entry & Notify Super Admin</button>
-        </form>
-      </div>
-
-      <!-- FILTER & STATEMENT DATE RANGE BAR -->
-      <div class="no-print" style="background: #121214; border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
-          <span style="font-size: 0.85rem; font-weight: 700; color: #ffffff;">📊 Filter Balance Sheet Range</span>
-          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-            <button class="btn-secondary" onclick="applyPresetFilter('day')">Day-wise (Today)</button>
-            <button class="btn-secondary" onclick="applyPresetFilter('week')">Week-wise (7 Days)</button>
-            <button class="btn-secondary" onclick="applyPresetFilter('month')">Month-wise</button>
-            <button class="btn-secondary" onclick="applyPresetFilter('year')">Economic Year</button>
-            <button class="btn-secondary" onclick="applyPresetFilter('all')">All Records</button>
-          </div>
-        </div>
-
-        <!-- Custom Date Range Statement of Account -->
-        <div style="display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 1rem;">
-          <div style="flex: 1; min-width: 150px;">
-            <label>Start Date</label>
-            <input type="date" id="filter-start-date" style="margin-bottom: 0;">
-          </div>
-          <div style="flex: 1; min-width: 150px;">
-            <label>End Date</label>
-            <input type="date" id="filter-end-date" style="margin-bottom: 0;">
-          </div>
-          <button class="btn-secondary" style="background: var(--primary); border: none;" onclick="applyCustomDateFilter()">Filter</button>
-          <button class="btn-secondary" style="background: #0284c7; border: none;" onclick="printStatementOfAccount()">🖨️ Print Statement of Account</button>
-        </div>
-      </div>
-
-      <!-- LEDGER TABLE -->
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>IST</th>
-              <th>Type</th>
-              <th>Purpose</th>
-              <th>Amount (₹)</th>
-              <th>Mode</th>
-              <th>Operator</th>
-              <th class="no-print">Action</th>
-            </tr>
-          </thead>
-          <tbody id="finance-table-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
-
 </div>
 
 <!-- SUPER ADMIN USER MANAGEMENT PANEL MODAL -->
 <div id="admin-mgmt-modal" style="display: none;">
-  <div class="auth-card" style="max-width: 920px; width: 95%;">
+  <div class="auth-card" style="max-width: 960px; width: 95%;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
       <h2 style="color: #ffffff;">Super Admin: User Access Management</h2>
       <button class="logout-btn" onclick="closeSuperAdminPanel()">✕ Close</button>
     </div>
-    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem;">Review registration requests, modify tab access, approve, or throw out users anytime.</p>
-    
+    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem;">Authorize users, modify permissions, or remove access.</p>
     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
       <table>
         <thead>
           <tr>
             <th>Name & Pass</th>
             <th>Designation</th>
-            <th>Mobile</th>
+            <th>Registered Mobile</th>
             <th>Permitted Tabs</th>
             <th>Status</th>
             <th>Actions</th>
@@ -591,8 +433,286 @@
   </div>
 </div>
 
+<!-- HEADER -->
+<header>
+  <div class="app-branding">
+    <div class="app-logo-badge">FF</div>
+    <div>
+      <div class="app-title">FAUJI FACTORY</div>
+      <div class="app-sub">Command & Academy Portal</div>
+    </div>
+  </div>
+  <div class="user-badge" id="user-display-badge">
+    <span>🔒 Authenticating...</span>
+    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+  </div>
+</header>
+
+<!-- MAIN NAVIGATION -->
+<nav class="main-nav no-print" id="app-nav" style="display: none;">
+  <button id="nav-btn-admission" class="active" onclick="switchSection('section-admission')">📝 Student Admission</button>
+  <button id="nav-btn-roster" onclick="switchSection('section-roster')">👥 Student Directory & Audit</button>
+  <button id="nav-btn-finance" onclick="switchSection('section-finance')">💰 Income & Expenditure</button>
+</nav>
+
+<div class="container">
+
+  <!-- PRINT HEADER -->
+  <div class="print-header">
+    <h1>FAUJI FACTORY</h1>
+    <h3>OFFICIAL CADET REGISTRATION & ADMISSION RECORD</h3>
+    <p id="print-meta"></p>
+  </div>
+
+  <!-- PENDING / WAITING SCREEN -->
+  <div id="screen-waiting" class="card" style="text-align: center; padding: 3rem 1.5rem; display: none;">
+    <h1 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 0.5rem;">WELCOME TO FAUJI FACTORY</h1>
+    <div style="background: #000000; border: 1px solid var(--primary); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; display: inline-block; max-width: 500px; width: 100%;">
+      <p style="font-size: 1.05rem; font-weight: 700; color: #fde68a; line-height: 1.5;">
+        ⏳ WAIT WHILE THE SUPER ADMIN SETTLE YOUR SCORE AND ACCESS.
+      </p>
+      <p style="font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem;">
+        An authentication request has been transmitted to the Super Admin.
+      </p>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="screen-dashboard" style="display: none;">
+
+    <!-- TOP CONTROL BAR -->
+    <div class="card no-print" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 style="font-size: 1.4rem; color: #ffffff;">Command Terminal</h2>
+        <p style="font-size: 0.82rem; color: var(--muted);">Authorized Role: <span id="dash-access-level" style="color: var(--primary); font-weight: 700;">Standard</span></p>
+      </div>
+      <div id="super-admin-controls" style="display: none; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="btn-secondary" onclick="openSuperAdminPhoneModal()">📱 Super Admin Phone</button>
+        <button class="btn-submit" style="width: auto; padding: 0.55rem 1.1rem;" onclick="openSuperAdminPanel()">⚙️ Manage User Access & Permissions</button>
+      </div>
+    </div>
+
+    <!-- SECTION 1: STUDENT ADMISSION -->
+    <div id="section-admission" class="app-section active">
+      <div class="card">
+        <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.4rem;">📝 Student Admission Form</h2>
+        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.5rem;">Fill in verified cadet credentials for enrollment and lifetime tracking.</p>
+
+        <form onsubmit="handleStudentAdmission(event)">
+          <div class="photo-upload-wrapper">
+            <img id="cadet-photo-preview" class="photo-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='100' viewBox='0 0 90 100'><rect width='90' height='100' fill='%2327272a'/><text x='50%25' y='50%25' fill='%2371717a' font-size='12' text-anchor='middle' dy='.3em'>No Photo</text></svg>" alt="Cadet Photo">
+            <div style="flex: 1;">
+              <label>1. Cadet Picture (Local Device)</label>
+              <input type="file" id="adm-photo" accept="image/*" onchange="previewPhoto(event)" style="margin-bottom: 0;">
+              <small style="color: var(--muted); font-size: 0.72rem;">Accepts JPG, PNG, WEBP from device storage.</small>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label>2. Full Name</label>
+              <input type="text" id="adm-name" placeholder="Full name of cadet" required>
+            </div>
+            <div>
+              <label>3. Father's / Mother's / Husband's Name</label>
+              <input type="text" id="adm-guardian" placeholder="Guardian full name" required>
+            </div>
+            <div>
+              <label>4. Date of Birth (DOB)</label>
+              <input type="date" id="adm-dob" required>
+            </div>
+            <div>
+              <label>5. Primary Mobile Number (Mandatory)</label>
+              <input type="tel" id="adm-phone1" placeholder="10-digit primary mobile" required>
+            </div>
+            <div>
+              <label>Mobile Number 2 (Optional)</label>
+              <input type="tel" id="adm-phone2" placeholder="Secondary contact (optional)">
+            </div>
+            <div>
+              <label>Aadhaar Number</label>
+              <input type="text" id="adm-aadhaar" placeholder="12-digit Aadhaar number" required>
+            </div>
+            <div>
+              <label>6. Reference</label>
+              <input type="text" id="adm-reference" placeholder="Referred by / Source">
+            </div>
+            <div>
+              <label>7. Admission Date</label>
+              <input type="date" id="adm-date" required>
+            </div>
+            <div>
+              <label>8. Admission Fees (₹)</label>
+              <input type="number" step="0.01" id="adm-fee" placeholder="e.g. 5000" required>
+            </div>
+            <div>
+              <label>9. Monthly Fees (₹)</label>
+              <input type="number" step="0.01" id="adm-monthly-fee" placeholder="e.g. 2000" required>
+            </div>
+            <div>
+              <label>10. Hostel Fees (₹)</label>
+              <input type="number" step="0.01" id="adm-hostel-fee" placeholder="e.g. 3500 (if applicable)">
+            </div>
+            <div>
+              <label>11. Batch</label>
+              <select id="adm-batch" onchange="updateSectionDropdown()" required>
+                <option value="General">General</option>
+                <option value="Hostel">Hostel</option>
+              </select>
+            </div>
+            <div>
+              <label>12. Section</label>
+              <select id="adm-section" required></select>
+            </div>
+            <div>
+              <label>13. Course</label>
+              <select id="adm-course" required>
+                <option value="Defence">Defence</option>
+                <option value="Others">Others</option>
+                <option value="Both">Both</option>
+              </select>
+            </div>
+            <div>
+              <label>Status</label>
+              <select id="adm-status" onchange="toggleStatusCauseField()" required>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Left">Left</option>
+                <option value="Suspended">Suspended</option>
+              </select>
+            </div>
+            <div id="status-cause-container" style="display: none;">
+              <label>Cause / Reason for Status</label>
+              <input type="text" id="adm-status-cause" placeholder="Reason for inactive/left/suspension">
+            </div>
+            <div>
+              <label>14. Place (Native Town/City)</label>
+              <input type="text" id="adm-place" placeholder="City / District" required>
+            </div>
+          </div>
+
+          <div style="margin-top: 0.5rem;">
+            <label>15. Remarks</label>
+            <textarea id="adm-remarks" rows="2" placeholder="Special physical remarks, academic background..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" style="margin-top: 1rem; width: 100%;">Complete Cadet Admission</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- SECTION 2: STUDENT DIRECTORY & LIFETIME AUDIT -->
+    <div id="section-roster" class="app-section">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+          <div>
+            <h2 style="font-size: 1.35rem; color: #ffffff;">👥 Cadet Master Directory</h2>
+            <p style="font-size: 0.82rem; color: var(--muted);">Lifetime ledger, financial year renewal, and dues tracking.</p>
+          </div>
+          <input type="text" id="roster-search" class="no-print" placeholder="🔍 Search by name, phone or section..." onkeyup="renderCadetRosterTable()" style="max-width: 280px; margin-bottom: 0;">
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Cadet Details</th>
+                <th>Batch & Sec</th>
+                <th>Course</th>
+                <th>Admitted FY</th>
+                <th>Status</th>
+                <th>Dues Status</th>
+                <th class="no-print">Actions / Re-Admission</th>
+              </tr>
+            </thead>
+            <tbody id="cadet-roster-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: INCOME & EXPENDITURE -->
+    <div id="section-finance" class="app-section">
+      <div class="card">
+        <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.4rem;">💰 Income & Expenditure Management</h2>
+        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem;">Automated balance sheet and financial ledger.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="background:#000; border:1px solid var(--border); border-top: 4px solid var(--success); padding: 1rem; border-radius: 10px; text-align: center;">
+            <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">TOTAL INCOME</span>
+            <div id="fin-stat-income" style="font-size:1.4rem; font-weight:900; color:#4ade80; margin-top:0.25rem;">₹ 0.00</div>
+          </div>
+          <div style="background:#000; border:1px solid var(--border); border-top: 4px solid var(--danger); padding: 1rem; border-radius: 10px; text-align: center;">
+            <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">TOTAL EXPENDITURE</span>
+            <div id="fin-stat-expense" style="font-size:1.4rem; font-weight:900; color:#f87171; margin-top:0.25rem;">₹ 0.00</div>
+          </div>
+          <div style="background:#000; border:1px solid var(--border); border-top: 4px solid #38bdf8; padding: 1rem; border-radius: 10px; text-align: center;">
+            <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">NET BALANCE</span>
+            <div id="fin-stat-net" style="font-size:1.4rem; font-weight:900; color:#38bdf8; margin-top:0.25rem;">₹ 0.00</div>
+          </div>
+        </div>
+
+        <div class="no-print" style="background: #000; border:1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <h3 style="color:#fff; font-size:1rem; margin-bottom:0.75rem;">Log Financial Record</h3>
+          <form onsubmit="handleFinanceSubmit(event)">
+            <div class="form-grid">
+              <div>
+                <label>Type</label>
+                <select id="fin-type" onchange="updateFinancePurposeDropdown()" required>
+                  <option value="Income">🟢 Income</option>
+                  <option value="Expenditure">🔴 Expenditure</option>
+                </select>
+              </div>
+              <div>
+                <label>Date</label>
+                <input type="date" id="fin-date" required>
+              </div>
+              <div>
+                <label>Purpose</label>
+                <select id="fin-purpose" required></select>
+              </div>
+              <div>
+                <label>Amount (₹)</label>
+                <input type="number" step="0.01" id="fin-amount" placeholder="Amount" required>
+              </div>
+              <div>
+                <label>Payment Mode</label>
+                <select id="fin-mode" required>
+                  <option value="Offline">Offline</option>
+                  <option value="Online">Online</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn-submit">Record & Notify Super Admin</button>
+          </form>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>IST</th>
+                <th>Type</th>
+                <th>Purpose</th>
+                <th>Amount (₹)</th>
+                <th>Mode</th>
+                <th>Operator</th>
+                <th class="no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody id="finance-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
 <script>
-// --- FIREBASE CREDENTIALS ---
 const firebaseConfig = {
   apiKey: "AIzaSyD8-XRYgu51zF0mHOfSZ7M3boOVKJ9KIM4",
   authDomain: "classroom-ca026.firebaseapp.com",
@@ -605,79 +725,67 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// State Variables
 let usersList = [];
+let cadetList = [];
 let financeRecords = [];
 let currentUser = null;
 let superAdminPin = '1234';
 let superAdminRecoveryPhone = '9876543210';
 let modifyingUserId = null;
-let activeDateFilter = { type: 'all', start: null, end: null };
+let uploadedPhotoBase64 = "";
 
-// Purpose Lists
 const INCOME_PURPOSES = [
-  "Admission Fees",
-  "Re admission fees",
-  "Monthly Fees",
-  "Hostel fees",
-  "Book and Dress fees",
-  "One time fees",
-  "Previous due",
-  "Penalty fees",
-  "Other fees",
-  "Donation"
+  "Admission Fees", "Re admission fees", "Monthly Fees", "Hostel fees",
+  "Book and Dress fees", "One time fees", "Previous due", "Penalty fees",
+  "Other fees", "Donation"
 ];
-
 const EXPENDITURE_PURPOSES = [
-  "Vegetable",
-  "Grocery",
-  "Stationery",
-  "Water",
-  "Photocopy",
-  "Wages",
-  "Entertainment",
-  "Miscellaneous"
+  "Vegetable", "Grocery", "Stationery", "Water",
+  "Photocopy", "Wages", "Entertainment", "Miscellaneous"
 ];
 
-// Realtime sync of Super Admin settings
 db.ref('settings/superAdminPin').on('value', snap => {
   const val = snap.val();
   if (val) superAdminPin = val.toString();
 });
 db.ref('settings/superAdminPhone').on('value', snap => {
   const val = snap.val();
-  if (val) superAdminRecoveryPhone = val.toString();
+  if (val) {
+    superAdminRecoveryPhone = val.toString();
+    const phoneInput = document.getElementById('super-admin-current-phone');
+    if (phoneInput) phoneInput.value = superAdminRecoveryPhone;
+  }
 });
 
-// Realtime sync of users database
 db.ref('fauji_users').on('value', snapshot => {
   const data = snapshot.val();
   usersList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
-  
   if (currentUser && currentUser.role !== 'SuperAdmin') {
     const latest = usersList.find(u => u.id === currentUser.id);
-    if (latest) {
-      currentUser = latest;
-      evaluateUserAccessState();
-    }
+    if (latest) { currentUser = latest; evaluateUserAccessState(); }
   }
   renderSuperAdminTable();
 });
 
-// Realtime sync of Income / Expenditure entries
+db.ref('cadets').on('value', snapshot => {
+  const data = snapshot.val();
+  cadetList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderCadetRosterTable();
+});
+
 db.ref('finance').on('value', snapshot => {
   const data = snapshot.val();
   financeRecords = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
   renderFinanceLedger();
 });
 
-// Check Local Storage on load
 window.addEventListener('DOMContentLoaded', () => {
-  updatePurposeDropdown();
   const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('adm-date').value = todayStr;
   document.getElementById('fin-date').value = todayStr;
-  document.getElementById('filter-start-date').value = todayStr;
-  document.getElementById('filter-end-date').value = todayStr;
+  document.getElementById('super-admin-current-phone').value = superAdminRecoveryPhone;
+  updateSectionDropdown();
+  updateFinancePurposeDropdown();
 
   const savedCred = localStorage.getItem('ff_saved_credential');
   if (savedCred) {
@@ -699,111 +807,466 @@ function switchAuthTab(tab) {
   }
 }
 
-// Handle Login
+function switchSection(secId) {
+  document.querySelectorAll('nav.main-nav button').forEach(b => b.classList.remove('active'));
+  const activeBtn = Array.from(document.querySelectorAll('nav.main-nav button')).find(b => b.getAttribute('onclick').includes(secId));
+  if (activeBtn) activeBtn.classList.add('active');
+
+  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(secId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateSectionDropdown() {
+  const batch = document.getElementById('adm-batch').value;
+  const secSelect = document.getElementById('adm-section');
+  secSelect.innerHTML = '';
+  const sections = batch === 'General' ? ['G1', 'G2', 'G3', 'G4'] : ['H1', 'H2', 'H3', 'H4'];
+  sections.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = `${batch} - Section ${s}`;
+    secSelect.appendChild(opt);
+  });
+}
+
+function toggleStatusCauseField() {
+  const status = document.getElementById('adm-status').value;
+  document.getElementById('status-cause-container').style.display = status !== 'Active' ? 'block' : 'none';
+}
+
+function previewPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedPhotoBase64 = e.target.result;
+    document.getElementById('cadet-photo-preview').src = uploadedPhotoBase64;
+  };
+  reader.readAsDataURL(file);
+}
+
+function getFinancialYear(dateString) {
+  const d = new Date(dateString);
+  const year = d.getFullYear();
+  const month = d.getMonth();
+  if (month >= 3) {
+    return `${year}-${year + 1}`;
+  } else {
+    return `${year - 1}-${year}`;
+  }
+}
+
+function handleStudentAdmission(e) {
+  e.preventDefault();
+  const name = document.getElementById('adm-name').value.trim();
+  const phone1 = document.getElementById('adm-phone1').value.trim();
+  const admDate = document.getElementById('adm-date').value;
+  const fy = getFinancialYear(admDate);
+  const admFee = parseFloat(document.getElementById('adm-fee').value) || 0;
+  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
+
+  const cadetData = {
+    photo: uploadedPhotoBase64 || "",
+    name: name,
+    guardian: document.getElementById('adm-guardian').value.trim(),
+    dob: document.getElementById('adm-dob').value,
+    phone1: phone1,
+    phone2: document.getElementById('adm-phone2').value.trim(),
+    aadhaar: document.getElementById('adm-aadhaar').value.trim(),
+    reference: document.getElementById('adm-reference').value.trim(),
+    admissionDate: admDate,
+    financialYearAdmitted: fy,
+    currentFinancialYear: fy,
+    admissionFee: admFee,
+    monthlyFee: parseFloat(document.getElementById('adm-monthly-fee').value) || 0,
+    hostelFee: parseFloat(document.getElementById('adm-hostel-fee').value) || 0,
+    batch: document.getElementById('adm-batch').value,
+    section: document.getElementById('adm-section').value,
+    course: document.getElementById('adm-course').value,
+    status: document.getElementById('adm-status').value,
+    statusCause: document.getElementById('adm-status-cause')?.value.trim() || "",
+    place: document.getElementById('adm-place').value.trim(),
+    remarks: document.getElementById('adm-remarks').value.trim(),
+    outstandingDues: 0,
+    enrolledBy: operator,
+    history: [
+      { event: "Admission Cleared", date: admDate, details: `Admitted under FY ${fy} in Section ${document.getElementById('adm-section').value} by ${operator}` }
+    ]
+  };
+
+  db.ref('cadets').push(cadetData).then((ref) => {
+    if (admFee > 0) {
+      const istTime = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
+      db.ref('finance').push({
+        type: 'Income',
+        date: admDate,
+        ist: istTime,
+        purpose: 'Admission Fees',
+        amount: admFee,
+        mode: 'Offline',
+        operator: operator,
+        timestamp: Date.now()
+      });
+    }
+
+    notifySuperAdminAction(`[NEW CADET ADMISSION]\nCadet: ${name}\nPhone: ${phone1}\nBatch: ${cadetData.batch} (${cadetData.section})\nAdmission Fee: ₹${admFee}\nOperator: ${operator}`);
+    alert(`Cadet ${name} successfully enrolled! Notification transmitted to Super Admin.`);
+    e.target.reset();
+    document.getElementById('cadet-photo-preview').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='100' viewBox='0 0 90 100'><rect width='90' height='100' fill='%2327272a'/><text x='50%25' y='50%25' fill='%2371717a' font-size='12' text-anchor='middle' dy='.3em'>No Photo</text></svg>";
+    uploadedPhotoBase64 = "";
+    switchSection('section-roster');
+  });
+}
+
+function renderCadetRosterTable() {
+  const tbody = document.getElementById('cadet-roster-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const q = (document.getElementById('roster-search')?.value || '').toLowerCase();
+  const currentFY = getFinancialYear(new Date().toISOString().split('T')[0]);
+
+  const filtered = cadetList.filter(c => 
+    c.name.toLowerCase().includes(q) || c.phone1.includes(q) || c.section.toLowerCase().includes(q) || c.batch.toLowerCase().includes(q)
+  );
+
+  filtered.forEach(c => {
+    const isFyCompleted = c.currentFinancialYear !== currentFY;
+    const hasDues = (c.outstandingDues || 0) > 0;
+    const canReAdmit = isFyCompleted && !hasDues;
+
+    let duesBadge = `<span class="badge badge-active">All Dues Cleared</span>`;
+    if (hasDues) {
+      duesBadge = `<span class="badge badge-suspended">Pending: ₹${c.outstandingDues}</span>`;
+    }
+
+    let statusClass = 'badge-active';
+    if (c.status === 'Inactive') statusClass = 'badge-inactive';
+    if (c.status === 'Left') statusClass = 'badge-left';
+    if (c.status === 'Suspended') statusClass = 'badge-suspended';
+
+    const photoSrc = c.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='45' viewBox='0 0 40 45'><rect width='40' height='45' fill='%2327272a'/></svg>";
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><img src="${photoSrc}" style="width:40px; height:46px; border-radius:4px; object-fit:cover;"></td>
+      <td>
+        <b>${c.name}</b><br>
+        <small style="color:var(--muted);">📞 ${c.phone1} | 📍 ${c.place}</small>
+      </td>
+      <td><b>${c.batch}</b><br><small style="color:var(--primary); font-weight:700;">${c.section}</small></td>
+      <td>${c.course}</td>
+      <td><b>${c.currentFinancialYear}</b></td>
+      <td><span class="badge ${statusClass}">${c.status}</span></td>
+      <td>${duesBadge}</td>
+      <td class="no-print">
+        <button class="btn-action btn-readmit" ${!canReAdmit ? 'disabled' : ''} onclick="processReAdmission('${c.id}', '${c.name}', '${currentFY}')" title="${!isFyCompleted ? 'FY not yet ended' : hasDues ? 'Clear all dues first' : 'Re-Admit for new FY'}">
+          🔄 Re-Admission
+        </button>
+        <button class="btn-action btn-modify" onclick="openStudentProfileModal('${c.id}')">Dossier</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:2rem;">No cadet records found.</td></tr>`;
+  }
+}
+
+function processReAdmission(id, name, newFY) {
+  const readmissionFee = prompt(`Confirm Re-Admission for ${name} under new Financial Year ${newFY}.\nEnter Re-admission Fee (₹):`, "2000");
+  if (readmissionFee === null) return;
+  const feeAmount = parseFloat(readmissionFee) || 0;
+  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
+
+  const cadet = cadetList.find(c => c.id === id);
+  if (!cadet) return;
+
+  const history = cadet.history || [];
+  const today = new Date().toISOString().split('T')[0];
+  history.push({
+    event: "Re-Admission Completed",
+    date: today,
+    details: `Renewed for FY ${newFY} with fee ₹${feeAmount} by ${operator}`
+  });
+
+  db.ref('cadets/' + id).update({
+    currentFinancialYear: newFY,
+    history: history
+  }).then(() => {
+    if (feeAmount > 0) {
+      db.ref('finance').push({
+        type: 'Income',
+        date: today,
+        ist: new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        purpose: 'Re admission fees',
+        amount: feeAmount,
+        mode: 'Offline',
+        operator: operator,
+        timestamp: Date.now()
+      });
+    }
+
+    notifySuperAdminAction(`[RE-ADMISSION COMPLETED]\nCadet: ${name}\nNew Financial Year: ${newFY}\nFee Collected: ₹${feeAmount}\nProcessed By: ${operator}`);
+    alert(`Cadet ${name} re-admitted under Financial Year ${newFY}! Super Admin notified.`);
+  });
+}
+
+function openStudentProfileModal(id) {
+  const cadet = cadetList.find(c => c.id === id);
+  if (!cadet) return;
+
+  document.getElementById('modal-student-name').textContent = `Dossier: ${cadet.name}`;
+  const hist = cadet.history || [];
+
+  let historyHtml = hist.map(h => `
+    <div style="background:#000; border:1px solid var(--border); border-left:3px solid var(--primary); padding:0.75rem; border-radius:6px; margin-bottom:0.5rem;">
+      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted);">
+        <b>${h.event}</b>
+        <span>${h.date}</span>
+      </div>
+      <p style="font-size:0.85rem; color:#fff; margin-top:0.25rem;">${h.details}</p>
+    </div>
+  `).join('');
+
+  document.getElementById('modal-student-content').innerHTML = `
+    <div style="display:flex; gap:1.25rem; align-items:center; background:#000; border:1px solid var(--border); padding:1rem; border-radius:8px; margin-bottom:1rem;">
+      <img src="${cadet.photo || ''}" style="width:70px; height:80px; border-radius:6px; object-fit:cover; background:#27272a;">
+      <div>
+        <h3 style="color:#fff;">${cadet.name}</h3>
+        <p style="font-size:0.8rem; color:var(--muted);">Guardian: ${cadet.guardian} | DOB: ${cadet.dob}</p>
+        <p style="font-size:0.8rem; color:var(--muted);">Registered Mobile: ${cadet.phone1} ${cadet.phone2 ? ' / ' + cadet.phone2 : ''}</p>
+        <p style="font-size:0.8rem; color:var(--primary); font-weight:700;">Aadhaar Number: ${cadet.aadhaar}</p>
+        <p style="font-size:0.75rem; color:var(--muted);">Enrolled By: ${cadet.enrolledBy || 'Official'}</p>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:0.5rem; margin-bottom:1rem; font-size:0.82rem;">
+      <div style="background:#000; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><b>Batch:</b> ${cadet.batch} (${cadet.section})</div>
+      <div style="background:#000; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><b>Course:</b> ${cadet.course}</div>
+      <div style="background:#000; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><b>Admitted:</b> ${cadet.admissionDate}</div>
+      <div style="background:#000; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><b>Monthly Fee:</b> ₹${cadet.monthlyFee}</div>
+    </div>
+    <h4 style="color:#fff; margin:1rem 0 0.5rem 0;">Lifetime Event & Financial Log</h4>
+    ${historyHtml || '<p style="color:var(--muted); font-size:0.85rem;">No log history recorded.</p>'}
+  `;
+
+  document.getElementById('student-profile-modal').style.display = 'flex';
+}
+
+function closeStudentProfileModal() {
+  document.getElementById('student-profile-modal').style.display = 'none';
+}
+
+function updateFinancePurposeDropdown() {
+  const type = document.getElementById('fin-type').value;
+  const sel = document.getElementById('fin-purpose');
+  sel.innerHTML = '';
+  const list = type === 'Income' ? INCOME_PURPOSES : EXPENDITURE_PURPOSES;
+  list.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p;
+    sel.appendChild(opt);
+  });
+}
+
+function handleFinanceSubmit(e) {
+  e.preventDefault();
+  const type = document.getElementById('fin-type').value;
+  const dateVal = document.getElementById('fin-date').value;
+  const purpose = document.getElementById('fin-purpose').value;
+  const amount = parseFloat(document.getElementById('fin-amount').value) || 0;
+  const mode = document.getElementById('fin-mode').value;
+  const istTime = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
+  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
+
+  db.ref('finance').push({
+    type: type,
+    date: dateVal,
+    ist: istTime,
+    purpose: purpose,
+    amount: amount,
+    mode: mode,
+    operator: operator,
+    timestamp: Date.now()
+  }).then(() => {
+    notifySuperAdminAction(`[FINANCIAL ENTRY LOGGED]\nType: ${type}\nPurpose: ${purpose}\nAmount: ₹${amount.toFixed(2)}\nMode: ${mode}\nDate/Time: ${dateVal} ${istTime}\nOperator: ${operator}`);
+    alert('Transaction saved & Super Admin notified!');
+    document.getElementById('fin-amount').value = '';
+  });
+}
+
+function deleteFinanceEntry(id, details) {
+  if (!confirm(`Are you sure you want to delete this record?\n${details}`)) return;
+  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
+  
+  db.ref('finance/' + id).remove().then(() => {
+    notifySuperAdminAction(`[FINANCIAL RECORD DELETED]\nDeleted Entry: ${details}\nAction By: ${operator}\nTime: ${new Date().toLocaleTimeString('en-IN')}`);
+    alert('Record deleted and Super Admin notified.');
+  });
+}
+
+function renderFinanceLedger() {
+  const tbody = document.getElementById('finance-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+
+  financeRecords.sort((a, b) => b.timestamp - a.timestamp).forEach(item => {
+    const amt = parseFloat(item.amount) || 0;
+    if (item.type === 'Income') totalIncome += amt;
+    else totalExpense += amt;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.date}</td>
+      <td><small style="color:var(--muted);">${item.ist}</small></td>
+      <td><span class="badge ${item.type === 'Income' ? 'badge-active' : 'badge-suspended'}">${item.type}</span></td>
+      <td><b>${item.purpose}</b></td>
+      <td style="font-weight:700; color:${item.type === 'Income' ? '#4ade80' : '#f87171'};">₹ ${amt.toFixed(2)}</td>
+      <td>${item.mode}</td>
+      <td>${item.operator}</td>
+      <td class="no-print">
+        <button class="btn-action btn-block" onclick="deleteFinanceEntry('${item.id}', '${item.type} ₹${amt} for ${item.purpose}')">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('fin-stat-income').textContent = `₹ ${totalIncome.toFixed(2)}`;
+  document.getElementById('fin-stat-expense').textContent = `₹ ${totalExpense.toFixed(2)}`;
+  const net = totalIncome - totalExpense;
+  const netEl = document.getElementById('fin-stat-net');
+  netEl.textContent = `₹ ${net.toFixed(2)}`;
+  netEl.style.color = net >= 0 ? '#38bdf8' : '#ef4444';
+}
+
+function notifySuperAdminAction(text) {
+  const istTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  const fullAlertMessage = `🚨 *FAUJI FACTORY COMMAND NOTIFICATION*\n\n${text}\n\nTime: ${istTime}`;
+
+  db.ref('command_logs').push({
+    message: text,
+    timestamp: Date.now(),
+    dateStr: istTime,
+    superAdminPhone: superAdminRecoveryPhone
+  });
+
+  const cleanPhone = superAdminRecoveryPhone.replace(/[^0-9]/g, '');
+  if (cleanPhone && cleanPhone.length >= 10) {
+    const formattedPhone = cleanPhone.length === 10 ? ('91' + cleanPhone) : cleanPhone;
+    const alertUrl = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(fullAlertMessage)}`;
+    window.open(alertUrl, '_blank');
+  }
+}
+
+function openSuperAdminPhoneModal() {
+  document.getElementById('super-admin-current-phone').value = superAdminRecoveryPhone;
+  document.getElementById('super-admin-phone-modal').style.display = 'flex';
+}
+function closeSuperAdminPhoneModal() {
+  document.getElementById('super-admin-phone-modal').style.display = 'none';
+}
+function saveSuperAdminPhone() {
+  const ph = document.getElementById('super-admin-current-phone').value.replace(/[^0-9]/g, '').trim();
+  if (ph.length < 10) {
+    alert('Please enter a valid 10-digit mobile number.');
+    return;
+  }
+  db.ref('settings/superAdminPhone').set(ph).then(() => {
+    superAdminRecoveryPhone = ph;
+    alert(`Super Admin notification phone number set to: ${ph}`);
+    closeSuperAdminPhoneModal();
+  });
+}
+
 function handleLogin() {
   const cred = document.getElementById('login-cred').value.trim();
   const remember = document.getElementById('remember-me').checked;
-  if (!cred) { alert('Please enter your access password or phone number.'); return; }
+  if (!cred) { alert('Enter credentials'); return; }
 
-  // 1. Super Admin
   if (cred === superAdminPin) {
-    currentUser = { name: 'Super Admin', designation: 'SuperAdmin', phone: superAdminRecoveryPhone, status: 'Approved', role: 'SuperAdmin' };
+    currentUser = { name: 'Super Admin', designation: 'SuperAdmin', role: 'SuperAdmin', phone: superAdminRecoveryPhone, permissions: { admission: true, roster: true, finance: true } };
     finalizeLogin(remember, cred);
     return;
   }
 
-  // 2. Standard User
-  const foundUser = usersList.find(u => u.phone === cred || u.password === cred);
-  if (foundUser) {
-    if (foundUser.status === 'Blocked') {
-      alert('Access Denied: You have been blocked/removed by the Super Admin.');
-      return;
-    }
-    currentUser = foundUser;
+  const user = usersList.find(u => u.phone === cred || u.password === cred);
+  if (user) {
+    if (user.status === 'Blocked') { alert('Access suspended.'); return; }
+    currentUser = user;
     finalizeLogin(remember, cred);
   } else {
-    alert('Invalid credential or awaiting Super Admin authorization.');
+    alert('Invalid credential or awaiting authorization.');
   }
 }
 
 function finalizeLogin(remember, cred) {
-  if (remember) {
-    localStorage.setItem('ff_saved_credential', cred);
-  } else {
-    localStorage.removeItem('ff_saved_credential');
-  }
-
+  if (remember) localStorage.setItem('ff_saved_credential', cred);
+  else localStorage.removeItem('ff_saved_credential');
   document.getElementById('auth-modal').style.display = 'none';
-  document.getElementById('fin-operator').value = currentUser.name;
+  document.getElementById('app-nav').style.display = 'flex';
   evaluateUserAccessState();
 }
 
 function evaluateUserAccessState() {
   const badge = document.getElementById('user-display-badge');
-  const waitingScreen = document.getElementById('screen-waiting');
-  const dashScreen = document.getElementById('screen-dashboard');
-  const adminControls = document.getElementById('super-admin-controls');
-  const financeSection = document.getElementById('section-finance');
+  const waiting = document.getElementById('screen-waiting');
+  const dash = document.getElementById('screen-dashboard');
+  const adminCtrl = document.getElementById('super-admin-controls');
 
   if (currentUser.role === 'SuperAdmin') {
-    badge.innerHTML = `
-      👤 <b>Super Admin</b>
-      <button class="header-btn" onclick="openChangePinModal()">🔑 Change PIN</button>
-      <button class="logout-btn" onclick="handleLogout()">Logout</button>
-    `;
-    waitingScreen.style.display = 'none';
-    dashScreen.style.display = 'block';
-    adminControls.style.display = 'block';
-    financeSection.style.display = 'block';
-    document.getElementById('dash-access-level').textContent = 'Full Super Admin Control';
+    badge.innerHTML = `👤 <b>Super Admin (${superAdminRecoveryPhone})</b> <button class="header-btn" onclick="openChangePinModal()">🔑 PIN</button> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
+    waiting.style.display = 'none';
+    dash.style.display = 'block';
+    adminCtrl.style.display = 'flex';
+    document.getElementById('dash-access-level').textContent = 'Super Admin (Full Access)';
+    document.getElementById('nav-btn-admission').style.display = 'inline-block';
+    document.getElementById('nav-btn-roster').style.display = 'inline-block';
+    document.getElementById('nav-btn-finance').style.display = 'inline-block';
   } else if (currentUser.status === 'Approved') {
-    badge.innerHTML = `👤 <b>${currentUser.name} (${currentUser.designation})</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
-    waitingScreen.style.display = 'none';
-    dashScreen.style.display = 'block';
-    adminControls.style.display = 'none';
+    badge.innerHTML = `👤 <b>${currentUser.name} (${currentUser.phone})</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
+    waiting.style.display = 'none';
+    dash.style.display = 'block';
+    adminCtrl.style.display = 'none';
     document.getElementById('dash-access-level').textContent = currentUser.designation;
 
-    // Check if finance module permission is granted
     const perms = currentUser.permissions || {};
-    financeSection.style.display = perms.finance ? 'block' : 'none';
+    document.getElementById('nav-btn-admission').style.display = perms.admission ? 'inline-block' : 'none';
+    document.getElementById('nav-btn-roster').style.display = perms.roster ? 'inline-block' : 'none';
+    document.getElementById('nav-btn-finance').style.display = perms.finance ? 'inline-block' : 'none';
   } else {
     badge.innerHTML = `👤 <b>${currentUser.name} (Pending)</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
-    waitingScreen.style.display = 'block';
-    dashScreen.style.display = 'none';
-    adminControls.style.display = 'none';
+    waiting.style.display = 'block';
+    dash.style.display = 'none';
+    adminCtrl.style.display = 'none';
+    document.getElementById('app-nav').style.display = 'none';
   }
 }
 
-// First-Time Registration Request
 function handleRegistrationRequest() {
   const name = document.getElementById('reg-name').value.trim();
-  const designation = document.getElementById('reg-designation').value;
   const phone = document.getElementById('reg-phone').value.trim();
+  const desig = document.getElementById('reg-designation').value;
   const dob = document.getElementById('reg-dob').value;
+  if (!name || phone.length < 10) { alert('Please enter full name and valid 10-digit mobile number.'); return; }
 
-  if (!name || !phone || !dob) { alert('Please fill in all required registration fields.'); return; }
-
-  if (usersList.some(u => u.phone === phone)) {
-    alert('An account with this mobile number already exists.');
-    return;
-  }
-
-  const generatedPassword = 'FF-' + Math.floor(1000 + Math.random() * 9000);
-
-  const newUserData = {
-    name: name,
-    designation: designation,
-    phone: phone,
-    dob: dob,
-    password: generatedPassword,
-    status: 'Pending',
-    permissions: { finance: false, attendance: false, syllabus: false, exams: false, notice: true, roster: false },
+  const generatedPass = 'FF-' + Math.floor(1000 + Math.random() * 9000);
+  const data = {
+    name: name, designation: desig, phone: phone, dob: dob,
+    password: generatedPass, status: 'Pending',
+    permissions: { admission: false, roster: false, finance: false },
     dateRegistered: new Date().toISOString().split('T')[0]
   };
 
-  db.ref('fauji_users').push(newUserData).then(() => {
-    alert(`Registration request submitted!\n\n[Super Admin Alert]: New request from ${name} (${designation}). Password generated: ${generatedPassword}`);
-    currentUser = newUserData;
+  db.ref('fauji_users').push(data).then(() => {
+    notifySuperAdminAction(`[NEW USER REGISTRATION]\nName: ${name}\nDesignation: ${desig}\nRegistered Mobile: ${phone}\nGenerated Pass: ${generatedPass}`);
+    alert(`Registration submitted! Temporary Password: ${generatedPass}`);
+    currentUser = data;
     document.getElementById('auth-modal').style.display = 'none';
     evaluateUserAccessState();
   });
@@ -813,341 +1276,101 @@ function handleLogout() {
   currentUser = null;
   localStorage.removeItem('ff_saved_credential');
   document.getElementById('auth-modal').style.display = 'flex';
+  document.getElementById('app-nav').style.display = 'none';
   document.getElementById('screen-waiting').style.display = 'none';
   document.getElementById('screen-dashboard').style.display = 'none';
 }
 
-// Super Admin Management Panel Actions
-function openSuperAdminPanel() {
-  document.getElementById('admin-mgmt-modal').style.display = 'flex';
-}
-function closeSuperAdminPanel() {
-  document.getElementById('admin-mgmt-modal').style.display = 'none';
-}
+function openSuperAdminPanel() { document.getElementById('admin-mgmt-modal').style.display = 'flex'; }
+function closeSuperAdminPanel() { document.getElementById('admin-mgmt-modal').style.display = 'none'; }
 
 function renderSuperAdminTable() {
   const tbody = document.getElementById('admin-users-table-body');
   if (!tbody) return;
   tbody.innerHTML = '';
-
-  if (usersList.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--muted);">No registered users found.</td></tr>`;
-    return;
-  }
-
   usersList.forEach(u => {
     const tr = document.createElement('tr');
-    let statusBadge = `<span class="badge badge-pending">Pending</span>`;
-    if (u.status === 'Approved') statusBadge = `<span class="badge badge-approved">Approved</span>`;
-    if (u.status === 'Blocked') statusBadge = `<span class="badge badge-blocked">Blocked</span>`;
-
-    const perms = u.permissions || {};
-    const activeTabs = Object.keys(perms).filter(k => perms[k]).map(k => k.charAt(0).toUpperCase() + k.slice(1)).join(', ') || 'None';
-
     tr.innerHTML = `
       <td><b>${u.name}</b><br><small style="color:var(--primary);">Pass: ${u.password}</small></td>
       <td>${u.designation}</td>
-      <td>${u.phone}</td>
-      <td><small style="color:var(--muted);">${activeTabs}</small></td>
-      <td>${statusBadge}</td>
+      <td>📞 <b>${u.phone}</b></td>
+      <td><small>${Object.keys(u.permissions || {}).filter(k => u.permissions[k]).join(', ') || 'None'}</small></td>
+      <td><span class="badge ${u.status === 'Approved' ? 'badge-active' : 'badge-suspended'}">${u.status}</span></td>
       <td>
         <button class="btn-action btn-modify" onclick="openModifyAccessModal('${u.id}')">Modify</button>
         ${u.status !== 'Approved' ? `<button class="btn-action btn-approve" onclick="updateUserStatus('${u.id}', 'Approved')">Approve</button>` : ''}
-        ${u.status !== 'Blocked' ? `<button class="btn-action btn-block" onclick="updateUserStatus('${u.id}', 'Blocked')">Throw Out</button>` : `<button class="btn-action btn-approve" onclick="updateUserStatus('${u.id}', 'Approved')">Restore</button>`}
+        ${u.status !== 'Blocked' ? `<button class="btn-action btn-block" onclick="updateUserStatus('${u.id}', 'Blocked')">Throw Out</button>` : ''}
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function updateUserStatus(id, newStatus) {
-  db.ref('fauji_users/' + id).update({ status: newStatus }).then(() => {
-    alert(`User status updated to: ${newStatus}`);
+function updateUserStatus(id, stat) {
+  db.ref('fauji_users/' + id).update({ status: stat }).then(() => {
+    const targetUser = usersList.find(u => u.id === id);
+    const uName = targetUser ? targetUser.name : id;
+    notifySuperAdminAction(`[USER STATUS UPDATED]\nUser: ${uName}\nNew Status: ${stat}`);
   });
 }
 
-// Modify Modal Handlers
-function openModifyAccessModal(userId) {
-  modifyingUserId = userId;
-  const user = usersList.find(u => u.id === userId);
+function openModifyAccessModal(id) {
+  modifyingUserId = id;
+  const user = usersList.find(u => u.id === id);
   if (!user) return;
-
-  document.getElementById('modify-user-subtitle').textContent = `Configuring permissions for ${user.name} (${user.designation})`;
   const perms = user.permissions || {};
-  document.getElementById('perm-finance').checked = !!perms.finance;
-  document.getElementById('perm-attendance').checked = !!perms.attendance;
-  document.getElementById('perm-syllabus').checked = !!perms.syllabus;
-  document.getElementById('perm-exams').checked = !!perms.exams;
-  document.getElementById('perm-notice').checked = !!perms.notice;
+  document.getElementById('perm-admission').checked = !!perms.admission;
   document.getElementById('perm-roster').checked = !!perms.roster;
-
+  document.getElementById('perm-finance').checked = !!perms.finance;
   document.getElementById('modify-access-modal').style.display = 'flex';
 }
-
-function closeModifyAccessModal() {
-  document.getElementById('modify-access-modal').style.display = 'none';
-  modifyingUserId = null;
-}
+function closeModifyAccessModal() { document.getElementById('modify-access-modal').style.display = 'none'; }
 
 function saveUserPermissions() {
   if (!modifyingUserId) return;
   const updatedPerms = {
-    finance: document.getElementById('perm-finance').checked,
-    attendance: document.getElementById('perm-attendance').checked,
-    syllabus: document.getElementById('perm-syllabus').checked,
-    exams: document.getElementById('perm-exams').checked,
-    notice: document.getElementById('perm-notice').checked,
-    roster: document.getElementById('perm-roster').checked
+    admission: document.getElementById('perm-admission').checked,
+    roster: document.getElementById('perm-roster').checked,
+    finance: document.getElementById('perm-finance').checked
   };
 
-  db.ref('fauji_users/' + modifyingUserId).update({ permissions: updatedPerms }).then(() => {
-    alert('User permissions updated successfully!');
+  db.ref('fauji_users/' + modifyingUserId).update({
+    permissions: updatedPerms
+  }).then(() => {
+    const targetUser = usersList.find(u => u.id === modifyingUserId);
+    const uName = targetUser ? targetUser.name : modifyingUserId;
+    notifySuperAdminAction(`[PERMISSIONS MODIFIED]\nTarget User: ${uName}\nActive Tabs: ${Object.keys(updatedPerms).filter(k => updatedPerms[k]).join(', ')}`);
+    alert('Permissions updated & Super Admin notified');
     closeModifyAccessModal();
   });
 }
 
-// Super Admin PIN Change
-function openChangePinModal() {
-  document.getElementById('old-admin-pin').value = '';
-  document.getElementById('new-admin-pin').value = '';
-  document.getElementById('confirm-admin-pin').value = '';
-  document.getElementById('change-pin-modal').style.display = 'flex';
-}
-function closeChangePinModal() {
-  document.getElementById('change-pin-modal').style.display = 'none';
-}
-
+function openChangePinModal() { document.getElementById('change-pin-modal').style.display = 'flex'; }
+function closeChangePinModal() { document.getElementById('change-pin-modal').style.display = 'none'; }
 function processSuperAdminPinChange() {
   const oldPin = document.getElementById('old-admin-pin').value.trim();
   const newPin = document.getElementById('new-admin-pin').value.trim();
-  const confirmPin = document.getElementById('confirm-admin-pin').value.trim();
-
-  if (oldPin !== superAdminPin) { alert('Current Super Admin password incorrect.'); return; }
-  if (!newPin || newPin !== confirmPin) { alert('New passwords do not match or are empty.'); return; }
-
+  if (oldPin !== superAdminPin) { alert('Incorrect old PIN'); return; }
   db.ref('settings/superAdminPin').set(newPin).then(() => {
     superAdminPin = newPin;
-    alert('Super Admin password updated successfully!');
+    notifySuperAdminAction(`[MASTER PIN CHANGED]\nSuper Admin PIN successfully updated.`);
+    alert('Master PIN updated');
     closeChangePinModal();
   });
 }
 
-// Forgot Super Admin PIN Modal
-function openForgotPinModal() {
-  document.getElementById('recovery-mobile').value = '';
-  document.getElementById('recovery-new-pin').value = '';
-  document.getElementById('forgot-pin-modal').style.display = 'flex';
-}
-function closeForgotPinModal() {
-  document.getElementById('forgot-pin-modal').style.display = 'none';
-}
-
+function openForgotPinModal() { document.getElementById('forgot-pin-modal').style.display = 'flex'; }
+function closeForgotPinModal() { document.getElementById('forgot-pin-modal').style.display = 'none'; }
 function processPinRecovery() {
-  const phone = document.getElementById('recovery-mobile').value.replace(/[^0-9]/g, '').trim();
+  const ph = document.getElementById('recovery-mobile').value.replace(/[^0-9]/g, '');
   const newPin = document.getElementById('recovery-new-pin').value.trim();
-
-  if (phone !== superAdminRecoveryPhone) {
-    alert('The entered mobile number is not registered as the Super Admin recovery contact.');
-    return;
-  }
-  if (!newPin) { alert('Please enter a new password.'); return; }
-
+  if (ph !== superAdminRecoveryPhone) { alert('Recovery mobile mismatch'); return; }
   db.ref('settings/superAdminPin').set(newPin).then(() => {
     superAdminPin = newPin;
-    alert('Super Admin password reset successfully!');
+    notifySuperAdminAction(`[MASTER PIN RECOVERED & RESET]\nReset completed via mobile: ${ph}`);
+    alert('PIN reset successful!');
     closeForgotPinModal();
   });
-}
-
-// ==========================================
-// 💰 INCOME & EXPENDITURE CORE LOGIC
-// ==========================================
-
-function updatePurposeDropdown() {
-  const type = document.getElementById('fin-type').value;
-  const purposeSelect = document.getElementById('fin-purpose');
-  purposeSelect.innerHTML = '';
-  
-  const list = type === 'Income' ? INCOME_PURPOSES : EXPENDITURE_PURPOSES;
-  list.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p;
-    opt.textContent = p;
-    purposeSelect.appendChild(opt);
-  });
-}
-
-// Save Entry & Transmit Alert
-function saveFinanceEntry(e) {
-  e.preventDefault();
-  const type = document.getElementById('fin-type').value;
-  const dateVal = document.getElementById('fin-date').value;
-  const purpose = document.getElementById('fin-purpose').value;
-  const amount = parseFloat(document.getElementById('fin-amount').value);
-  const mode = document.getElementById('fin-mode').value;
-  const operator = currentUser ? currentUser.name : 'Official';
-
-  // Compute Indian Standard Time (IST) string
-  const istTimeStr = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-  const record = {
-    type: type,
-    date: dateVal,
-    ist: istTimeStr,
-    purpose: purpose,
-    amount: amount,
-    mode: mode,
-    operator: operator,
-    timestamp: Date.now()
-  };
-
-  db.ref('finance').push(record).then(() => {
-    // Notify Super Admin
-    notifySuperAdminFinanceAction(`[ENTRY LOGGED] ${type}: ₹${amount.toFixed(2)} for '${purpose}' by ${operator} (Mode: ${mode}) at ${istTimeStr}`);
-    document.getElementById('fin-amount').value = '';
-    alert('Financial record successfully stored and Super Admin notified!');
-  });
-}
-
-// Delete Entry & Transmit Alert
-function deleteFinanceEntry(id, details) {
-  if (confirm(`Are you sure you want to delete this record:\n${details}?`)) {
-    db.ref('finance/' + id).remove().then(() => {
-      notifySuperAdminFinanceAction(`[ENTRY DELETED] Record removed by ${currentUser.name}: ${details}`);
-      alert('Record deleted.');
-    });
-  }
-}
-
-// Live Super Admin Notification Dispatcher
-function notifySuperAdminFinanceAction(msg) {
-  const fullMessage = `🚨 *FAUJI FACTORY - FINANCIAL ALERT*\n\n${msg}\nTime: ${new Date().toLocaleTimeString('en-IN')}`;
-  
-  // Log to in-app audit node
-  db.ref('finance_notifications').push({
-    message: msg,
-    timestamp: Date.now(),
-    dateStr: new Date().toLocaleString('en-IN')
-  });
-
-  // Prompt direct dispatch to Super Admin WhatsApp if initiated on screen
-  const cleanPhone = superAdminRecoveryPhone.replace(/[^0-9]/g, '');
-  if (cleanPhone) {
-    const notifyUrl = `https://api.whatsapp.com/send?phone=${cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
-    // Optional background window trigger
-    console.log("Super Admin Alert Triggered:", fullMessage);
-  }
-}
-
-// Filter Preset Handlers
-function applyPresetFilter(preset) {
-  activeDateFilter.type = preset;
-  const now = new Date();
-  
-  if (preset === 'day') {
-    const todayStr = now.toISOString().split('T')[0];
-    activeDateFilter.start = todayStr;
-    activeDateFilter.end = todayStr;
-  } else if (preset === 'week') {
-    const past7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    activeDateFilter.start = past7.toISOString().split('T')[0];
-    activeDateFilter.end = now.toISOString().split('T')[0];
-  } else if (preset === 'month') {
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-    activeDateFilter.start = startOfMonth;
-    activeDateFilter.end = endOfMonth;
-  } else if (preset === 'year') {
-    // Economic Year: April 1 to March 31
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0-indexed (3 is April)
-    let startYear = currentMonth >= 3 ? currentYear : currentYear - 1;
-    let endYear = startYear + 1;
-    activeDateFilter.start = `${startYear}-04-01`;
-    activeDateFilter.end = `${endYear}-03-31`;
-  } else {
-    activeDateFilter.start = null;
-    activeDateFilter.end = null;
-  }
-  
-  renderFinanceLedger();
-}
-
-function applyCustomDateFilter() {
-  const start = document.getElementById('filter-start-date').value;
-  const end = document.getElementById('filter-end-date').value;
-  if (!start || !end) { alert('Please select both Start Date and End Date.'); return; }
-
-  activeDateFilter.type = 'custom';
-  activeDateFilter.start = start;
-  activeDateFilter.end = end;
-  renderFinanceLedger();
-}
-
-// Render Balance Sheet and Table
-function renderFinanceLedger() {
-  const tbody = document.getElementById('finance-table-body');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  let filtered = financeRecords;
-
-  if (activeDateFilter.start && activeDateFilter.end) {
-    filtered = filtered.filter(item => item.date >= activeDateFilter.start && item.date <= activeDateFilter.end);
-  }
-
-  // Sort by date descending
-  filtered.sort((a, b) => b.timestamp - a.timestamp);
-
-  let totalIncome = 0;
-  let totalExpense = 0;
-
-  filtered.forEach(item => {
-    const amt = parseFloat(item.amount) || 0;
-    if (item.type === 'Income') totalIncome += amt;
-    else totalExpense += amt;
-
-    const tr = document.createElement('tr');
-    const typeBadge = item.type === 'Income' ? `<span class="badge badge-income">Income</span>` : `<span class="badge badge-expense">Expenditure</span>`;
-    const modeBadge = item.mode === 'Online' ? `<span class="badge badge-mode-online">Online</span>` : `<span class="badge badge-mode-offline">Offline</span>`;
-
-    tr.innerHTML = `
-      <td><b>${item.date}</b></td>
-      <td><small style="color:var(--muted);">${item.ist}</small></td>
-      <td>${typeBadge}</td>
-      <td><b>${item.purpose}</b></td>
-      <td style="font-weight:700; color:${item.type === 'Income' ? '#4ade80' : '#f87171'};">₹ ${amt.toFixed(2)}</td>
-      <td>${modeBadge}</td>
-      <td>${item.operator}</td>
-      <td class="no-print">
-        <button class="btn-del btn-action" onclick="deleteFinanceEntry('${item.id}', '${item.type} ₹${amt} for ${item.purpose}')">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  // Calculate Net
-  const netBalance = totalIncome - totalExpense;
-
-  // Update Balance Sheet Cards
-  document.getElementById('stat-total-income').textContent = `₹ ${totalIncome.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-  document.getElementById('stat-total-expense').textContent = `₹ ${totalExpense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-  
-  const netElem = document.getElementById('stat-net-balance');
-  netElem.textContent = `₹ ${netBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-  netElem.style.color = netBalance >= 0 ? '#38bdf8' : '#ef4444';
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:2rem;">No transactions recorded for the selected period.</td></tr>`;
-  }
-}
-
-// Print Statement of Account
-function printStatementOfAccount() {
-  const start = activeDateFilter.start || 'Start';
-  const end = activeDateFilter.end || 'Present';
-  document.getElementById('print-date-range').textContent = `Account Statement Period: ${start} to ${end} | Printed on: ${new Date().toLocaleString('en-IN')}`;
-  window.print();
 }
 </script>
 
