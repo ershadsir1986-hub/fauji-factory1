@@ -210,7 +210,7 @@
   th { background: #121214; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
   tr:hover td { background: #18181b; }
 
-  /* Sub Tab Bar (for Academics) */
+  /* Sub Tab Bar */
   .sub-nav-bar {
     display: flex;
     gap: 0.5rem;
@@ -232,6 +232,19 @@
     cursor: pointer;
   }
   .sub-nav-btn.active { background: var(--primary); color: white; }
+
+  /* Routine Timing Header Inputs */
+  .timing-input-header {
+    background: #000000;
+    border: 1px solid var(--border);
+    color: #38bdf8;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 0.3rem;
+  }
 
   /* Unit Tracking 84-Grid */
   .unit-grid {
@@ -657,7 +670,7 @@
           <button class="sub-nav-btn" id="sub-btn-units" onclick="switchAcademicSubTab('sub-units')">🎯 UNIT TRACKING (84 UNITS)</button>
         </div>
 
-        <!-- SUB-SECTION 1: WEEKLY ROUTINE -->
+        <!-- SUB-SECTION 1: WEEKLY ROUTINE WITH EDITABLE TIMINGS -->
         <div id="sub-routine" style="display: block;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -682,17 +695,29 @@
             </div>
           </div>
 
-          <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.75rem;">Timetable automatically rolls forward Sunday to Saturday until modified.</p>
+          <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.75rem;">Timetable automatically rolls forward Sunday to Saturday until modified. Times are fully customizable per session.</p>
 
           <div class="table-responsive">
             <table>
               <thead>
                 <tr>
-                  <th style="width: 130px;">Day</th>
-                  <th>Session 1 (Morning)</th>
-                  <th>Session 2 (Mid-Day)</th>
-                  <th>Session 3 (Afternoon)</th>
-                  <th>Session 4 (Evening/PT)</th>
+                  <th style="width: 120px;">Day</th>
+                  <th style="min-width: 200px;">
+                    <div>Session 1</div>
+                    <div id="header-timing-s1-box"></div>
+                  </th>
+                  <th style="min-width: 200px;">
+                    <div>Session 2</div>
+                    <div id="header-timing-s2-box"></div>
+                  </th>
+                  <th style="min-width: 200px;">
+                    <div>Session 3</div>
+                    <div id="header-timing-s3-box"></div>
+                  </th>
+                  <th style="min-width: 200px;">
+                    <div>Session 4</div>
+                    <div id="header-timing-s4-box"></div>
+                  </th>
                 </tr>
               </thead>
               <tbody id="routine-table-body"></tbody>
@@ -1024,6 +1049,13 @@ let selectedUnitId = null;
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const BATCH_KEYS = ["G1", "G2", "G3", "G4", "H1", "H2", "H3", "H4"];
 
+const DEFAULT_TIMINGS = {
+  s1: "06:00 AM - 07:30 AM",
+  s2: "08:30 AM - 10:30 AM",
+  s3: "11:30 AM - 01:30 PM",
+  s4: "04:30 PM - 06:30 PM"
+};
+
 const INCOME_PURPOSES = [
   "Admission Fees", "Re admission fees", "Monthly Fees", "Hostel fees",
   "Book and Dress fees", "One time fees", "Previous due", "Penalty fees",
@@ -1074,13 +1106,13 @@ db.ref('finance').on('value', snapshot => {
   renderFinanceLedger();
 });
 
-// Academics Routines listener
+// Routines listener
 db.ref('routines').on('value', snapshot => {
   routines = snapshot.val() || {};
   loadRoutineForBatch();
 });
 
-// Academics Units listener
+// Units listener
 db.ref('units').on('value', snapshot => {
   unitData = snapshot.val() || {};
   renderUnitGrid();
@@ -1133,7 +1165,7 @@ function switchAcademicSubTab(subId) {
 }
 
 // -------------------------------------------------------------
-// WEEKLY ROUTINE CORE LOGIC
+// WEEKLY ROUTINE CORE LOGIC WITH EDITABLE PRECISE TIMING
 // -------------------------------------------------------------
 function canEditAcademics() {
   if (!currentUser) return false;
@@ -1150,15 +1182,30 @@ function loadRoutineForBatch() {
   const batchRoutine = (routines && routines[batch]) ? routines[batch] : {};
   const isEditable = canEditAcademics();
 
+  // Load or fallback to default session timings
+  const sessionTimings = batchRoutine.timings || DEFAULT_TIMINGS;
+
+  // Render timing header controls
+  ['s1', 's2', 's3', 's4'].forEach(s => {
+    const box = document.getElementById(`header-timing-${s}-box`);
+    if (box) {
+      if (isEditable) {
+        box.innerHTML = `<input type="text" id="timing-input-${s}" class="timing-input-header" value="${sessionTimings[s] || DEFAULT_TIMINGS[s]}" placeholder="e.g. 06:00 AM - 07:30 AM">`;
+      } else {
+        box.innerHTML = `<span style="color:#38bdf8; font-weight:700; font-size:0.75rem;">${sessionTimings[s] || DEFAULT_TIMINGS[s]}</span>`;
+      }
+    }
+  });
+
   DAYS.forEach(day => {
     const dayData = batchRoutine[day] || { s1: '', s2: '', s3: '', s4: '' };
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><b>${day}</b></td>
-      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s1" value="${dayData.s1 || ''}" style="margin:0; padding:0.4rem;">` : `<span>${dayData.s1 || '-'}</span>`}</td>
-      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s2" value="${dayData.s2 || ''}" style="margin:0; padding:0.4rem;">` : `<span>${dayData.s2 || '-'}</span>`}</td>
-      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s3" value="${dayData.s3 || ''}" style="margin:0; padding:0.4rem;">` : `<span>${dayData.s3 || '-'}</span>`}</td>
-      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s4" value="${dayData.s4 || ''}" style="margin:0; padding:0.4rem;">` : `<span>${dayData.s4 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s1" value="${dayData.s1 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject / Instructor">` : `<span>${dayData.s1 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s2" value="${dayData.s2 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject / Instructor">` : `<span>${dayData.s2 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s3" value="${dayData.s3 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject / Instructor">` : `<span>${dayData.s3 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s4" value="${dayData.s4 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject / Instructor">` : `<span>${dayData.s4 || '-'}</span>`}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -1168,7 +1215,7 @@ function copyCurrentRoutine() {
   const batch = document.getElementById('routine-batch-select').value;
   const batchRoutine = (routines && routines[batch]) ? routines[batch] : {};
   copiedRoutineBuffer = JSON.parse(JSON.stringify(batchRoutine));
-  alert(`Routine for Batch ${batch} copied! Select another batch and tap "Paste to this Batch".`);
+  alert(`Routine & Timings for Batch ${batch} copied! Select another batch and tap "Paste to this Batch".`);
 }
 
 function pasteRoutineToCurrent() {
@@ -1179,12 +1226,19 @@ function pasteRoutineToCurrent() {
   const batch = document.getElementById('routine-batch-select').value;
   routines[batch] = JSON.parse(JSON.stringify(copiedRoutineBuffer));
   loadRoutineForBatch();
-  alert(`Pasted copied routine into ${batch}. Tap "Save & Broadcast Notice" to commit.`);
+  alert(`Pasted copied routine & timings into ${batch}. Tap "Save & Broadcast Notice" to commit.`);
 }
 
 function saveRoutineChanges() {
   const batch = document.getElementById('routine-batch-select').value;
-  const updatedBatchRoutine = {};
+  const updatedBatchRoutine = {
+    timings: {
+      s1: document.getElementById('timing-input-s1')?.value.trim() || DEFAULT_TIMINGS.s1,
+      s2: document.getElementById('timing-input-s2')?.value.trim() || DEFAULT_TIMINGS.s2,
+      s3: document.getElementById('timing-input-s3')?.value.trim() || DEFAULT_TIMINGS.s3,
+      s4: document.getElementById('timing-input-s4')?.value.trim() || DEFAULT_TIMINGS.s4
+    }
+  };
 
   DAYS.forEach(day => {
     updatedBatchRoutine[day] = {
@@ -1196,12 +1250,10 @@ function saveRoutineChanges() {
   });
 
   db.ref('routines/' + batch).set(updatedBatchRoutine).then(() => {
-    // Notify Super Admin if done by permitted official
-    notifySuperAdminAction(`[ROUTINE UPDATED] Weekly Routine for batch ${batch} updated by ${currentUser ? currentUser.name : 'SuperAdmin'}.`);
+    notifySuperAdminAction(`[ROUTINE UPDATED] Weekly Routine & Timings for batch ${batch} updated by ${currentUser ? currentUser.name : 'SuperAdmin'}.`);
 
-    // Broadcast Notice to All Registered Students
-    broadcastNoticeToAllStudents(`📢 *FAUJI FACTORY - WEEKLY TIMETABLE UPDATE*\n\nWeekly Routine for Batch *${batch}* (Sunday to Saturday) has been updated.\nPlease check the Academics section on the portal.`);
-    alert(`Weekly routine for ${batch} saved and notification sent to students!`);
+    broadcastNoticeToAllStudents(`📢 *FAUJI FACTORY - WEEKLY TIMETABLE UPDATE*\n\nWeekly Routine for Batch *${batch}* (Sunday to Saturday) with updated session timings has been published.\nPlease check the Academics section on the portal.`);
+    alert(`Weekly routine & timings for ${batch} saved and notification sent to students!`);
   });
 }
 
@@ -1266,10 +1318,8 @@ function saveUnitStatus() {
   db.ref(`units/${subject}/${batch}/${unitKey}`).set(payload).then(() => {
     closeUnitModal();
 
-    // Notify Super Admin if done by non-Super Admin
     notifySuperAdminAction(`[UNIT TRACKED] ${subject} (${batch}) - ${unitKey} marked as ${status.toUpperCase()} by ${currentUser ? currentUser.name : 'SuperAdmin'}. Upcoming: ${upcoming || 'None'}`);
 
-    // Broadcast Notice to All Registered Students
     const statusText = status === 'completed' ? 'Completed (Red)' : status === 'incomplete' ? 'Remaining / Incomplete (Blue)' : 'Reset';
     const noticeMsg = `📢 *FAUJI FACTORY - UNIT UPDATE NOTICE*\n\n• *Date:* ${dateStr}\n• *Subject:* ${subject}\n• *Batch:* ${batch}\n• *Unit:* ${unitKey} -> ${statusText}\n• *Upcoming Unit in Next Class:* ${upcoming || 'To be announced'}\n\n- Academic Command Desk`;
     broadcastNoticeToAllStudents(noticeMsg);
@@ -1278,18 +1328,14 @@ function saveUnitStatus() {
   });
 }
 
-// Broadcast Message to All Registered Students via WhatsApp Web
 function broadcastNoticeToAllStudents(msgText) {
-  // Collect all unique student contact numbers
   const studentPhones = cadetList
     .map(c => (c.phone1 || '').replace(/[^0-9]/g, ''))
     .filter(p => p.length >= 10);
 
-  // Trigger web dispatch link
   const broadcastUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msgText)}`;
   window.open(broadcastUrl, '_blank');
 
-  // Log in Firebase notices
   db.ref('broadcast_notices').push({
     message: msgText,
     timestamp: Date.now(),
@@ -1774,7 +1820,7 @@ function renderFinanceLedger() {
 // -------------------------------------------------------------
 function notifySuperAdminAction(text) {
   if (currentUser && currentUser.role === 'SuperAdmin') {
-    return; // Don't notify if the Super Admin makes the change
+    return;
   }
 
   const istTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -1870,7 +1916,6 @@ function evaluateUserAccessState() {
     document.getElementById('dash-access-level').textContent = currentUser.designation;
 
     const perms = currentUser.permissions || {};
-    // Students can always view academics; officials can edit if permission granted
     document.getElementById('nav-btn-academics').style.display = 'inline-block';
     if (routineCtrl) routineCtrl.style.display = (perms.academics === true) ? 'flex' : 'none';
 
