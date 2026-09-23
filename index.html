@@ -9,6 +9,9 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+<!-- QR Code Generator Library (QRCode.js) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
   :root {
     --primary: #dc2626;
@@ -235,7 +238,6 @@
   }
   .sub-nav-btn.active { background: var(--primary); color: white; }
 
-  /* Routine Timing Header Inputs */
   .timing-input-header {
     background: #000000;
     border: 1px solid var(--border);
@@ -248,7 +250,6 @@
     margin-top: 0.3rem;
   }
 
-  /* Unit Tracking 84-Grid */
   .unit-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
@@ -286,7 +287,7 @@
   }
 
   /* Modals */
-  #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal, #unit-modal {
+  #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal, #unit-modal, #qr-code-modal {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.85);
@@ -342,7 +343,7 @@
 
   @media print {
     body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
-    header, nav.main-nav, .container, #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal, #unit-modal, .no-print {
+    header, nav.main-nav, .container, #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal, #unit-modal, #qr-code-modal, .no-print {
       display: none !important;
     }
     #printable-admission-slip {
@@ -416,6 +417,20 @@
         <span>Authorized Officer Signature</span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- QR CODE GENERATOR MODAL FOR ATTENDANCE -->
+<div id="qr-code-modal" style="display: none;">
+  <div class="auth-card" style="text-align: center;">
+    <h2 style="font-size: 1.3rem; margin-bottom: 0.3rem;">📱 Live Attendance QR Code</h2>
+    <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem;" id="qr-modal-subtitle">Scan to mark attendance before window expires.</p>
+    
+    <div id="qrcode-container" style="background: #ffffff; padding: 1rem; border-radius: 8px; display: inline-block; margin-bottom: 1rem;"></div>
+    
+    <div id="qr-timer-display" style="font-size: 0.95rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;">Time Remaining: 10:00</div>
+
+    <button class="btn-submit" onclick="closeQrModal()">Close QR Terminal</button>
   </div>
 </div>
 
@@ -664,16 +679,17 @@
     <div id="section-academics" class="app-section active">
       <div class="card">
         <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.3rem;">🎓 Academics Command Desk</h2>
-        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem;">Access weekly timetable routine, exam schedules, and unit progress.</p>
+        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem;">Access weekly timetable routine, exam schedules, unit progress, and QR attendance.</p>
 
         <!-- Sub Tabs -->
         <div class="sub-nav-bar">
-          <button class="sub-nav-btn active" id="sub-btn-routine" onclick="switchAcademicSubTab('sub-routine')">📅 WEEKLY ROUTINE</button>
-          <button class="sub-nav-btn" id="sub-btn-exams" onclick="switchAcademicSubTab('sub-exams')">📝 EXAM SCHEDULE</button>
-          <button class="sub-nav-btn" id="sub-btn-units" onclick="switchAcademicSubTab('sub-units')">🎯 UNIT TRACKING (84 UNITS)</button>
+          <button class="sub-nav-btn active" id="sub-btn-routine" onclick="switchAcademicSubTab('sub-routine')">📅 ROUTINE</button>
+          <button class="sub-nav-btn" id="sub-btn-exams" onclick="switchAcademicSubTab('sub-exams')">📝 EXAMS</button>
+          <button class="sub-nav-btn" id="sub-btn-units" onclick="switchAcademicSubTab('sub-units')">🎯 UNITS</button>
+          <button class="sub-nav-btn" id="sub-btn-attendance" onclick="switchAcademicSubTab('sub-attendance')">📷 ATTENDANCE QR</button>
         </div>
 
-        <!-- SUB-SECTION 1: WEEKLY ROUTINE WITH EDITABLE TIMINGS -->
+        <!-- SUB-SECTION 1: WEEKLY ROUTINE -->
         <div id="sub-routine" style="display: block;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -690,37 +706,22 @@
               </select>
             </div>
 
-            <!-- Official Copy-Paste Across Batches -->
             <div id="routine-official-controls" style="display: none; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
               <button class="btn-secondary" onclick="copyCurrentRoutine()">📋 Copy Routine</button>
-              <button class="btn-secondary" onclick="pasteRoutineToCurrent()">📥 Paste to this Batch</button>
-              <button class="btn-submit" style="padding: 0.55rem 0.9rem;" onclick="saveRoutineChanges()">💾 Save & Broadcast Notice</button>
+              <button class="btn-secondary" onclick="pasteRoutineToCurrent()">📥 Paste to Batch</button>
+              <button class="btn-submit" style="padding: 0.55rem 0.9rem;" onclick="saveRoutineChanges()">💾 Save & Broadcast</button>
             </div>
           </div>
-
-          <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.75rem;">Timetable automatically rolls forward Sunday to Saturday until modified. Times are fully customizable per session.</p>
 
           <div class="table-responsive">
             <table>
               <thead>
                 <tr>
                   <th style="width: 120px;">Day</th>
-                  <th style="min-width: 200px;">
-                    <div>Session 1</div>
-                    <div id="header-timing-s1-box"></div>
-                  </th>
-                  <th style="min-width: 200px;">
-                    <div>Session 2</div>
-                    <div id="header-timing-s2-box"></div>
-                  </th>
-                  <th style="min-width: 200px;">
-                    <div>Session 3</div>
-                    <div id="header-timing-s3-box"></div>
-                  </th>
-                  <th style="min-width: 200px;">
-                    <div>Session 4</div>
-                    <div id="header-timing-s4-box"></div>
-                  </th>
+                  <th style="min-width: 180px;"><div>Session 1</div><div id="header-timing-s1-box"></div></th>
+                  <th style="min-width: 180px;"><div>Session 2</div><div id="header-timing-s2-box"></div></th>
+                  <th style="min-width: 180px;"><div>Session 3</div><div id="header-timing-s3-box"></div></th>
+                  <th style="min-width: 180px;"><div>Session 4</div><div id="header-timing-s4-box"></div></th>
                 </tr>
               </thead>
               <tbody id="routine-table-body"></tbody>
@@ -730,14 +731,13 @@
 
         <!-- SUB-SECTION 2: EXAM SCHEDULE -->
         <div id="sub-exams" style="display: none;">
-          <!-- Official Exam Formulation Form -->
           <div id="exam-schedule-editor" class="no-print" style="display: none; background: #000000; border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
             <h3 style="color: #ffffff; font-size: 1.05rem; margin-bottom: 0.85rem;">📝 Prepare & Publish Exam Schedule</h3>
             <form onsubmit="handleExamScheduleSubmit(event)">
               <div class="form-grid">
                 <div>
                   <label>Name of the Exam</label>
-                  <input type="text" id="exam-sched-name" placeholder="e.g. Combined Defence Mock Test - Phase I" required>
+                  <input type="text" id="exam-sched-name" placeholder="e.g. Combined Defence Mock Test" required>
                 </div>
                 <div>
                   <label>Date of the Exam</label>
@@ -764,9 +764,9 @@
               </div>
               <div>
                 <label>Syllabus of the Exam</label>
-                <textarea id="exam-sched-syllabus" rows="2" placeholder="List subjects, units (e.g. Math: U1-U10, GK: Current Affairs & History)" required></textarea>
+                <textarea id="exam-sched-syllabus" rows="2" placeholder="List subjects, units..." required></textarea>
               </div>
-              <button type="submit" class="btn-submit" style="margin-top: 0.5rem;">📢 Record Schedule & Broadcast to All Registered Students</button>
+              <button type="submit" class="btn-submit" style="margin-top: 0.5rem;">📢 Record Schedule & Broadcast to Students</button>
             </form>
           </div>
 
@@ -783,7 +783,7 @@
                   <th>Date of Exam</th>
                   <th>Time of Exam</th>
                   <th>Batch</th>
-                  <th>Syllabus of the Exam</th>
+                  <th>Syllabus</th>
                   <th>Scheduled By</th>
                   <th class="no-print">Action</th>
                 </tr>
@@ -830,6 +830,58 @@
 
           <div class="unit-grid" id="unit-grid-container"></div>
         </div>
+
+        <!-- SUB-SECTION 4: ATTENDANCE QR CODE TERMINAL -->
+        <div id="sub-attendance" style="display: none;">
+          <div style="background: #000000; border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 0.4rem;">📷 Live Attendance QR Code Terminal</h3>
+            <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem;">Generate a 10-minute active attendance QR code before scheduled classes or exams. Unmarked cadets are marked Absent.</p>
+
+            <div class="form-grid">
+              <div>
+                <label>Select Session Type</label>
+                <select id="qr-session-type">
+                  <option value="Class">Scheduled Class Session</option>
+                  <option value="Exam">Scheduled Examination</option>
+                </select>
+              </div>
+              <div>
+                <label>Select Batch / Section</label>
+                <select id="qr-batch-target">
+                  <option value="G1">General - G1</option>
+                  <option value="G2">General - G2</option>
+                  <option value="G3">General - G3</option>
+                  <option value="G4">General - G4</option>
+                  <option value="H1">Hostel - H1</option>
+                  <option value="H2">Hostel - H2</option>
+                  <option value="H3">Hostel - H3</option>
+                  <option value="H4">Hostel - H4</option>
+                </select>
+              </div>
+            </div>
+
+            <button class="btn-submit" style="background: var(--info); margin-top: 0.5rem;" onclick="generateAttendanceQRCode()">Generate 10-Minute QR Code</button>
+          </div>
+
+          <div class="card" style="background: #000; border: 1px solid var(--border);">
+            <h3 style="color: #ffffff; font-size: 1rem; margin-bottom: 0.75rem;">📋 Today's Attendance & Absentee Log</h3>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cadet Name</th>
+                    <th>Batch/Sec</th>
+                    <th>Session Type</th>
+                    <th>Status</th>
+                    <th>Time Recorded</th>
+                  </tr>
+                </thead>
+                <tbody id="attendance-log-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1106,6 +1158,7 @@ let financeRecords = [];
 let routines = {};
 let unitData = {};
 let examSchedules = [];
+let attendanceLogs = [];
 let currentUser = null;
 let superAdminPin = '1234';
 let superAdminRecoveryPhone = '9876543210';
@@ -1114,6 +1167,7 @@ let activeModalCadetId = null;
 let uploadedPhotoBase64 = "";
 let copiedRoutineBuffer = null;
 let selectedUnitId = null;
+let qrTimerInterval = null;
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const BATCH_KEYS = ["G1", "G2", "G3", "G4", "H1", "H2", "H3", "H4"];
@@ -1194,6 +1248,13 @@ db.ref('exam_schedules').on('value', snapshot => {
   renderExamScheduleTable();
 });
 
+// Attendance logs listener
+db.ref('attendance_logs').on('value', snapshot => {
+  const data = snapshot.val();
+  attendanceLogs = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderAttendanceLogTable();
+});
+
 window.addEventListener('DOMContentLoaded', () => {
   const todayStr = new Date().toISOString().split('T')[0];
   document.getElementById('adm-date').value = todayStr;
@@ -1240,10 +1301,106 @@ function switchAcademicSubTab(subId) {
   document.getElementById('sub-routine').style.display = subId === 'sub-routine' ? 'block' : 'none';
   document.getElementById('sub-exams').style.display = subId === 'sub-exams' ? 'block' : 'none';
   document.getElementById('sub-units').style.display = subId === 'sub-units' ? 'block' : 'none';
+  document.getElementById('sub-attendance').style.display = subId === 'sub-attendance' ? 'block' : 'none';
 
   document.getElementById('sub-btn-routine').classList.toggle('active', subId === 'sub-routine');
   document.getElementById('sub-btn-exams').classList.toggle('active', subId === 'sub-exams');
   document.getElementById('sub-btn-units').classList.toggle('active', subId === 'sub-units');
+  document.getElementById('sub-btn-attendance').classList.toggle('active', subId === 'sub-attendance');
+}
+
+// -------------------------------------------------------------
+// ATTENDANCE QR CODE GENERATOR (10-MINUTE WINDOW)
+// -------------------------------------------------------------
+function generateAttendanceQRCode() {
+  const sessionType = document.getElementById('qr-session-type').value;
+  const batchTarget = document.getElementById('qr-batch-target').value;
+  const container = document.getElementById('qrcode-container');
+  container.innerHTML = '';
+
+  const token = 'FF-ATT-' + batchTarget + '-' + sessionType + '-' + Date.now();
+  const payloadUrl = window.location.href.split('?')[0] + '?attendance_token=' + token;
+
+  // Generate QR Code via QRCode.js
+  new QRCode(container, {
+    text: payloadUrl,
+    width: 200,
+    height: 200,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  document.getElementById('qr-modal-subtitle').textContent = `Batch: ${batchTarget} | Session: ${sessionType}`;
+  document.getElementById('qr-code-modal').style.display = 'flex';
+
+  // 10-Minute Countdown Timer (600 seconds)
+  let timeLeft = 600;
+  if (qrTimerInterval) clearInterval(qrTimerInterval);
+
+  qrTimerInterval = setInterval(() => {
+    timeLeft--;
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    document.getElementById('qr-timer-display').textContent = `Time Remaining: ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+
+    if (timeLeft <= 0) {
+      clearInterval(qrTimerInterval);
+      markUnmarkedCadetsAbsent(batchTarget, sessionType);
+      alert('Attendance window closed. Cadets who failed to scan have been marked Absent.');
+      closeQrModal();
+    }
+  }, 1000);
+
+  notifySuperAdminAction(`[QR ATTENDANCE GENERATED]\nBatch: ${batchTarget}\nSession Type: ${sessionType}\n10-Minute attendance window active.`);
+}
+
+function closeQrModal() {
+  if (qrTimerInterval) clearInterval(qrTimerInterval);
+  document.getElementById('qr-code-modal').style.display = 'none';
+}
+
+function markUnmarkedCadetsAbsent(batch, sessionType) {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const batchCadets = cadetList.filter(c => c.section === batch && c.status === 'Active');
+
+  batchCadets.forEach(cadet => {
+    const alreadyLogged = attendanceLogs.some(log => log.cadetId === cadet.id && log.date === todayStr && log.session === sessionType);
+    if (!alreadyLogged) {
+      db.ref('attendance_logs').push({
+        cadetId: cadet.id,
+        cadetName: cadet.name,
+        batch: batch,
+        session: sessionType,
+        status: 'Absent',
+        date: todayStr,
+        timestamp: Date.now()
+      });
+    }
+  });
+}
+
+function renderAttendanceLogTable() {
+  const tbody = document.getElementById('attendance-log-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  attendanceLogs.sort((a, b) => b.timestamp - a.timestamp).forEach(log => {
+    const tr = document.createElement('tr');
+    const badgeClass = log.status === 'Present' ? 'badge-active' : 'badge-suspended';
+    tr.innerHTML = `
+      <td><b>${log.cadetName}</b></td>
+      <td>${log.batch}</td>
+      <td>${log.session}</td>
+      <td><span class="badge ${badgeClass}">${log.status}</span></td>
+      <td><small style="color:var(--muted);">${new Date(log.timestamp).toLocaleTimeString()}</small></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if (attendanceLogs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted); padding:2rem;">No attendance records generated yet.</td></tr>`;
+  }
 }
 
 // -------------------------------------------------------------
@@ -1263,7 +1420,6 @@ function loadRoutineForBatch() {
 
   const batchRoutine = (routines && routines[batch]) ? routines[batch] : {};
   const isEditable = canEditAcademics();
-
   const sessionTimings = batchRoutine.timings || DEFAULT_TIMINGS;
 
   ['s1', 's2', 's3', 's4'].forEach(s => {
@@ -1282,10 +1438,10 @@ function loadRoutineForBatch() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><b>${day}</b></td>
-      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s1" value="${dayData.s1 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject / Instructor">` : `<span>${dayData.s1 || '-'}</span>`}</td>
-      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s2" value="${dayData.s2 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject / Instructor">` : `<span>${dayData.s2 || '-'}</span>`}</td>
-      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s3" value="${dayData.s3 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject / Instructor">` : `<span>${dayData.s3 || '-'}</span>`}</td>
-      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s4" value="${dayData.s4 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject / Instructor">` : `<span>${dayData.s4 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s1" value="${dayData.s1 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject">` : `<span>${dayData.s1 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s2" value="${dayData.s2 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject">` : `<span>${dayData.s2 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s3" value="${dayData.s3 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject">` : `<span>${dayData.s3 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s4" value="${dayData.s4 || ''}" style="margin:0; padding:0.4rem;" placeholder="Subject">` : `<span>${dayData.s4 || '-'}</span>`}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -1295,7 +1451,7 @@ function copyCurrentRoutine() {
   const batch = document.getElementById('routine-batch-select').value;
   const batchRoutine = (routines && routines[batch]) ? routines[batch] : {};
   copiedRoutineBuffer = JSON.parse(JSON.stringify(batchRoutine));
-  alert(`Routine & Timings for Batch ${batch} copied! Select another batch and tap "Paste to this Batch".`);
+  alert(`Routine & Timings for Batch ${batch} copied! Select another batch and tap "Paste to Batch".`);
 }
 
 function pasteRoutineToCurrent() {
@@ -1306,7 +1462,7 @@ function pasteRoutineToCurrent() {
   const batch = document.getElementById('routine-batch-select').value;
   routines[batch] = JSON.parse(JSON.stringify(copiedRoutineBuffer));
   loadRoutineForBatch();
-  alert(`Pasted copied routine & timings into ${batch}. Tap "Save & Broadcast Notice" to commit.`);
+  alert(`Pasted copied routine into ${batch}. Tap "Save & Broadcast" to commit.`);
 }
 
 function saveRoutineChanges() {
@@ -1331,7 +1487,7 @@ function saveRoutineChanges() {
 
   db.ref('routines/' + batch).set(updatedBatchRoutine).then(() => {
     notifySuperAdminAction(`[ROUTINE UPDATED] Weekly Routine & Timings for batch ${batch} updated by ${currentUser ? currentUser.name : 'SuperAdmin'}.`);
-    broadcastNoticeToAllStudents(`📢 *FAUJI FACTORY - WEEKLY TIMETABLE UPDATE*\n\nWeekly Routine for Batch *${batch}* (Sunday to Saturday) with updated session timings has been published.\nPlease check the Academics section on the portal.`);
+    broadcastNoticeToAllStudents(`📢 *FAUJI FACTORY - WEEKLY TIMETABLE UPDATE*\n\nWeekly Routine for Batch *${batch}* (Sunday to Saturday) has been published.\nPlease check the Academics section on the portal.`);
     alert(`Weekly routine & timings for ${batch} saved and notification sent to students!`);
   });
 }
@@ -1361,7 +1517,7 @@ function handleExamScheduleSubmit(e) {
   db.ref('exam_schedules').push(scheduleData).then(() => {
     notifySuperAdminAction(`[EXAM SCHEDULED]\nExam: ${name}\nDate: ${dateVal}\nTime: ${timeVal}\nBatch: ${batch}\nScheduled By: ${scheduledBy}`);
 
-    const broadcastMsg = `📝 *FAUJI FACTORY - OFFICIAL EXAMINATION SCHEDULE*\n\n• *Exam Name:* ${name}\n• *Date of Exam:* ${dateVal}\n• *Time of Exam:* ${timeVal}\n• *Batch:* ${batch}\n• *Syllabus:* ${syllabus}\n\nAll cadets are instructed to report on time in proper uniform.\n- Academic Examination Desk`;
+    const broadcastMsg = `📝 *FAUJI FACTORY - OFFICIAL EXAMINATION SCHEDULE*\n\n• *Exam Name:* ${name}\n• *Date of Exam:* ${dateVal}\n• *Time of Exam:* ${timeVal}\n• *Batch:* ${batch}\n• *Syllabus:* ${syllabus}\n\nAll cadets are instructed to report on time.\n- Academic Examination Desk`;
     broadcastNoticeToAllStudents(broadcastMsg);
 
     alert(`Exam "${name}" successfully recorded and dispatched to all registered students!`);
@@ -1379,7 +1535,6 @@ function renderExamScheduleTable() {
   countBadge.textContent = `${examSchedules.length} Scheduled`;
   const isEditable = canEditAcademics();
 
-  // Sort descending by date
   examSchedules.sort((a, b) => (b.date > a.date ? 1 : -1));
 
   examSchedules.forEach(item => {
