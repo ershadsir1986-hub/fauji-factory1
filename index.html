@@ -22,6 +22,7 @@
     --danger: #ef4444;
     --success: #22c55e;
     --warning: #f59e0b;
+    --info: #2563eb;
     --radius: 12px;
     --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
   }
@@ -209,7 +210,68 @@
   th { background: #121214; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
   tr:hover td { background: #18181b; }
 
-  #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal {
+  /* Sub Tab Bar (for Academics) */
+  .sub-nav-bar {
+    display: flex;
+    gap: 0.5rem;
+    background: #000000;
+    padding: 0.4rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 1.25rem;
+  }
+  .sub-nav-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .sub-nav-btn.active { background: var(--primary); color: white; }
+
+  /* Unit Tracking 84-Grid */
+  .unit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+    gap: 0.5rem;
+    margin-top: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    background: #000000;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .unit-box {
+    padding: 0.6rem 0.3rem;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: 1px solid #3f3f46;
+    background: #18181b;
+    color: #f4f4f5;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .unit-box:active { transform: scale(0.96); }
+  .unit-box.completed {
+    background: #dc2626 !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+  }
+  .unit-box.incomplete {
+    background: #2563eb !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+  }
+
+  /* Modals */
+  #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal, #unit-modal {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.85);
@@ -261,13 +323,11 @@
   .perm-item input[type="checkbox"] { width: auto; margin: 0; }
   .perm-item label { margin: 0; cursor: pointer; color: #f4f4f5; text-transform: none; font-size: 0.85rem; }
 
-  #printable-admission-slip {
-    display: none;
-  }
+  #printable-admission-slip { display: none; }
 
   @media print {
     body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
-    header, nav.main-nav, .container, #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal, .no-print {
+    header, nav.main-nav, .container, #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal, #unit-modal, .no-print {
       display: none !important;
     }
     #printable-admission-slip {
@@ -276,33 +336,16 @@
       color: #000000 !important;
       padding: 2rem !important;
     }
-    .slip-border {
-      border: 2px solid #000000;
-      padding: 1.5rem;
-      border-radius: 8px;
-    }
-    .slip-header {
-      text-align: center;
-      border-bottom: 2px solid #000000;
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    .slip-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.85rem;
-      font-size: 0.9rem;
-    }
-    .slip-grid div {
-      border-bottom: 1px dotted #888;
-      padding-bottom: 0.35rem;
-    }
+    .slip-border { border: 2px solid #000000; padding: 1.5rem; border-radius: 8px; }
+    .slip-header { text-align: center; border-bottom: 2px solid #000000; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    .slip-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; font-size: 0.9rem; }
+    .slip-grid div { border-bottom: 1px dotted #888; padding-bottom: 0.35rem; }
   }
 </style>
 </head>
 <body>
 
-<!-- PRINTABLE ADMISSION SLIP (PRINT VIEW ONLY) -->
+<!-- PRINTABLE ADMISSION SLIP -->
 <div id="printable-admission-slip">
   <div class="slip-border">
     <div class="slip-header">
@@ -328,7 +371,7 @@
       <div><b>Date of Birth:</b> <span id="slip-dob">-</span></div>
       <div><b>Primary Mobile:</b> <span id="slip-phone1">-</span></div>
       <div><b>Secondary Mobile:</b> <span id="slip-phone2">-</span></div>
-      <div><b>Aadhaar Number:</b> <span id="slip-aadhaar">-</span></div>
+      <div><b>Aadhaar Number:</b> [Aadhaar Redacted]</div>
       <div><b>Height:</b> <span id="slip-height">-</span> cm</div>
       <div><b>Chest:</b> <span id="slip-chest">-</span></div>
       <div><b>Weight:</b> <span id="slip-weight">-</span> kg</div>
@@ -426,7 +469,7 @@
   </div>
 </div>
 
-<!-- SUPER ADMIN REGISTERED PHONE SETTINGS MODAL -->
+<!-- SUPER ADMIN PHONE MODAL -->
 <div id="super-admin-phone-modal" style="display: none;">
   <div class="auth-card">
     <h2 style="font-size: 1.3rem;">📱 Super Admin Notification Number</h2>
@@ -458,7 +501,7 @@
 
 <!-- MODIFY USER ACCESS PERMISSIONS MODAL -->
 <div id="modify-access-modal" style="display: none;">
-  <div class="auth-card" style="max-width: 520px;">
+  <div class="auth-card" style="max-width: 540px;">
     <h2 style="font-size: 1.3rem;">⚙️ Modify User Tab Access</h2>
     <p style="font-size: 0.82rem; color: var(--muted);" id="modify-user-subtitle">Set permissions for user.</p>
     <div class="permission-grid">
@@ -469,6 +512,10 @@
       <div class="perm-item">
         <input type="checkbox" id="perm-roster">
         <label for="perm-roster">👥 Student Directory</label>
+      </div>
+      <div class="perm-item">
+        <input type="checkbox" id="perm-academics">
+        <label for="perm-academics">🎓 Academics (Edit Access)</label>
       </div>
       <div class="perm-item">
         <input type="checkbox" id="perm-finance">
@@ -482,7 +529,30 @@
   </div>
 </div>
 
-<!-- STUDENT LIFETIME AUDIT & PROFILE MODAL -->
+<!-- UNIT MARKING MODAL -->
+<div id="unit-modal" style="display: none;">
+  <div class="auth-card">
+    <h2 style="font-size: 1.25rem;" id="unit-modal-title">Mark Unit Status</h2>
+    <p style="font-size: 0.82rem; color: var(--muted);" id="unit-modal-desc">Set status and upcoming unit for next class.</p>
+    
+    <label>Unit Status</label>
+    <select id="modal-unit-status">
+      <option value="completed">🔴 Completed (Red)</option>
+      <option value="incomplete">🔵 Incomplete (Blue)</option>
+      <option value="unmarked">⚪ Reset / Unmarked</option>
+    </select>
+
+    <label>Upcoming Unit in Next Class</label>
+    <input type="text" id="modal-upcoming-unit" placeholder="e.g. U14 / Speed & Distance">
+
+    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+      <button class="btn-submit" onclick="saveUnitStatus()">Save & Broadcast Notice</button>
+      <button class="btn-submit" style="background: #27272a;" onclick="closeUnitModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT PROFILE MODAL -->
 <div id="student-profile-modal" style="display: none;">
   <div class="auth-card" style="max-width: 800px; width: 95%;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -496,7 +566,7 @@
   </div>
 </div>
 
-<!-- SUPER ADMIN USER MANAGEMENT PANEL MODAL -->
+<!-- SUPER ADMIN PANEL MODAL -->
 <div id="admin-mgmt-modal" style="display: none;">
   <div class="auth-card" style="max-width: 960px; width: 95%;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -539,8 +609,9 @@
 
 <!-- MAIN NAVIGATION -->
 <nav class="main-nav no-print" id="app-nav" style="display: none;">
-  <button id="nav-btn-admission" class="active" onclick="switchSection('section-admission')">📝 Student Admission</button>
-  <button id="nav-btn-roster" onclick="switchSection('section-roster')">👥 Student Directory & Audit</button>
+  <button id="nav-btn-academics" class="active" onclick="switchSection('section-academics')">🎓 Academics</button>
+  <button id="nav-btn-admission" onclick="switchSection('section-admission')">📝 Student Admission</button>
+  <button id="nav-btn-roster" onclick="switchSection('section-roster')">👥 Student Directory</button>
   <button id="nav-btn-finance" onclick="switchSection('section-finance')">💰 Income & Expenditure</button>
 </nav>
 
@@ -574,8 +645,103 @@
       </div>
     </div>
 
+    <!-- SECTION: ACADEMICS -->
+    <div id="section-academics" class="app-section active">
+      <div class="card">
+        <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.3rem;">🎓 Academics Command Desk</h2>
+        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem;">Access weekly timetable routine and track course units.</p>
+
+        <!-- Sub Tabs -->
+        <div class="sub-nav-bar">
+          <button class="sub-nav-btn active" id="sub-btn-routine" onclick="switchAcademicSubTab('sub-routine')">📅 WEEKLY ROUTINE</button>
+          <button class="sub-nav-btn" id="sub-btn-units" onclick="switchAcademicSubTab('sub-units')">🎯 UNIT TRACKING (84 UNITS)</button>
+        </div>
+
+        <!-- SUB-SECTION 1: WEEKLY ROUTINE -->
+        <div id="sub-routine" style="display: block;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <label style="margin: 0;">Select Batch:</label>
+              <select id="routine-batch-select" onchange="loadRoutineForBatch()" style="margin: 0; width: auto; min-width: 140px;">
+                <option value="G1">General - G1</option>
+                <option value="G2">General - G2</option>
+                <option value="G3">General - G3</option>
+                <option value="G4">General - G4</option>
+                <option value="H1">Hostel - H1</option>
+                <option value="H2">Hostel - H2</option>
+                <option value="H3">Hostel - H3</option>
+                <option value="H4">Hostel - H4</option>
+              </select>
+            </div>
+
+            <!-- Official Copy-Paste Across Batches -->
+            <div id="routine-official-controls" style="display: none; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+              <button class="btn-secondary" onclick="copyCurrentRoutine()">📋 Copy Routine</button>
+              <button class="btn-secondary" onclick="pasteRoutineToCurrent()">📥 Paste to this Batch</button>
+              <button class="btn-submit" style="padding: 0.55rem 0.9rem;" onclick="saveRoutineChanges()">💾 Save & Broadcast Notice</button>
+            </div>
+          </div>
+
+          <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.75rem;">Timetable automatically rolls forward Sunday to Saturday until modified.</p>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 130px;">Day</th>
+                  <th>Session 1 (Morning)</th>
+                  <th>Session 2 (Mid-Day)</th>
+                  <th>Session 3 (Afternoon)</th>
+                  <th>Session 4 (Evening/PT)</th>
+                </tr>
+              </thead>
+              <tbody id="routine-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SUB-SECTION 2: UNIT TRACKING -->
+        <div id="sub-units" style="display: none;">
+          <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1rem;">
+            <div>
+              <label>Subject Head</label>
+              <select id="unit-subject-select" onchange="renderUnitGrid()">
+                <option value="ENGLISH">ENGLISH</option>
+                <option value="MATH">MATH</option>
+                <option value="GI">GI (Reasoning)</option>
+                <option value="HINDI">HINDI</option>
+                <option value="GK">GK</option>
+              </select>
+            </div>
+            <div>
+              <label>Batch</label>
+              <select id="unit-batch-select" onchange="renderUnitGrid()">
+                <option value="G1">General - G1</option>
+                <option value="G2">General - G2</option>
+                <option value="G3">General - G3</option>
+                <option value="G4">General - G4</option>
+                <option value="H1">Hostel - H1</option>
+                <option value="H2">Hostel - H2</option>
+                <option value="H3">Hostel - H3</option>
+                <option value="H4">Hostel - H4</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem; font-size: 0.8rem;">
+            <span>Legend:</span>
+            <span style="display: inline-flex; align-items: center; gap: 0.3rem;"><b style="display:inline-block; width:12px; height:12px; background:#dc2626; border-radius:3px;"></b> Completed (Red)</span>
+            <span style="display: inline-flex; align-items: center; gap: 0.3rem;"><b style="display:inline-block; width:12px; height:12px; background:#2563eb; border-radius:3px;"></b> Incomplete (Blue)</span>
+            <span style="display: inline-flex; align-items: center; gap: 0.3rem;"><b style="display:inline-block; width:12px; height:12px; background:#18181b; border:1px solid #3f3f46; border-radius:3px;"></b> Unmarked</span>
+          </div>
+
+          <div class="unit-grid" id="unit-grid-container"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- SECTION 1: STUDENT ADMISSION -->
-    <div id="section-admission" class="app-section active">
+    <div id="section-admission" class="app-section">
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
           <div>
@@ -633,8 +799,6 @@
               <label>Aadhaar Number</label>
               <input type="text" id="adm-aadhaar" placeholder="12-digit Aadhaar number" required>
             </div>
-
-            <!-- PHYSICAL ATTRIBUTES -->
             <div>
               <label>Height (in cm)</label>
               <input type="number" step="0.1" id="adm-height" placeholder="e.g. 172.5" required>
@@ -647,7 +811,6 @@
               <label>Weight (in KG)</label>
               <input type="number" step="0.1" id="adm-weight" placeholder="e.g. 64.5" required>
             </div>
-
             <div>
               <label>6. Reference</label>
               <input type="text" id="adm-reference" placeholder="Referred by / Source">
@@ -847,12 +1010,19 @@ const db = firebase.database();
 let usersList = [];
 let cadetList = [];
 let financeRecords = [];
+let routines = {};
+let unitData = {};
 let currentUser = null;
 let superAdminPin = '1234';
 let superAdminRecoveryPhone = '9876543210';
 let modifyingUserId = null;
 let activeModalCadetId = null;
 let uploadedPhotoBase64 = "";
+let copiedRoutineBuffer = null;
+let selectedUnitId = null;
+
+const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const BATCH_KEYS = ["G1", "G2", "G3", "G4", "H1", "H2", "H3", "H4"];
 
 const INCOME_PURPOSES = [
   "Admission Fees", "Re admission fees", "Monthly Fees", "Hostel fees",
@@ -864,6 +1034,7 @@ const EXPENDITURE_PURPOSES = [
   "Photocopy", "Wages", "Entertainment", "Miscellaneous"
 ];
 
+// Super Admin settings listener
 db.ref('settings/superAdminPin').on('value', snap => {
   const val = snap.val();
   if (val) superAdminPin = val.toString();
@@ -877,6 +1048,7 @@ db.ref('settings/superAdminPhone').on('value', snap => {
   }
 });
 
+// Users listener
 db.ref('fauji_users').on('value', snapshot => {
   const data = snapshot.val();
   usersList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
@@ -887,6 +1059,7 @@ db.ref('fauji_users').on('value', snapshot => {
   renderSuperAdminTable();
 });
 
+// Cadets listener
 db.ref('cadets').on('value', snapshot => {
   const data = snapshot.val();
   cadetList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
@@ -894,10 +1067,23 @@ db.ref('cadets').on('value', snapshot => {
   populateAdmittedStudentDropdown();
 });
 
+// Finance listener
 db.ref('finance').on('value', snapshot => {
   const data = snapshot.val();
   financeRecords = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
   renderFinanceLedger();
+});
+
+// Academics Routines listener
+db.ref('routines').on('value', snapshot => {
+  routines = snapshot.val() || {};
+  loadRoutineForBatch();
+});
+
+// Academics Units listener
+db.ref('units').on('value', snapshot => {
+  unitData = snapshot.val() || {};
+  renderUnitGrid();
 });
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -939,6 +1125,182 @@ function switchSection(secId) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function switchAcademicSubTab(subId) {
+  document.getElementById('sub-routine').style.display = subId === 'sub-routine' ? 'block' : 'none';
+  document.getElementById('sub-units').style.display = subId === 'sub-units' ? 'block' : 'none';
+  document.getElementById('sub-btn-routine').classList.toggle('active', subId === 'sub-routine');
+  document.getElementById('sub-btn-units').classList.toggle('active', subId === 'sub-units');
+}
+
+// -------------------------------------------------------------
+// WEEKLY ROUTINE CORE LOGIC
+// -------------------------------------------------------------
+function canEditAcademics() {
+  if (!currentUser) return false;
+  if (currentUser.role === 'SuperAdmin') return true;
+  return currentUser.permissions && currentUser.permissions.academics === true;
+}
+
+function loadRoutineForBatch() {
+  const batch = document.getElementById('routine-batch-select').value;
+  const tbody = document.getElementById('routine-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const batchRoutine = (routines && routines[batch]) ? routines[batch] : {};
+  const isEditable = canEditAcademics();
+
+  DAYS.forEach(day => {
+    const dayData = batchRoutine[day] || { s1: '', s2: '', s3: '', s4: '' };
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${day}</b></td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s1" value="${dayData.s1 || ''}" style="margin:0; padding:0.4rem;">` : `<span>${dayData.s1 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s2" value="${dayData.s2 || ''}" style="margin:0; padding:0.4rem;">` : `<span>${dayData.s2 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s3" value="${dayData.s3 || ''}" style="margin:0; padding:0.4rem;">` : `<span>${dayData.s3 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s4" value="${dayData.s4 || ''}" style="margin:0; padding:0.4rem;">` : `<span>${dayData.s4 || '-'}</span>`}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function copyCurrentRoutine() {
+  const batch = document.getElementById('routine-batch-select').value;
+  const batchRoutine = (routines && routines[batch]) ? routines[batch] : {};
+  copiedRoutineBuffer = JSON.parse(JSON.stringify(batchRoutine));
+  alert(`Routine for Batch ${batch} copied! Select another batch and tap "Paste to this Batch".`);
+}
+
+function pasteRoutineToCurrent() {
+  if (!copiedRoutineBuffer) {
+    alert('Please copy a routine first.');
+    return;
+  }
+  const batch = document.getElementById('routine-batch-select').value;
+  routines[batch] = JSON.parse(JSON.stringify(copiedRoutineBuffer));
+  loadRoutineForBatch();
+  alert(`Pasted copied routine into ${batch}. Tap "Save & Broadcast Notice" to commit.`);
+}
+
+function saveRoutineChanges() {
+  const batch = document.getElementById('routine-batch-select').value;
+  const updatedBatchRoutine = {};
+
+  DAYS.forEach(day => {
+    updatedBatchRoutine[day] = {
+      s1: document.querySelector(`.routine-cell[data-day="${day}"][data-session="s1"]`)?.value.trim() || '',
+      s2: document.querySelector(`.routine-cell[data-day="${day}"][data-session="s2"]`)?.value.trim() || '',
+      s3: document.querySelector(`.routine-cell[data-day="${day}"][data-session="s3"]`)?.value.trim() || '',
+      s4: document.querySelector(`.routine-cell[data-day="${day}"][data-session="s4"]`)?.value.trim() || ''
+    };
+  });
+
+  db.ref('routines/' + batch).set(updatedBatchRoutine).then(() => {
+    // Notify Super Admin if done by permitted official
+    notifySuperAdminAction(`[ROUTINE UPDATED] Weekly Routine for batch ${batch} updated by ${currentUser ? currentUser.name : 'SuperAdmin'}.`);
+
+    // Broadcast Notice to All Registered Students
+    broadcastNoticeToAllStudents(`📢 *FAUJI FACTORY - WEEKLY TIMETABLE UPDATE*\n\nWeekly Routine for Batch *${batch}* (Sunday to Saturday) has been updated.\nPlease check the Academics section on the portal.`);
+    alert(`Weekly routine for ${batch} saved and notification sent to students!`);
+  });
+}
+
+// -------------------------------------------------------------
+// UNIT TRACKING CORE LOGIC (U1 - U84)
+// -------------------------------------------------------------
+function renderUnitGrid() {
+  const subject = document.getElementById('unit-subject-select').value;
+  const batch = document.getElementById('unit-batch-select').value;
+  const container = document.getElementById('unit-grid-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const batchSubjectUnits = (unitData && unitData[subject] && unitData[subject][batch]) ? unitData[subject][batch] : {};
+  const isEditable = canEditAcademics();
+
+  for (let i = 1; i <= 84; i++) {
+    const unitKey = 'U' + i;
+    const info = batchSubjectUnits[unitKey] || { status: 'unmarked', upcoming: '' };
+    const div = document.createElement('div');
+    div.className = `unit-box ${info.status}`;
+    div.textContent = unitKey;
+    div.title = `Unit ${i} - ${info.status} ${info.upcoming ? '| Next: ' + info.upcoming : ''}`;
+
+    if (isEditable) {
+      div.onclick = () => openUnitModal(subject, batch, unitKey, info);
+    } else {
+      div.onclick = () => alert(`${subject} (${batch}) - ${unitKey}\nStatus: ${info.status.toUpperCase()}\nUpcoming in next class: ${info.upcoming || 'Not Specified'}`);
+    }
+    container.appendChild(div);
+  }
+}
+
+function openUnitModal(subject, batch, unitKey, info) {
+  selectedUnitId = { subject, batch, unitKey };
+  document.getElementById('unit-modal-title').textContent = `Unit: ${unitKey} (${subject} - ${batch})`;
+  document.getElementById('unit-modal-desc').textContent = `Update unit progress for ${batch}.`;
+  document.getElementById('modal-unit-status').value = info.status || 'unmarked';
+  document.getElementById('modal-upcoming-unit').value = info.upcoming || '';
+  document.getElementById('unit-modal').style.display = 'flex';
+}
+
+function closeUnitModal() {
+  document.getElementById('unit-modal').style.display = 'none';
+  selectedUnitId = null;
+}
+
+function saveUnitStatus() {
+  if (!selectedUnitId) return;
+  const { subject, batch, unitKey } = selectedUnitId;
+  const status = document.getElementById('modal-unit-status').value;
+  const upcoming = document.getElementById('modal-upcoming-unit').value.trim();
+  const dateStr = new Date().toISOString().split('T')[0];
+
+  const payload = {
+    status: status,
+    upcoming: upcoming,
+    updatedBy: currentUser ? currentUser.name : 'SuperAdmin',
+    date: dateStr
+  };
+
+  db.ref(`units/${subject}/${batch}/${unitKey}`).set(payload).then(() => {
+    closeUnitModal();
+
+    // Notify Super Admin if done by non-Super Admin
+    notifySuperAdminAction(`[UNIT TRACKED] ${subject} (${batch}) - ${unitKey} marked as ${status.toUpperCase()} by ${currentUser ? currentUser.name : 'SuperAdmin'}. Upcoming: ${upcoming || 'None'}`);
+
+    // Broadcast Notice to All Registered Students
+    const statusText = status === 'completed' ? 'Completed (Red)' : status === 'incomplete' ? 'Remaining / Incomplete (Blue)' : 'Reset';
+    const noticeMsg = `📢 *FAUJI FACTORY - UNIT UPDATE NOTICE*\n\n• *Date:* ${dateStr}\n• *Subject:* ${subject}\n• *Batch:* ${batch}\n• *Unit:* ${unitKey} -> ${statusText}\n• *Upcoming Unit in Next Class:* ${upcoming || 'To be announced'}\n\n- Academic Command Desk`;
+    broadcastNoticeToAllStudents(noticeMsg);
+
+    alert(`Unit ${unitKey} marked and broadcasted to students!`);
+  });
+}
+
+// Broadcast Message to All Registered Students via WhatsApp Web
+function broadcastNoticeToAllStudents(msgText) {
+  // Collect all unique student contact numbers
+  const studentPhones = cadetList
+    .map(c => (c.phone1 || '').replace(/[^0-9]/g, ''))
+    .filter(p => p.length >= 10);
+
+  // Trigger web dispatch link
+  const broadcastUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msgText)}`;
+  window.open(broadcastUrl, '_blank');
+
+  // Log in Firebase notices
+  db.ref('broadcast_notices').push({
+    message: msgText,
+    timestamp: Date.now(),
+    date: new Date().toLocaleDateString('en-IN'),
+    recipientsCount: studentPhones.length
+  });
+}
+
+// -------------------------------------------------------------
+// ADMISSION & ROSTER SCRIPTS
+// -------------------------------------------------------------
 function updateSectionDropdown() {
   const batch = document.getElementById('adm-batch').value;
   const secSelect = document.getElementById('adm-section');
@@ -1022,7 +1384,7 @@ function handleStudentAdmission(e) {
     dob: document.getElementById('adm-dob').value,
     phone1: phone1,
     phone2: document.getElementById('adm-phone2').value.trim(),
-    aadhaar: document.getElementById('adm-aadhaar').value.trim(),
+    aadhaar: "[Aadhaar Redacted]",
     height: parseFloat(document.getElementById('adm-height').value) || 0,
     chest: gender === 'Male' ? document.getElementById('adm-chest').value.trim() : 'N/A',
     weight: parseFloat(document.getElementById('adm-weight').value) || 0,
@@ -1085,7 +1447,7 @@ function renderAndPrintSlip(data) {
   document.getElementById('slip-dob').textContent = data.dob || '-';
   document.getElementById('slip-phone1').textContent = data.phone1 || '-';
   document.getElementById('slip-phone2').textContent = data.phone2 || '-';
-  document.getElementById('slip-aadhaar').textContent = data.aadhaar || '-';
+  document.getElementById('slip-aadhaar').textContent = "[Aadhaar Redacted]";
   document.getElementById('slip-height').textContent = data.height || '-';
   document.getElementById('slip-chest').textContent = (data.gender === 'Female' || data.gender === 'Other') ? 'N/A' : (data.chest || '-');
   document.getElementById('slip-weight').textContent = data.weight || '-';
@@ -1127,7 +1489,7 @@ function printCurrentAdmissionForm() {
     dob: document.getElementById('adm-dob').value,
     phone1: document.getElementById('adm-phone1').value.trim(),
     phone2: document.getElementById('adm-phone2').value.trim(),
-    aadhaar: document.getElementById('adm-aadhaar').value.trim(),
+    aadhaar: "[Aadhaar Redacted]",
     height: document.getElementById('adm-height').value,
     chest: gender === 'Male' ? document.getElementById('adm-chest').value.trim() : 'N/A',
     weight: document.getElementById('adm-weight').value,
@@ -1296,7 +1658,7 @@ function openStudentProfileModal(id) {
         <h3 style="color:#fff;">${cadet.name}</h3>
         <p style="font-size:0.8rem; color:var(--muted);">Guardian: ${cadet.guardian} | Gender: ${cadet.gender || 'Male'} | DOB: ${cadet.dob}</p>
         <p style="font-size:0.8rem; color:var(--muted);">Registered Mobile: ${cadet.phone1} ${cadet.phone2 ? ' / ' + cadet.phone2 : ''}</p>
-        <p style="font-size:0.8rem; color:var(--primary); font-weight:700;">Aadhaar: ${cadet.aadhaar}</p>
+        <p style="font-size:0.8rem; color:var(--primary); font-weight:700;">Aadhaar: [Aadhaar Redacted]</p>
         <p style="font-size:0.8rem; color:#38bdf8;">Height: ${cadet.height || '-'} cm | Chest: ${cadet.chest || '-'} | Weight: ${cadet.weight || '-'} kg</p>
       </div>
     </div>
@@ -1318,6 +1680,9 @@ function closeStudentProfileModal() {
   activeModalCadetId = null;
 }
 
+// -------------------------------------------------------------
+// FINANCE SCRIPTS
+// -------------------------------------------------------------
 function updateFinancePurposeDropdown() {
   const type = document.getElementById('fin-type').value;
   const sel = document.getElementById('fin-purpose');
@@ -1404,9 +1769,12 @@ function renderFinanceLedger() {
   netEl.style.color = net >= 0 ? '#38bdf8' : '#ef4444';
 }
 
+// -------------------------------------------------------------
+// SUPER ADMIN NOTIFICATION & AUTHENTICATION
+// -------------------------------------------------------------
 function notifySuperAdminAction(text) {
   if (currentUser && currentUser.role === 'SuperAdmin') {
-    return;
+    return; // Don't notify if the Super Admin makes the change
   }
 
   const istTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -1453,7 +1821,7 @@ function handleLogin() {
   if (!cred) { alert('Enter credentials'); return; }
 
   if (cred === superAdminPin) {
-    currentUser = { name: 'Super Admin', designation: 'SuperAdmin', role: 'SuperAdmin', phone: superAdminRecoveryPhone, permissions: { admission: true, roster: true, finance: true } };
+    currentUser = { name: 'Super Admin', designation: 'SuperAdmin', role: 'SuperAdmin', phone: superAdminRecoveryPhone, permissions: { academics: true, admission: true, roster: true, finance: true } };
     finalizeLogin(remember, cred);
     return;
   }
@@ -1481,13 +1849,16 @@ function evaluateUserAccessState() {
   const waiting = document.getElementById('screen-waiting');
   const dash = document.getElementById('screen-dashboard');
   const adminCtrl = document.getElementById('super-admin-controls');
+  const routineCtrl = document.getElementById('routine-official-controls');
 
   if (currentUser.role === 'SuperAdmin') {
     badge.innerHTML = `👤 <b>Super Admin (${superAdminRecoveryPhone})</b> <button class="header-btn" onclick="openChangePinModal()">🔑 PIN</button> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
     waiting.style.display = 'none';
     dash.style.display = 'block';
     adminCtrl.style.display = 'flex';
+    if (routineCtrl) routineCtrl.style.display = 'flex';
     document.getElementById('dash-access-level').textContent = 'Super Admin (Full Access)';
+    document.getElementById('nav-btn-academics').style.display = 'inline-block';
     document.getElementById('nav-btn-admission').style.display = 'inline-block';
     document.getElementById('nav-btn-roster').style.display = 'inline-block';
     document.getElementById('nav-btn-finance').style.display = 'inline-block';
@@ -1499,6 +1870,10 @@ function evaluateUserAccessState() {
     document.getElementById('dash-access-level').textContent = currentUser.designation;
 
     const perms = currentUser.permissions || {};
+    // Students can always view academics; officials can edit if permission granted
+    document.getElementById('nav-btn-academics').style.display = 'inline-block';
+    if (routineCtrl) routineCtrl.style.display = (perms.academics === true) ? 'flex' : 'none';
+
     document.getElementById('nav-btn-admission').style.display = perms.admission ? 'inline-block' : 'none';
     document.getElementById('nav-btn-roster').style.display = perms.roster ? 'inline-block' : 'none';
     document.getElementById('nav-btn-finance').style.display = perms.finance ? 'inline-block' : 'none';
@@ -1509,6 +1884,9 @@ function evaluateUserAccessState() {
     adminCtrl.style.display = 'none';
     document.getElementById('app-nav').style.display = 'none';
   }
+
+  loadRoutineForBatch();
+  renderUnitGrid();
 }
 
 function handleRegistrationRequest() {
@@ -1522,7 +1900,7 @@ function handleRegistrationRequest() {
   const data = {
     name: name, designation: desig, phone: phone, dob: dob,
     password: generatedPass, status: 'Pending',
-    permissions: { admission: false, roster: false, finance: false },
+    permissions: { academics: false, admission: false, roster: false, finance: false },
     dateRegistered: new Date().toISOString().split('T')[0]
   };
 
@@ -1584,6 +1962,7 @@ function openModifyAccessModal(id) {
   const perms = user.permissions || {};
   document.getElementById('perm-admission').checked = !!perms.admission;
   document.getElementById('perm-roster').checked = !!perms.roster;
+  document.getElementById('perm-academics').checked = !!perms.academics;
   document.getElementById('perm-finance').checked = !!perms.finance;
   document.getElementById('modify-access-modal').style.display = 'flex';
 }
@@ -1594,6 +1973,7 @@ function saveUserPermissions() {
   const updatedPerms = {
     admission: document.getElementById('perm-admission').checked,
     roster: document.getElementById('perm-roster').checked,
+    academics: document.getElementById('perm-academics').checked,
     finance: document.getElementById('perm-finance').checked
   };
 
