@@ -2,6 +2,2449 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>FAUJI FACTORY | Official Command Portal</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<!-- QR Code Generator Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+  :root {
+    --primary: #dc2626;
+    --primary-dark: #b91c1c;
+    --primary-gradient: linear-gradient(135deg, #000000 0%, #dc2626 100%);
+    --bg: #09090b;
+    --card: #18181b;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --border: #27272a;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --info: #2563eb;
+    --radius: 12px;
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  html, body { width: 100%; min-height: 100vh; background-color: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+  body { padding-bottom: 80px; }
+
+  /* Header */
+  header {
+    background: #000000;
+    color: #ffffff;
+    border-bottom: 2px solid var(--primary);
+    padding: 0.85rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+  }
+  .app-branding { display: flex; align-items: center; gap: 0.6rem; }
+  .app-logo-badge {
+    background: var(--primary);
+    color: #ffffff;
+    font-weight: 900;
+    font-size: 1.1rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 8px;
+    letter-spacing: 1px;
+    display: inline-block;
+  }
+  .app-title { font-size: 1.15rem; font-weight: 900; letter-spacing: 0.5px; color: #ffffff; }
+  .app-sub { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #18181b;
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    flex-wrap: wrap;
+  }
+  .logout-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+
+  /* Full Screen Navigation */
+  nav.main-nav {
+    background: #121214;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    overflow-x: auto;
+    position: sticky;
+    top: 55px;
+    z-index: 90;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+  nav.main-nav button {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  nav.main-nav button.active {
+    background: #000000;
+    color: #ffffff;
+    border-color: var(--primary);
+  }
+
+  /* Responsive Full Screen Container */
+  .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0.85rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+  }
+
+  .app-section { display: none; width: 100%; }
+  .app-section.active { display: block; animation: fadeIn 0.2s ease-in-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+
+  label { font-size: 0.75rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.92rem;
+    outline: none;
+    background: #000000;
+    color: #ffffff;
+    margin-bottom: 0.9rem;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.85rem;
+  }
+
+  /* Full Screen Buttons */
+  .btn-submit {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    touch-action: manipulation;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  .btn-submit:hover { background: var(--primary-dark); }
+  .btn-secondary {
+    background: #27272a;
+    color: #ffffff;
+    border: 1px solid #3f3f46;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.84rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  .btn-action { padding: 0.4rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: none; margin: 2px; }
+  .btn-approve { background: #15803d; color: white; }
+  .btn-block { background: #b91c1c; color: white; }
+  .btn-modify { background: #2563eb; color: white; }
+  .btn-print { background: #0284c7; color: white; }
+
+  .photo-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+    background: #000000;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px dashed var(--border);
+    flex-wrap: wrap;
+  }
+  .photo-preview {
+    width: 85px;
+    height: 100px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    object-fit: cover;
+    background: #18181b;
+  }
+
+  .badge { display: inline-flex; align-items: center; padding: 0.22rem 0.6rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+  .badge-active { background: #14532d; color: #bbf7d0; }
+  .badge-inactive { background: #3f3f46; color: #d4d4d8; }
+  .badge-suspended { background: #7f1d1d; color: #fecaca; }
+
+  /* Fully Responsive Tables */
+  .table-responsive { width: 100%; overflow-x: auto; margin-top: 0.85rem; border-radius: 8px; border: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.86rem; background: #000000; min-width: 600px; }
+  th, td { padding: 0.75rem 0.9rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  th { background: #121214; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  tr:hover td { background: #18181b; }
+
+  .sub-nav-bar {
+    display: flex;
+    gap: 0.5rem;
+    background: #000000;
+    padding: 0.4rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sub-nav-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .sub-nav-btn.active { background: var(--primary); color: white; }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+  .metric-card {
+    background: #000000;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem;
+    text-align: center;
+  }
+  .metric-lbl { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+  .metric-val { font-size: 1.4rem; font-weight: 900; margin-top: 0.3rem; color: #ffffff; }
+
+  /* Modals */
+  .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 1rem;
+  }
+  .auth-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-lg);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .portal-role-btn {
+    width: 100%;
+    background: #000000;
+    border: 1px solid var(--border);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 0.9rem;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.15s;
+  }
+  .portal-role-btn:hover { border-color: var(--primary); background: #121214; }
+
+  /* Universal Print Layout */
+  .printable-area { display: none; }
+
+  @media print {
+    body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+    header, nav.main-nav, .container, .modal-backdrop, .no-print { display: none !important; }
+    .printable-area {
+      display: block !important;
+      background: #ffffff !important;
+      color: #000000 !important;
+      padding: 1.5rem !important;
+      width: 100% !important;
+    }
+    .slip-border { border: 2px solid #000000; padding: 1.5rem; border-radius: 8px; }
+    .slip-header { text-align: center; border-bottom: 2px solid #000000; padding-bottom: 0.85rem; margin-bottom: 1.25rem; }
+    .slip-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; font-size: 0.88rem; }
+    .slip-grid div { border-bottom: 1px dotted #888; padding-bottom: 0.35rem; }
+    table { width: 100% !important; border: 1px solid #000000 !important; background: white !important; color: black !important; }
+    th, td { border: 1px solid #000000 !important; color: black !important; }
+    th { background: #f4f4f5 !important; }
+  }
+
+  @media (max-width: 640px) {
+    body { padding-bottom: 90px; }
+    .container { padding: 0.5rem; width: 100%; }
+    .card { padding: 1rem; border-radius: 10px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: 1fr 1fr; }
+    header { padding: 0.65rem 0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================================== -->
+<!-- 1. ENTRY MODAL & PORTAL GATEWAY           -->
+<!-- ========================================== -->
+<div id="modal-entry-picker" class="modal-backdrop" style="display: flex;">
+  <div class="auth-card">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;">
+      <div class="app-logo-badge">FF</div>
+      <h2 style="font-size: 1.35rem;">FAUJI FACTORY</h2>
+    </div>
+    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem;">Secure Institutional Command Portal</p>
+
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+      <button class="portal-role-btn" onclick="openLoginForm('SuperAdmin')">
+        <span>👑 a. SUPER ADMIN</span>
+        <span style="font-size: 0.8rem; color: var(--primary);">Enter &rarr;</span>
+      </button>
+      <button class="portal-role-btn" onclick="openLoginForm('Faculty')">
+        <span>👨‍🏫 b. FACULTY</span>
+        <span style="font-size: 0.8rem; color: var(--primary);">Enter &rarr;</span>
+      </button>
+      <button class="portal-role-btn" onclick="openLoginForm('Official')">
+        <span>👔 c. OFFICIAL</span>
+        <span style="font-size: 0.8rem; color: var(--primary);">Enter &rarr;</span>
+      </button>
+      <button class="portal-role-btn" onclick="openLoginForm('Student')">
+        <span>🎖️ d. STUDENT</span>
+        <span style="font-size: 0.8rem; color: var(--primary);">Enter &rarr;</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 2. LOGIN / FIRST-TIME REGISTER MODAL       -->
+<!-- ========================================== -->
+<div id="modal-login-form" class="modal-backdrop">
+  <div class="auth-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+      <h2 id="login-modal-title" style="font-size: 1.25rem;">User Entry</h2>
+      <button class="btn-action" style="background:#27272a; color:#fff;" onclick="backToEntryPicker()">← Back</button>
+    </div>
+
+    <!-- Super Admin Exclusive Password Login -->
+    <div id="box-superadmin-login" style="display: none;">
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Enter Super Admin Master Password.</p>
+      
+      <label>Master Password</label>
+      <input type="password" id="admin-pass-input" placeholder="" autocomplete="off" style="letter-spacing: 2px;">
+
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+        <input type="checkbox" id="admin-remember" style="width: auto; margin: 0;">
+        <label for="admin-remember" style="margin: 0; font-size: 0.8rem; cursor: pointer; color: #ffffff;">Remember on this device</label>
+      </div>
+
+      <button class="btn-submit" style="width: 100%;" onclick="submitSuperAdminLogin()">Enter Super Admin Dashboard</button>
+    </div>
+
+    <!-- Faculty, Official & Student Form -->
+    <div id="box-standard-login" style="display: none;">
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+        <button id="btn-sub-login" class="btn-secondary" style="flex:1; border-color: var(--primary);" onclick="setStandardAuthMode('login')">Direct Login</button>
+        <button id="btn-sub-register" class="btn-secondary" style="flex:1;" onclick="setStandardAuthMode('register')">1st Time Register</button>
+      </div>
+
+      <!-- Returning User: Mobile & Password -->
+      <div id="sub-login-panel">
+        <label>Registered Mobile Number</label>
+        <input type="tel" id="user-login-phone" placeholder="Enter 10-digit mobile number">
+
+        <label>Assigned Password</label>
+        <input type="password" id="user-login-pass" placeholder="Enter password provided by Super Admin">
+
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+          <input type="checkbox" id="user-remember" style="width: auto; margin: 0;">
+          <label for="user-remember" style="margin: 0; font-size: 0.8rem; cursor: pointer; color: #ffffff;">Remember on this device</label>
+        </div>
+
+        <button class="btn-submit" style="width: 100%;" onclick="submitStandardLogin()">Access Portal</button>
+      </div>
+
+      <!-- First-Time Registration Panel -->
+      <div id="sub-register-panel" style="display: none;">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Enter verified name">
+
+        <label>Registered Mobile Number</label>
+        <input type="tel" id="reg-phone" placeholder="10-digit mobile number">
+
+        <label>Date of Birth (DOB)</label>
+        <input type="date" id="reg-dob">
+
+        <label>Password Given by Super Admin</label>
+        <input type="text" id="reg-pass" placeholder="Enter password received from Super Admin">
+
+        <button class="btn-submit" style="width: 100%;" onclick="submitStandardRegistration()">Verify & Register Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 3. SUPER ADMIN: GENERATE PASSWORD MODAL   -->
+<!-- ========================================== -->
+<div id="modal-generate-pass" class="modal-backdrop">
+  <div class="auth-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+      <h2 style="font-size: 1.25rem;">🔑 Generate New User Password</h2>
+      <button class="btn-action" style="background:#27272a; color:#fff;" onclick="closeModal('modal-generate-pass')">✕</button>
+    </div>
+    <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Issue a one-time entry password for an Official, Faculty, or Student.</p>
+
+    <label>Candidate Full Name</label>
+    <input type="text" id="gen-name" placeholder="Full name">
+
+    <label>Candidate Mobile Number</label>
+    <input type="tel" id="gen-phone" placeholder="10-digit mobile number">
+
+    <label>Role / Segment</label>
+    <select id="gen-role">
+      <option value="Official">Official</option>
+      <option value="Faculty">Faculty</option>
+      <option value="Student">Student</option>
+    </select>
+
+    <button class="btn-submit" style="width: 100%;" onclick="processGeneratePassword()">Generate & Save Password</button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 4. SUPER ADMIN: SHOW ALL PASSWORDS MODAL  -->
+<!-- ========================================== -->
+<div id="modal-show-passwords" class="modal-backdrop">
+  <div class="auth-card" style="max-width: 850px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+      <h2 style="font-size: 1.25rem;">📋 Issued Passwords Registry</h2>
+      <button class="btn-action" style="background:#27272a; color:#fff;" onclick="closeModal('modal-show-passwords')">✕</button>
+    </div>
+    <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">List of all passwords issued against name and mobile number. Only Super Admin has access.</p>
+
+    <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Mobile Number</th>
+            <th>Issued Password</th>
+            <th>Date Issued</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="issued-passwords-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 5. CHANGE SUPER ADMIN PASSWORD MODAL       -->
+<!-- ========================================== -->
+<div id="modal-change-admin-pass" class="modal-backdrop">
+  <div class="auth-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+      <h2 style="font-size: 1.25rem;">🔐 Change Super Admin Password</h2>
+      <button class="btn-action" style="background:#27272a; color:#fff;" onclick="closeModal('modal-change-admin-pass')">✕</button>
+    </div>
+    <label>Current Password</label>
+    <input type="password" id="cur-admin-pass" placeholder="" autocomplete="off">
+
+    <label>New Password</label>
+    <input type="password" id="new-admin-pass" placeholder="" autocomplete="off">
+
+    <label>Confirm New Password</label>
+    <input type="password" id="conf-admin-pass" placeholder="" autocomplete="off">
+
+    <button class="btn-submit" style="width: 100%;" onclick="saveNewSuperAdminPassword()">Save New Password</button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 6. PRINT TEMPLATES (PRINT VIEW ONLY)       -->
+<!-- ========================================== -->
+<!-- Print 1: Admission Slip -->
+<div id="printable-admission-slip" class="printable-area">
+  <div class="slip-border">
+    <div class="slip-header">
+      <h1 style="font-size: 1.8rem; margin-bottom: 0.2rem; letter-spacing: 1px;">FAUJI FACTORY</h1>
+      <h3 style="font-size: 1.05rem; font-weight: normal; color: #333;">OFFICIAL CADET ADMISSION ACKNOWLEDGEMENT</h3>
+      <p style="font-size: 0.8rem; color: #555; margin-top: 0.3rem;">Verification & Records Desk</p>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+      <div>
+        <p style="font-size: 1rem; margin-bottom: 0.3rem;"><b>Cadet Name:</b> <span id="slip-name">-</span></p>
+        <p style="font-size: 0.9rem; color: #444;"><b>Guardian:</b> <span id="slip-guardian">-</span></p>
+        <p style="font-size: 0.9rem; color: #444;"><b>Gender:</b> <span id="slip-gender">-</span></p>
+        <p style="font-size: 0.9rem; color: #444;"><b>Admission Date:</b> <span id="slip-date">-</span></p>
+        <p style="font-size: 0.9rem; color: #444;"><b>Financial Year:</b> <span id="slip-fy">-</span></p>
+      </div>
+      <div>
+        <img id="slip-photo" src="" alt="Cadet Photo" style="width: 100px; height: 115px; border: 1px solid #000; object-fit: cover; border-radius: 4px;">
+      </div>
+    </div>
+    <div class="slip-grid">
+      <div><b>Date of Birth:</b> <span id="slip-dob">-</span></div>
+      <div><b>Primary Mobile:</b> <span id="slip-phone1">-</span></div>
+      <div><b>Secondary Mobile:</b> <span id="slip-phone2">-</span></div>
+      <div><b>Aadhaar Number:</b> [Aadhaar Redacted]</div>
+      <div><b>Height:</b> <span id="slip-height">-</span> cm</div>
+      <div><b>Chest:</b> <span id="slip-chest">-</span></div>
+      <div><b>Weight:</b> <span id="slip-weight">-</span> kg</div>
+      <div><b>Batch:</b> <span id="slip-batch">-</span></div>
+      <div><b>Section:</b> <span id="slip-section">-</span></div>
+      <div><b>Course:</b> <span id="slip-course">-</span></div>
+      <div><b>Place:</b> <span id="slip-place">-</span></div>
+      <div><b>Reference:</b> <span id="slip-reference">-</span></div>
+      <div><b>Status:</b> <span id="slip-status">-</span></div>
+      <div><b>Admission Fees:</b> ₹<span id="slip-adm-fee">0.00</span></div>
+      <div><b>Monthly Fees:</b> ₹<span id="slip-monthly-fee">0.00</span></div>
+      <div><b>Hostel Fees:</b> ₹<span id="slip-hostel-fee">0.00</span></div>
+      <div><b>Outstanding Dues:</b> ₹<span id="slip-dues">0.00</span></div>
+    </div>
+    <div style="margin-top: 1rem; border-bottom: 1px dotted #888; padding-bottom: 0.35rem; font-size: 0.9rem;">
+      <b>Remarks:</b> <span id="slip-remarks">None</span>
+    </div>
+    <div style="margin-top: 3.5rem; display: flex; justify-content: space-between; font-size: 0.85rem;">
+      <div><hr style="width: 160px; border-top: 1px solid #000; margin-bottom: 0.3rem;"><span>Cadet / Parent Signature</span></div>
+      <div><hr style="width: 160px; border-top: 1px solid #000; margin-bottom: 0.3rem;"><span>Authorized Officer Signature</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Print 2: Accounts / Finance Ledger -->
+<div id="printable-accounts-statement" class="printable-area">
+  <div class="slip-border">
+    <div class="slip-header">
+      <h1 style="font-size: 1.8rem; margin-bottom: 0.2rem; letter-spacing: 1px;">FAUJI FACTORY</h1>
+      <h3 style="font-size: 1.05rem; font-weight: normal; color: #333;">FINANCIAL STATEMENT & LEDGER REPORT</h3>
+      <p id="print-accounts-meta" style="font-size: 0.8rem; color: #555; margin-top: 0.3rem;"></p>
+    </div>
+    <div style="display: flex; justify-content: space-around; background: #f4f4f5; padding: 0.85rem; border-radius: 6px; margin-bottom: 1.25rem;">
+      <div><b>Total Income:</b> ₹<span id="p-acc-income">0.00</span></div>
+      <div><b>Total Expenditure:</b> ₹<span id="p-acc-expense">0.00</span></div>
+      <div><b>Net Balance:</b> ₹<span id="p-acc-net">0.00</span></div>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>IST</th>
+            <th>Type</th>
+            <th>Purpose</th>
+            <th>Amount (₹)</th>
+            <th>Mode</th>
+            <th>Operator</th>
+          </tr>
+        </thead>
+        <tbody id="print-accounts-table-body"></tbody>
+      </table>
+    </div>
+    <div style="margin-top: 3rem; display: flex; justify-content: space-between; font-size: 0.85rem;">
+      <div><hr style="width: 160px; border-top: 1px solid #000; margin-bottom: 0.3rem;"><span>Accountant Signature</span></div>
+      <div><hr style="width: 160px; border-top: 1px solid #000; margin-bottom: 0.3rem;"><span>Super Admin Signature</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Print 3: 360 Degree Dossier -->
+<div id="printable-360-report" class="printable-area">
+  <div class="slip-border">
+    <div class="slip-header">
+      <h1 style="font-size: 1.8rem; margin-bottom: 0.2rem; letter-spacing: 1px;">FAUJI FACTORY</h1>
+      <h3 style="font-size: 1.05rem; font-weight: normal; color: #333;">CADET 360° COMPREHENSIVE LIFETIME PERFORMANCE REPORT</h3>
+      <p id="print-360-meta" style="font-size: 0.8rem; color: #555; margin-top: 0.3rem;"></p>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <div>
+        <p style="font-size: 1rem;"><b>Cadet Name:</b> <span id="p360-name">-</span></p>
+        <p style="font-size: 0.85rem; color: #444;"><b>Batch & Section:</b> <span id="p360-batch">-</span> | <b>Course:</b> <span id="p360-course">-</span></p>
+        <p style="font-size: 0.85rem; color: #444;"><b>Guardian:</b> <span id="p360-guardian">-</span> | <b>Mobile:</b> <span id="p360-phone">-</span></p>
+        <p style="font-size: 0.85rem; color: #444;"><b>Financial Year:</b> <span id="p360-fy">-</span> | <b>Status:</b> <span id="p360-status">-</span></p>
+      </div>
+      <div>
+        <img id="p360-photo" src="" alt="Photo" style="width: 85px; height: 100px; border: 1px solid #000; object-fit: cover;">
+      </div>
+    </div>
+    <div class="slip-grid" style="margin-bottom: 1rem;">
+      <div><b>Attendance Rate:</b> <span id="p360-att-rate">0%</span></div>
+      <div><b>Total Tracked:</b> <span id="p360-total-att">0</span></div>
+      <div><b>Present Count:</b> <span id="p360-present-count">0</span></div>
+      <div><b>Absent Count:</b> <span id="p360-absent-count">0</span></div>
+      <div><b>Units Completed:</b> <span id="p360-units-comp">0</span></div>
+      <div><b>Outstanding Dues:</b> ₹<span id="p360-dues">0.00</span></div>
+    </div>
+    <h4 style="margin: 0.75rem 0 0.35rem 0; font-size: 0.9rem; border-bottom: 1px solid #000; padding-bottom: 0.2rem;">Lifetime Audit Log</h4>
+    <div id="p360-history-table" style="font-size: 0.82rem; line-height: 1.4;"></div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 7. MAIN APPLICATION INTERFACE              -->
+<!-- ========================================== -->
+<header>
+  <div class="app-branding">
+    <div class="app-logo-badge">FF</div>
+    <div>
+      <div class="app-title">FAUJI FACTORY</div>
+      <div class="app-sub">Command & Academy Portal</div>
+    </div>
+  </div>
+  <div class="user-badge" id="user-display-badge">
+    <button class="btn-submit" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;" onclick="openEntryPickerModal()">ENTRY</button>
+  </div>
+</header>
+
+<nav class="main-nav no-print" id="app-nav" style="display: none;">
+  <button id="nav-btn-360" class="active" onclick="switchSection('section-360')">🌐 Student 360°</button>
+  <button id="nav-btn-academics" onclick="switchSection('section-academics')">🎓 Academics</button>
+  <button id="nav-btn-admission" onclick="switchSection('section-admission')">📝 Admission</button>
+  <button id="nav-btn-roster" onclick="switchSection('section-roster')">👥 Directory</button>
+  <button id="nav-btn-finance" onclick="switchSection('section-finance')">💰 Accounts</button>
+</nav>
+
+<div class="container">
+  <!-- Super Admin Live Command Header -->
+  <div id="super-admin-toolbar" class="card no-print" style="display: none; background: #000000; border: 1.5px solid var(--primary); padding: 1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem;">
+      <div>
+        <h3 style="color: #fff; font-size: 1.05rem;">👑 Super Admin Control Deck</h3>
+        <p style="color: var(--muted); font-size: 0.76rem;">Generate keys and review passwords issued against mobile numbers.</p>
+      </div>
+      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+        <button class="btn-submit" onclick="openModal('modal-generate-pass')">GENERATE A NEW PASSWORD</button>
+        <button class="btn-secondary" onclick="openShowPasswordsModal()">SHOW THE PASSWORD</button>
+        <button class="btn-secondary" onclick="openModal('modal-change-admin-pass')">Change Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: STUDENT 360 -->
+  <div id="section-360" class="app-section active">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.3rem; color: #ffffff;">🌐 Student 360° Comprehensive Progress Monitor</h2>
+          <p style="font-size: 0.78rem; color: var(--muted);">Unified weekly, monthly, and financial yearly audit.</p>
+        </div>
+        <div class="no-print" style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          <select id="select-360-student" onchange="renderStudent360View()" style="margin-bottom: 0; min-width: 180px; font-size: 0.82rem; padding: 0.4rem 0.6rem;">
+            <option value="">-- Select Cadet to Monitor --</option>
+          </select>
+          <button class="btn-secondary btn-print" onclick="printStudent360Report()">🖨️ Print 360° Report</button>
+        </div>
+      </div>
+
+      <div id="360-empty-placeholder" style="text-align: center; color: var(--muted); padding: 2.5rem 1rem;">
+        Select a cadet from the dropdown above to load their 360° progress dossier.
+      </div>
+
+      <div id="360-data-container" style="display: none;">
+        <div style="background: #000000; border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <img id="360-photo" src="" alt="Cadet Photo" style="width: 75px; height: 90px; border-radius: 6px; border: 1px solid var(--border); object-fit: cover;">
+          <div style="flex: 1;">
+            <h3 id="360-name" style="color: #fff; font-size: 1.2rem;">-</h3>
+            <p style="font-size: 0.8rem; color: var(--muted);" id="360-subline">-</p>
+            <p style="font-size: 0.8rem; color: var(--primary); font-weight: 700; margin-top: 0.2rem;" id="360-physline">-</p>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card" style="border-top: 3px solid var(--success);">
+            <div class="metric-lbl">Attendance Rate</div>
+            <div class="metric-val" id="360-stat-att-rate">0%</div>
+          </div>
+          <div class="metric-card" style="border-top: 3px solid var(--info);">
+            <div class="metric-lbl">Units Mastered</div>
+            <div class="metric-val" id="360-stat-units">0 / 84</div>
+          </div>
+          <div class="metric-card" style="border-top: 3px solid var(--warning);">
+            <div class="metric-lbl">Examinations Tracked</div>
+            <div class="metric-val" id="360-stat-exams">0</div>
+          </div>
+          <div class="metric-card" style="border-top: 3px solid var(--danger);">
+            <div class="metric-lbl">Outstanding Dues</div>
+            <div class="metric-val" id="360-stat-dues">₹ 0.00</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+          <div class="card" style="background:#000; border:1px solid var(--border); margin:0; padding:1rem;">
+            <h4 style="color:#ffffff; font-size:0.9rem; margin-bottom:0.5rem;">📅 Weekly Routine Alignment</h4>
+            <div id="360-routine-preview" style="font-size:0.8rem; color:var(--muted); line-height:1.5;"></div>
+          </div>
+          <div class="card" style="background:#000; border:1px solid var(--border); margin:0; padding:1rem;">
+            <h4 style="color:#ffffff; font-size:0.9rem; margin-bottom:0.5rem;">🎯 Unit Progress Across Subjects</h4>
+            <div id="360-units-preview" style="font-size:0.8rem; color:var(--muted); line-height:1.5;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="background:#000; border:1px solid var(--border); padding:1rem;">
+          <h4 style="color:#ffffff; font-size:0.9rem; margin-bottom:0.5rem;">📜 Lifetime Record & Financial History</h4>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Event / Transaction</th>
+                  <th>Category</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="360-history-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: ACADEMICS -->
+  <div id="section-academics" class="app-section">
+    <div class="card">
+      <h2 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 0.3rem;">🎓 Academics Command Desk</h2>
+      <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem;">Timetable routines, exam schedules, unit progress, and QR attendance.</p>
+
+      <div class="sub-nav-bar">
+        <button class="sub-nav-btn active" id="sub-btn-routine" onclick="switchAcademicSubTab('sub-routine')">📅 ROUTINE</button>
+        <button class="sub-nav-btn" id="sub-btn-exams" onclick="switchAcademicSubTab('sub-exams')">📝 EXAMS</button>
+        <button class="sub-nav-btn" id="sub-btn-units" onclick="switchAcademicSubTab('sub-units')">🎯 UNITS</button>
+        <button class="sub-nav-btn" id="sub-btn-attendance" onclick="switchAcademicSubTab('sub-attendance')">📷 ATTENDANCE QR</button>
+      </div>
+
+      <!-- ROUTINE -->
+      <div id="sub-routine" style="display: block;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <label style="margin: 0;">Batch:</label>
+            <select id="routine-batch-select" onchange="loadRoutineForBatch()" style="margin: 0; width: auto; font-size: 0.82rem;">
+              <option value="G1">General - G1</option>
+              <option value="G2">General - G2</option>
+              <option value="G3">General - G3</option>
+              <option value="G4">General - G4</option>
+              <option value="H1">Hostel - H1</option>
+              <option value="H2">Hostel - H2</option>
+              <option value="H3">Hostel - H3</option>
+              <option value="H4">Hostel - H4</option>
+            </select>
+          </div>
+          <div id="routine-official-controls" style="display: none; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
+            <button class="btn-secondary" onclick="copyCurrentRoutine()">📋 Copy</button>
+            <button class="btn-secondary" onclick="pasteRoutineToCurrent()">📥 Paste</button>
+            <button class="btn-submit" style="padding: 0.5rem 0.75rem;" onclick="saveRoutineChanges()">💾 Save & Broadcast</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 100px;">Day</th>
+                <th><div>Session 1</div><div id="header-timing-s1-box"></div></th>
+                <th><div>Session 2</div><div id="header-timing-s2-box"></div></th>
+                <th><div>Session 3</div><div id="header-timing-s3-box"></div></th>
+                <th><div>Session 4</div><div id="header-timing-s4-box"></div></th>
+              </tr>
+            </thead>
+            <tbody id="routine-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- EXAM SCHEDULE -->
+      <div id="sub-exams" style="display: none;">
+        <div id="exam-schedule-editor" class="no-print" style="display: none; background: #000000; border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+          <h3 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 0.75rem;">📝 Prepare & Publish Exam Schedule</h3>
+          <form onsubmit="handleExamScheduleSubmit(event)">
+            <div class="form-grid">
+              <div>
+                <label>Exam Name</label>
+                <input type="text" id="exam-sched-name" placeholder="e.g. Combined Mock Test" required>
+              </div>
+              <div>
+                <label>Date</label>
+                <input type="date" id="exam-sched-date" required>
+              </div>
+              <div>
+                <label>Time</label>
+                <input type="text" id="exam-sched-time" placeholder="e.g. 10:00 AM - 01:00 PM" required>
+              </div>
+              <div>
+                <label>Target Batch</label>
+                <select id="exam-sched-batch" required>
+                  <option value="All Batches">All Batches (G1-G4 & H1-H4)</option>
+                  <option value="G1">General - G1</option>
+                  <option value="G2">General - G2</option>
+                  <option value="G3">General - G3</option>
+                  <option value="G4">General - G4</option>
+                  <option value="H1">Hostel - H1</option>
+                  <option value="H2">Hostel - H2</option>
+                  <option value="H3">Hostel - H3</option>
+                  <option value="H4">Hostel - H4</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label>Syllabus</label>
+              <textarea id="exam-sched-syllabus" rows="2" placeholder="Topics & units covered..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">📢 Record Schedule & Broadcast</button>
+          </form>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Exam</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Batch</th>
+                <th>Syllabus</th>
+                <th>Official</th>
+                <th class="no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody id="exam-schedule-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- UNIT TRACKING -->
+      <div id="sub-units" style="display: none;">
+        <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 0.75rem;">
+          <div>
+            <label>Subject</label>
+            <select id="unit-subject-select" onchange="renderUnitGrid()">
+              <option value="ENGLISH">ENGLISH</option>
+              <option value="MATH">MATH</option>
+              <option value="GI">GI (Reasoning)</option>
+              <option value="HINDI">HINDI</option>
+              <option value="GK">GK</option>
+            </select>
+          </div>
+          <div>
+            <label>Batch</label>
+            <select id="unit-batch-select" onchange="renderUnitGrid()">
+              <option value="G1">General - G1</option>
+              <option value="G2">General - G2</option>
+              <option value="G3">General - G3</option>
+              <option value="G4">General - G4</option>
+              <option value="H1">Hostel - H1</option>
+              <option value="H2">Hostel - H2</option>
+              <option value="H3">Hostel - H3</option>
+              <option value="H4">Hostel - H4</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.4rem; font-size: 0.75rem; flex-wrap: wrap;">
+          <span><b style="display:inline-block; width:10px; height:10px; background:#dc2626; border-radius:2px;"></b> Completed (Red)</span>
+          <span><b style="display:inline-block; width:10px; height:10px; background:#2563eb; border-radius:2px;"></b> Incomplete (Blue)</span>
+          <span><b style="display:inline-block; width:10px; height:10px; background:#18181b; border:1px solid #3f3f46; border-radius:2px;"></b> Unmarked</span>
+        </div>
+
+        <div class="unit-grid" id="unit-grid-container"></div>
+      </div>
+
+      <!-- ATTENDANCE QR -->
+      <div id="sub-attendance" style="display: none;">
+        <div style="background: #000000; border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem;">
+          <h3 style="color: #ffffff; font-size: 1rem; margin-bottom: 0.35rem;">📷 Live Attendance QR Terminal</h3>
+          <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem;">10-minute active QR generation for classes and exams.</p>
+
+          <div class="form-grid">
+            <div>
+              <label>Session</label>
+              <select id="qr-session-type">
+                <option value="Class">Class Session</option>
+                <option value="Exam">Examination</option>
+              </select>
+            </div>
+            <div>
+              <label>Target Section</label>
+              <select id="qr-batch-target">
+                <option value="G1">General - G1</option>
+                <option value="G2">General - G2</option>
+                <option value="G3">General - G3</option>
+                <option value="G4">General - G4</option>
+                <option value="H1">Hostel - H1</option>
+                <option value="H2">Hostel - H2</option>
+                <option value="H3">Hostel - H3</option>
+                <option value="H4">Hostel - H4</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-submit" style="background: var(--info); margin-top: 0.4rem;" onclick="generateAttendanceQRCode()">Generate 10-Minute QR Code</button>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Cadet</th>
+                <th>Batch</th>
+                <th>Session</th>
+                <th>Status</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-log-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: ADMISSION -->
+  <div id="section-admission" class="app-section">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; color: #ffffff;">📝 Student Admission Form</h2>
+          <p style="font-size: 0.78rem; color: var(--muted);">Enroll and register cadets for academy records.</p>
+        </div>
+        <div class="no-print" style="display: flex; gap: 0.4rem; align-items: center; background: #000000; padding: 0.35rem 0.65rem; border-radius: 8px; border: 1px solid var(--border);">
+          <select id="select-admitted-student-print" style="margin-bottom: 0; padding: 0.35rem 0.5rem; font-size: 0.8rem; min-width: 150px;">
+            <option value="">-- Choose Student --</option>
+          </select>
+          <button type="button" class="btn-secondary" onclick="printFromAdmissionDropdown()" style="padding: 0.35rem 0.65rem;">🖨️ Print Slip</button>
+        </div>
+      </div>
+
+      <form id="admission-form" onsubmit="handleStudentAdmission(event)">
+        <div class="photo-upload-wrapper">
+          <img id="cadet-photo-preview" class="photo-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='95' viewBox='0 0 80 95'><rect width='80' height='95' fill='%2327272a'/><text x='50%25' y='50%25' fill='%2371717a' font-size='11' text-anchor='middle' dy='.3em'>No Photo</text></svg>" alt="Cadet Photo">
+          <div style="flex: 1; min-width: 180px;">
+            <label>1. Picture (Local Device)</label>
+            <input type="file" id="adm-photo" accept="image/*" onchange="previewPhoto(event)" style="margin-bottom: 0;">
+            <small style="color: var(--muted); font-size: 0.7rem;">Takes direct mobile or desktop camera uploads.</small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label>2. Full Name</label>
+            <input type="text" id="adm-name" placeholder="Cadet name" required>
+          </div>
+          <div>
+            <label>3. Guardian's Name</label>
+            <input type="text" id="adm-guardian" placeholder="Father/Mother/Husband" required>
+          </div>
+          <div>
+            <label>Gender</label>
+            <select id="adm-gender" onchange="handleGenderChange()" required>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label>4. Date of Birth (DOB)</label>
+            <input type="date" id="adm-dob" required>
+          </div>
+          <div>
+            <label>5. Primary Mobile (Mandatory)</label>
+            <input type="tel" id="adm-phone1" placeholder="10-digit number" required>
+          </div>
+          <div>
+            <label>Mobile Number 2 (Optional)</label>
+            <input type="tel" id="adm-phone2" placeholder="Secondary contact">
+          </div>
+          <div>
+            <label>Aadhaar Number</label>
+            <input type="text" id="adm-aadhaar" placeholder="12-digit number" required>
+          </div>
+          <div>
+            <label>Height (in cm)</label>
+            <input type="number" step="0.1" id="adm-height" placeholder="e.g. 172.5" required>
+          </div>
+          <div id="chest-input-container">
+            <label>Chest (Male Only)</label>
+            <input type="text" id="adm-chest" placeholder="e.g. 80-85 cm">
+          </div>
+          <div>
+            <label>Weight (in KG)</label>
+            <input type="number" step="0.1" id="adm-weight" placeholder="e.g. 64.5" required>
+          </div>
+          <div>
+            <label>6. Reference</label>
+            <input type="text" id="adm-reference" placeholder="Source / Referrer">
+          </div>
+          <div>
+            <label>7. Admission Date</label>
+            <input type="date" id="adm-date" required>
+          </div>
+          <div>
+            <label>8. Admission Fees (₹)</label>
+            <input type="number" step="0.01" id="adm-fee" placeholder="5000" required>
+          </div>
+          <div>
+            <label>9. Monthly Fees (₹)</label>
+            <input type="number" step="0.01" id="adm-monthly-fee" placeholder="2000" required>
+          </div>
+          <div>
+            <label>10. Hostel Fees (₹)</label>
+            <input type="number" step="0.01" id="adm-hostel-fee" placeholder="Optional">
+          </div>
+          <div>
+            <label>11. Batch</label>
+            <select id="adm-batch" onchange="updateSectionDropdown()" required>
+              <option value="General">General</option>
+              <option value="Hostel">Hostel</option>
+            </select>
+          </div>
+          <div>
+            <label>12. Section</label>
+            <select id="adm-section" required></select>
+          </div>
+          <div>
+            <label>13. Course</label>
+            <select id="adm-course" required>
+              <option value="Defence">Defence</option>
+              <option value="Others">Others</option>
+              <option value="Both">Both</option>
+            </select>
+          </div>
+          <div>
+            <label>Status</label>
+            <select id="adm-status" onchange="toggleStatusCauseField()" required>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Left">Left</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+          </div>
+          <div id="status-cause-container" style="display: none;">
+            <label>Status Cause</label>
+            <input type="text" id="adm-status-cause" placeholder="Reason">
+          </div>
+          <div>
+            <label>14. Place (Native Town/City)</label>
+            <input type="text" id="adm-place" placeholder="Native District" required>
+          </div>
+        </div>
+
+        <div style="margin-top: 0.4rem;">
+          <label>15. Remarks</label>
+          <textarea id="adm-remarks" rows="2" placeholder="Candidate notes..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.85rem; flex-wrap: wrap;">
+          <button type="submit" class="btn-submit" style="flex: 2; min-width: 170px;">Save Admission Record</button>
+          <button type="button" class="btn-secondary" onclick="printCurrentAdmissionForm()" style="flex: 1; min-width: 120px;">🖨️ Print Slip</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SECTION: DIRECTORY -->
+  <div id="section-roster" class="app-section">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; color: #ffffff;">👥 Cadet Master Directory</h2>
+          <p style="font-size: 0.78rem; color: var(--muted);">Lifetime ledger, renewal, and dues tracking.</p>
+        </div>
+        <input type="text" id="roster-search" class="no-print" placeholder="🔍 Search cadet..." onkeyup="renderCadetRosterTable()" style="max-width: 220px; margin-bottom: 0; font-size: 0.82rem;">
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Photo</th>
+              <th>Cadet</th>
+              <th>Physical</th>
+              <th>Batch/Sec</th>
+              <th>Course</th>
+              <th>FY</th>
+              <th>Status</th>
+              <th>Dues</th>
+              <th class="no-print">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cadet-roster-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: ACCOUNTS -->
+  <div id="section-finance" class="app-section">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.85rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; color: #ffffff;">💰 Income & Expenditure Management</h2>
+          <p style="font-size: 0.78rem; color: var(--muted);">Automated balance sheet and accounts ledger.</p>
+        </div>
+        <button class="btn-secondary btn-print no-print" onclick="printAccountsStatement()">🖨️ Print Accounts Statement</button>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card" style="border-top: 3px solid var(--success);">
+          <div class="metric-lbl">Total Income</div>
+          <div class="metric-val" id="fin-stat-income" style="color:#4ade80;">₹ 0.00</div>
+        </div>
+        <div class="metric-card" style="border-top: 3px solid var(--danger);">
+          <div class="metric-lbl">Total Expenditure</div>
+          <div class="metric-val" id="fin-stat-expense" style="color:#f87171;">₹ 0.00</div>
+        </div>
+        <div class="metric-card" style="border-top: 3px solid #38bdf8;">
+          <div class="metric-lbl">Net Balance</div>
+          <div class="metric-val" id="fin-stat-net" style="color:#38bdf8;">₹ 0.00</div>
+        </div>
+      </div>
+
+      <div class="no-print" style="background: #000; border:1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+        <h3 style="color:#fff; font-size:0.95rem; margin-bottom:0.6rem;">Log Financial Record</h3>
+        <form onsubmit="handleFinanceSubmit(event)">
+          <div class="form-grid">
+            <div>
+              <label>Type</label>
+              <select id="fin-type" onchange="updateFinancePurposeDropdown()" required>
+                <option value="Income">🟢 Income</option>
+                <option value="Expenditure">🔴 Expenditure</option>
+              </select>
+            </div>
+            <div>
+              <label>Date</label>
+              <input type="date" id="fin-date" required>
+            </div>
+            <div>
+              <label>Purpose</label>
+              <select id="fin-purpose" required></select>
+            </div>
+            <div>
+              <label>Amount (₹)</label>
+              <input type="number" step="0.01" id="fin-amount" placeholder="Amount" required>
+            </div>
+            <div>
+              <label>Payment Mode</label>
+              <select id="fin-mode" required>
+                <option value="Offline">Offline</option>
+                <option value="Online">Online</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit">Record Financial Entry</button>
+        </form>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>IST</th>
+              <th>Type</th>
+              <th>Purpose</th>
+              <th>Amount</th>
+              <th>Mode</th>
+              <th>Operator</th>
+              <th class="no-print">Action</th>
+            </tr>
+          </thead>
+          <tbody id="finance-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD8-XRYgu51zF0mHOfSZ7M3boOVKJ9KIM4",
+  authDomain: "classroom-ca026.firebaseapp.com",
+  databaseURL: "https://classroom-ca026-default-rtdb.firebaseio.com",
+  projectId: "classroom-ca026",
+  storageBucket: "classroom-ca026.firebasestorage.app",
+  messagingSenderId: "835920397563",
+  appId: "1:835920397563:web:7079d60ee22f4361869c5e"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// State
+let usersList = [];
+let cadetList = [];
+let financeRecords = [];
+let issuedPasswords = [];
+let routines = {};
+let unitData = {};
+let examSchedules = [];
+let attendanceLogs = [];
+let currentUser = null;
+
+let superAdminPassword = "20101986"; // Default self-created password
+let selectedEntryRole = "Official";
+let standardAuthMode = "login";
+let uploadedPhotoBase64 = "";
+let copiedRoutineBuffer = null;
+let selectedUnitId = null;
+let qrTimerInterval = null;
+
+const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const DEFAULT_TIMINGS = {
+  s1: "06:00 AM - 07:30 AM",
+  s2: "08:30 AM - 10:30 AM",
+  s3: "11:30 AM - 01:30 PM",
+  s4: "04:30 PM - 06:30 PM"
+};
+
+const INCOME_PURPOSES = [
+  "Admission Fees", "Re admission fees", "Monthly Fees", "Hostel fees",
+  "Book and Dress fees", "One time fees", "Previous due", "Penalty fees",
+  "Other fees", "Donation"
+];
+const EXPENDITURE_PURPOSES = [
+  "Vegetable", "Grocery", "Stationery", "Water",
+  "Photocopy", "Wages", "Entertainment", "Miscellaneous"
+];
+
+// Firebase Listeners
+db.ref('settings/superAdminPassword').on('value', snap => {
+  const val = snap.val();
+  if (val) superAdminPassword = val.toString();
+});
+
+db.ref('issued_passwords').on('value', snap => {
+  const data = snap.val();
+  issuedPasswords = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderIssuedPasswordsTable();
+});
+
+db.ref('fauji_users').on('value', snap => {
+  const data = snap.val();
+  usersList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  if (currentUser && currentUser.role !== 'SuperAdmin') {
+    const latest = usersList.find(u => u.id === currentUser.id);
+    if (latest) { currentUser = latest; evaluateUserAccessState(); }
+  }
+});
+
+db.ref('cadets').on('value', snap => {
+  const data = snap.val();
+  cadetList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderCadetRosterTable();
+  populateAdmittedStudentDropdown();
+  populate360Dropdown();
+});
+
+db.ref('finance').on('value', snap => {
+  const data = snap.val();
+  financeRecords = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderFinanceLedger();
+});
+
+db.ref('routines').on('value', snap => {
+  routines = snap.val() || {};
+  loadRoutineForBatch();
+});
+
+db.ref('units').on('value', snap => {
+  unitData = snap.val() || {};
+  renderUnitGrid();
+});
+
+db.ref('exam_schedules').on('value', snap => {
+  const data = snap.val();
+  examSchedules = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderExamScheduleTable();
+});
+
+db.ref('attendance_logs').on('value', snap => {
+  const data = snap.val();
+  attendanceLogs = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderAttendanceLogTable();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('adm-date').value = todayStr;
+  document.getElementById('fin-date').value = todayStr;
+  const examDateInput = document.getElementById('exam-sched-date');
+  if (examDateInput) examDateInput.value = todayStr;
+
+  updateSectionDropdown();
+  updateFinancePurposeDropdown();
+  handleGenderChange();
+
+  // Auto-login from saved device storage
+  const savedCred = localStorage.getItem('ff_saved_device_cred');
+  if (savedCred) {
+    try {
+      const parsed = JSON.parse(savedCred);
+      if (parsed.role === 'SuperAdmin') {
+        if (parsed.pass === superAdminPassword) {
+          currentUser = { name: "Ersad Alam", role: "SuperAdmin" };
+          finalizeLoginSuccess();
+        }
+      } else {
+        const found = usersList.find(u => u.phone === parsed.phone && u.password === parsed.pass);
+        if (found && found.status !== 'Blocked') {
+          currentUser = found;
+          finalizeLoginSuccess();
+        }
+      }
+    } catch(e) {}
+  }
+});
+
+// -------------------------------------------------------------
+// RECREATED ENTRY & POPUP WORKFLOW
+// -------------------------------------------------------------
+function openEntryPickerModal() {
+  document.getElementById('modal-entry-picker').style.display = 'flex';
+}
+
+function openLoginForm(role) {
+  selectedEntryRole = role;
+  document.getElementById('modal-entry-picker').style.display = 'none';
+  document.getElementById('modal-login-form').style.display = 'flex';
+
+  document.getElementById('login-modal-title').textContent = `${role.toUpperCase()} PORTAL ENTRY`;
+
+  if (role === 'SuperAdmin') {
+    document.getElementById('box-superadmin-login').style.display = 'block';
+    document.getElementById('box-standard-login').style.display = 'none';
+    document.getElementById('admin-pass-input').value = '';
+  } else {
+    document.getElementById('box-superadmin-login').style.display = 'none';
+    document.getElementById('box-standard-login').style.display = 'block';
+    setStandardAuthMode('login');
+  }
+}
+
+function backToEntryPicker() {
+  document.getElementById('modal-login-form').style.display = 'none';
+  document.getElementById('modal-entry-picker').style.display = 'flex';
+}
+
+function setStandardAuthMode(mode) {
+  standardAuthMode = mode;
+  document.getElementById('btn-sub-login').classList.toggle('active', mode === 'login');
+  document.getElementById('btn-sub-register').classList.toggle('active', mode === 'register');
+  document.getElementById('sub-login-panel').style.display = mode === 'login' ? 'block' : 'none';
+  document.getElementById('sub-register-panel').style.display = mode === 'register' ? 'block' : 'none';
+}
+
+// Super Admin Password Check
+function submitSuperAdminLogin() {
+  const enteredPass = document.getElementById('admin-pass-input').value.trim();
+  const remember = document.getElementById('admin-remember').checked;
+
+  if (!enteredPass) {
+    alert('Please enter password.');
+    return;
+  }
+
+  if (enteredPass === superAdminPassword) {
+    currentUser = { name: "Ersad Alam", role: "SuperAdmin" };
+    if (remember) {
+      localStorage.setItem('ff_saved_device_cred', JSON.stringify({ role: 'SuperAdmin', pass: enteredPass }));
+    } else {
+      localStorage.removeItem('ff_saved_device_cred');
+    }
+    finalizeLoginSuccess();
+  } else {
+    alert('Incorrect Super Admin Password.');
+  }
+}
+
+// Faculty, Official, Student: Direct Login (2nd visit onwards)
+function submitStandardLogin() {
+  const phone = document.getElementById('user-login-phone').value.replace(/[^0-9]/g, '').trim();
+  const pass = document.getElementById('user-login-pass').value.trim();
+  const remember = document.getElementById('user-remember').checked;
+
+  if (!phone || !pass) {
+    alert('Please enter both mobile number and assigned password.');
+    return;
+  }
+
+  const foundUser = usersList.find(u => u.phone === phone && u.password === pass && u.role === selectedEntryRole);
+  if (foundUser) {
+    if (foundUser.status === 'Blocked') {
+      alert('Access Denied: Your account has been suspended by Super Admin.');
+      return;
+    }
+    currentUser = foundUser;
+    if (remember) {
+      localStorage.setItem('ff_saved_device_cred', JSON.stringify({ role: selectedEntryRole, phone, pass }));
+    } else {
+      localStorage.removeItem('ff_saved_device_cred');
+    }
+    finalizeLoginSuccess();
+  } else {
+    alert('Invalid mobile or password. If this is your first entry, click "1st Time Register" and enter the password issued by the Super Admin.');
+  }
+}
+
+// Faculty, Official, Student: 1st Time Registration
+function submitStandardRegistration() {
+  const name = document.getElementById('reg-name').value.trim();
+  const phone = document.getElementById('reg-phone').value.replace(/[^0-9]/g, '').trim();
+  const dob = document.getElementById('reg-dob').value;
+  const pass = document.getElementById('reg-pass').value.trim();
+
+  if (!name || phone.length < 10 || !dob || !pass) {
+    alert('Please complete all fields (Name, 10-digit Mobile, DOB, and Assigned Password).');
+    return;
+  }
+
+  // Verify against Super Admin's issued passwords database
+  const issuedMatch = issuedPasswords.find(p => p.phone === phone && p.password === pass && p.role === selectedEntryRole);
+  if (!issuedMatch) {
+    alert('The provided password does not match any password generated by Super Admin for this mobile number and role.');
+    return;
+  }
+
+  // Prevent duplicate registration
+  const existingUser = usersList.find(u => u.phone === phone && u.role === selectedEntryRole);
+  if (existingUser) {
+    alert('An account with this mobile number is already registered. Please use Direct Login.');
+    setStandardAuthMode('login');
+    return;
+  }
+
+  const newUserData = {
+    name,
+    phone,
+    dob,
+    role: selectedEntryRole,
+    password: pass,
+    status: 'Approved',
+    registeredOn: new Date().toISOString().split('T')[0]
+  };
+
+  db.ref('fauji_users').push(newUserData).then((ref) => {
+    // Mark issued key as claimed
+    db.ref('issued_passwords/' + issuedMatch.id).update({ status: 'Claimed / Active' });
+    currentUser = { id: ref.key, ...newUserData };
+    alert(`Registration successful! You can now log in anytime using your mobile number and this password.`);
+    finalizeLoginSuccess();
+  });
+}
+
+function finalizeLoginSuccess() {
+  document.getElementById('modal-login-form').style.display = 'none';
+  document.getElementById('modal-entry-picker').style.display = 'none';
+  document.getElementById('app-nav').style.display = 'flex';
+  evaluateUserAccessState();
+}
+
+function handleLogout() {
+  currentUser = null;
+  localStorage.removeItem('ff_saved_device_cred');
+  document.getElementById('app-nav').style.display = 'none';
+  document.getElementById('super-admin-toolbar').style.display = 'none';
+  document.getElementById('user-display-badge').innerHTML = `<button class="btn-submit" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;" onclick="openEntryPickerModal()">ENTRY</button>`;
+  openEntryPickerModal();
+}
+
+// -------------------------------------------------------------
+// SUPER ADMIN: PASSWORD GENERATOR & SHOW PASSWORDS REGISTRY
+// -------------------------------------------------------------
+function processGeneratePassword() {
+  const name = document.getElementById('gen-name').value.trim();
+  const phone = document.getElementById('gen-phone').value.replace(/[^0-9]/g, '').trim();
+  const role = document.getElementById('gen-role').value;
+
+  if (!name || phone.length < 10) {
+    alert('Please enter Candidate Name and 10-digit Mobile Number.');
+    return;
+  }
+
+  // Generate clean 6-character alphanumeric key
+  const randomCode = Math.random().toString(36).substring(2, 7).toUpperCase();
+  const generatedPassword = `FF-${role.substring(0, 3).toUpperCase()}-${randomCode}`;
+
+  const passwordRecord = {
+    name,
+    phone,
+    role,
+    password: generatedPassword,
+    issuedDate: new Date().toISOString().split('T')[0],
+    status: 'Issued / Unclaimed'
+  };
+
+  db.ref('issued_passwords').push(passwordRecord).then(() => {
+    alert(`Password Generated Successfully!\n\nName: ${name}\nMobile: ${phone}\nRole: ${role}\nGenerated Password: ${generatedPassword}\n\nConvey this password to the candidate.`);
+    closeModal('modal-generate-pass');
+    document.getElementById('gen-name').value = '';
+    document.getElementById('gen-phone').value = '';
+  });
+}
+
+function openShowPasswordsModal() {
+  renderIssuedPasswordsTable();
+  openModal('modal-show-passwords');
+}
+
+function renderIssuedPasswordsTable() {
+  const tbody = document.getElementById('issued-passwords-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (issuedPasswords.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--muted); padding:1.5rem;">No passwords generated yet.</td></tr>`;
+    return;
+  }
+
+  issuedPasswords.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${p.name}</b></td>
+      <td><span class="badge" style="background:#27272a; color:#fff;">${p.role}</span></td>
+      <td>📞 ${p.phone}</td>
+      <td><b style="color:var(--primary); font-size:0.95rem; letter-spacing:1px;">${p.password}</b></td>
+      <td><small style="color:var(--muted);">${p.issuedDate}</small></td>
+      <td><span class="badge ${p.status.includes('Active') ? 'badge-active' : 'badge-suspended'}">${p.status}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function saveNewSuperAdminPassword() {
+  const cur = document.getElementById('cur-admin-pass').value.trim();
+  const nxt = document.getElementById('new-admin-pass').value.trim();
+  const conf = document.getElementById('conf-admin-pass').value.trim();
+
+  if (cur !== superAdminPassword) {
+    alert('Current password incorrect.');
+    return;
+  }
+  if (!nxt || nxt !== conf) {
+    alert('New passwords do not match or are blank.');
+    return;
+  }
+
+  db.ref('settings/superAdminPassword').set(nxt).then(() => {
+    superAdminPassword = nxt;
+    alert('Super Admin password successfully updated!');
+    closeModal('modal-change-admin-pass');
+    document.getElementById('cur-admin-pass').value = '';
+    document.getElementById('new-admin-pass').value = '';
+    document.getElementById('conf-admin-pass').value = '';
+  });
+}
+
+function evaluateUserAccessState() {
+  const badge = document.getElementById('user-display-badge');
+  const adminToolbar = document.getElementById('super-admin-toolbar');
+  const routineCtrl = document.getElementById('routine-official-controls');
+  const examEditor = document.getElementById('exam-schedule-editor');
+
+  if (currentUser.role === 'SuperAdmin') {
+    badge.innerHTML = `👑 <b>Ersad Alam</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
+    adminToolbar.style.display = 'block';
+    if (routineCtrl) routineCtrl.style.display = 'flex';
+    if (examEditor) examEditor.style.display = 'block';
+
+    ['360', 'academics', 'admission', 'roster', 'finance'].forEach(s => {
+      const btn = document.getElementById(`nav-btn-${s}`);
+      if (btn) btn.style.display = 'inline-block';
+    });
+  } else {
+    badge.innerHTML = `👤 <b>${currentUser.name} (${currentUser.role})</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
+    adminToolbar.style.display = 'none';
+
+    const isOfficial = currentUser.role === 'Official';
+    const isFaculty = currentUser.role === 'Faculty';
+
+    document.getElementById('nav-btn-360').style.display = isOfficial ? 'inline-block' : 'none';
+    document.getElementById('nav-btn-academics').style.display = 'inline-block';
+    document.getElementById('nav-btn-admission').style.display = isOfficial ? 'inline-block' : 'none';
+    document.getElementById('nav-btn-roster').style.display = (isOfficial || isFaculty) ? 'inline-block' : 'none';
+    document.getElementById('nav-btn-finance').style.display = isOfficial ? 'inline-block' : 'none';
+
+    if (routineCtrl) routineCtrl.style.display = (isOfficial || isFaculty) ? 'flex' : 'none';
+    if (examEditor) examEditor.style.display = (isOfficial || isFaculty) ? 'block' : 'none';
+  }
+
+  loadRoutineForBatch();
+  renderUnitGrid();
+  renderExamScheduleTable();
+  populate360Dropdown();
+}
+
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+// -------------------------------------------------------------
+// ADMISSION: DUPLICATE PREVENTION & EXPLICIT SAVE MESSAGE
+// -------------------------------------------------------------
+function handleStudentAdmission(e) {
+  e.preventDefault();
+  const name = document.getElementById('adm-name').value.trim();
+  const phone1 = document.getElementById('adm-phone1').value.replace(/[^0-9]/g, '').trim();
+
+  // Duplicate Check: ensure no two entries share the same phone or identical full name
+  const duplicate = cadetList.find(c => c.phone1 === phone1 || c.name.toLowerCase() === name.toLowerCase());
+  if (duplicate) {
+    alert(`Entry Rejected: A cadet with the phone number (${phone1}) or name "${name}" is already registered.`);
+    return;
+  }
+
+  const admDate = document.getElementById('adm-date').value;
+  const fy = getFinancialYear(admDate);
+  const admFee = parseFloat(document.getElementById('adm-fee').value) || 0;
+  const operator = currentUser ? currentUser.name : 'SuperAdmin';
+  const gender = document.getElementById('adm-gender').value;
+
+  const cadetData = {
+    photo: uploadedPhotoBase64 || "",
+    name,
+    guardian: document.getElementById('adm-guardian').value.trim(),
+    gender,
+    dob: document.getElementById('adm-dob').value,
+    phone1,
+    phone2: document.getElementById('adm-phone2').value.trim(),
+    aadhaar: "[Aadhaar Redacted]",
+    height: parseFloat(document.getElementById('adm-height').value) || 0,
+    chest: gender === 'Male' ? document.getElementById('adm-chest').value.trim() : 'N/A',
+    weight: parseFloat(document.getElementById('adm-weight').value) || 0,
+    reference: document.getElementById('adm-reference').value.trim(),
+    admissionDate: admDate,
+    financialYearAdmitted: fy,
+    currentFinancialYear: fy,
+    admissionFee: admFee,
+    monthlyFee: parseFloat(document.getElementById('adm-monthly-fee').value) || 0,
+    hostelFee: parseFloat(document.getElementById('adm-hostel-fee').value) || 0,
+    batch: document.getElementById('adm-batch').value,
+    section: document.getElementById('adm-section').value,
+    course: document.getElementById('adm-course').value,
+    status: document.getElementById('adm-status').value,
+    statusCause: document.getElementById('adm-status-cause')?.value.trim() || "",
+    place: document.getElementById('adm-place').value.trim(),
+    remarks: document.getElementById('adm-remarks').value.trim(),
+    outstandingDues: 0,
+    enrolledBy: operator,
+    history: [
+      { event: "Admission Registered", date: admDate, details: `Enrolled under FY ${fy} in Section ${document.getElementById('adm-section').value}` }
+    ]
+  };
+
+  db.ref('cadets').push(cadetData).then(() => {
+    if (admFee > 0) {
+      db.ref('finance').push({
+        type: 'Income',
+        date: admDate,
+        ist: new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        purpose: 'Admission Fees',
+        amount: admFee,
+        mode: 'Offline',
+        operator: operator,
+        timestamp: Date.now()
+      });
+    }
+
+    // Explicit Pop-up as requested
+    alert("Save completed in admission form!");
+
+    if (confirm(`Do you want to print the Admission Slip for ${name} now?`)) {
+      renderAndPrintSlip(cadetData);
+    }
+
+    e.target.reset();
+    document.getElementById('cadet-photo-preview').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='95' viewBox='0 0 80 95'><rect width='80' height='95' fill='%2327272a'/><text x='50%25' y='50%25' fill='%2371717a' font-size='11' text-anchor='middle' dy='.3em'>No Photo</text></svg>";
+    uploadedPhotoBase64 = "";
+    handleGenderChange();
+    switchSection('section-roster');
+  });
+}
+
+// -------------------------------------------------------------
+// PRINT SYSTEM
+// -------------------------------------------------------------
+function renderAndPrintSlip(data) {
+  document.getElementById('slip-name').textContent = data.name || '-';
+  document.getElementById('slip-guardian').textContent = data.guardian || '-';
+  document.getElementById('slip-gender').textContent = data.gender || '-';
+  document.getElementById('slip-date').textContent = data.admissionDate || '-';
+  document.getElementById('slip-fy').textContent = data.currentFinancialYear || data.financialYearAdmitted || '-';
+  document.getElementById('slip-dob').textContent = data.dob || '-';
+  document.getElementById('slip-phone1').textContent = data.phone1 || '-';
+  document.getElementById('slip-phone2').textContent = data.phone2 || '-';
+  document.getElementById('slip-aadhaar').textContent = "[Aadhaar Redacted]";
+  document.getElementById('slip-height').textContent = data.height || '-';
+  document.getElementById('slip-chest').textContent = data.chest || '-';
+  document.getElementById('slip-weight').textContent = data.weight || '-';
+  document.getElementById('slip-batch').textContent = data.batch || '-';
+  document.getElementById('slip-section').textContent = data.section || '-';
+  document.getElementById('slip-course').textContent = data.course || '-';
+  document.getElementById('slip-place').textContent = data.place || '-';
+  document.getElementById('slip-reference').textContent = data.reference || '-';
+  document.getElementById('slip-status').textContent = data.status || 'Active';
+  document.getElementById('slip-adm-fee').textContent = (parseFloat(data.admissionFee) || 0).toFixed(2);
+  document.getElementById('slip-monthly-fee').textContent = (parseFloat(data.monthlyFee) || 0).toFixed(2);
+  document.getElementById('slip-hostel-fee').textContent = (parseFloat(data.hostelFee) || 0).toFixed(2);
+  document.getElementById('slip-dues').textContent = (parseFloat(data.outstandingDues) || 0).toFixed(2);
+  document.getElementById('slip-remarks').textContent = data.remarks || 'None';
+
+  const slipPhoto = document.getElementById('slip-photo');
+  slipPhoto.src = data.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='115' viewBox='0 0 100 115'><rect width='100' height='115' fill='%23eee'/></svg>";
+
+  window.print();
+}
+
+function printCurrentAdmissionForm() {
+  const name = document.getElementById('adm-name').value.trim();
+  if (!name) { alert('Enter at least Cadet Name.'); return; }
+  const gender = document.getElementById('adm-gender').value;
+
+  const formData = {
+    photo: uploadedPhotoBase64 || "",
+    name,
+    guardian: document.getElementById('adm-guardian').value.trim(),
+    gender,
+    dob: document.getElementById('adm-dob').value,
+    phone1: document.getElementById('adm-phone1').value.trim(),
+    phone2: document.getElementById('adm-phone2').value.trim(),
+    aadhaar: "[Aadhaar Redacted]",
+    height: document.getElementById('adm-height').value,
+    chest: gender === 'Male' ? document.getElementById('adm-chest').value.trim() : 'N/A',
+    weight: document.getElementById('adm-weight').value,
+    reference: document.getElementById('adm-reference').value.trim(),
+    admissionDate: document.getElementById('adm-date').value,
+    currentFinancialYear: getFinancialYear(document.getElementById('adm-date').value),
+    admissionFee: document.getElementById('adm-fee').value,
+    monthlyFee: document.getElementById('adm-monthly-fee').value,
+    hostelFee: document.getElementById('adm-hostel-fee').value,
+    batch: document.getElementById('adm-batch').value,
+    section: document.getElementById('adm-section').value,
+    course: document.getElementById('adm-course').value,
+    status: document.getElementById('adm-status').value,
+    place: document.getElementById('adm-place').value.trim(),
+    remarks: document.getElementById('adm-remarks').value.trim(),
+    outstandingDues: 0
+  };
+  renderAndPrintSlip(formData);
+}
+
+function printFromAdmissionDropdown() {
+  const id = document.getElementById('select-admitted-student-print').value;
+  if (!id) { alert('Choose a student.'); return; }
+  const cadet = cadetList.find(c => c.id === id);
+  if (cadet) renderAndPrintSlip(cadet);
+}
+
+// Print Accounts Statement
+function printAccountsStatement() {
+  if (financeRecords.length === 0) {
+    alert('No financial records to print.');
+    return;
+  }
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+  const tbody = document.getElementById('print-accounts-table-body');
+  tbody.innerHTML = '';
+
+  financeRecords.forEach(item => {
+    const amt = parseFloat(item.amount) || 0;
+    if (item.type === 'Income') totalIncome += amt;
+    else totalExpense += amt;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.date}</td>
+      <td>${item.ist}</td>
+      <td>${item.type}</td>
+      <td>${item.purpose}</td>
+      <td>₹ ${amt.toFixed(2)}</td>
+      <td>${item.mode}</td>
+      <td>${item.operator}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('print-accounts-meta').textContent = `Generated on ${new Date().toLocaleString('en-IN')}`;
+  document.getElementById('p-acc-income').textContent = totalIncome.toFixed(2);
+  document.getElementById('p-acc-expense').textContent = totalExpense.toFixed(2);
+  document.getElementById('p-acc-net').textContent = (totalIncome - totalExpense).toFixed(2);
+
+  window.print();
+}
+
+function printStudent360Report() {
+  const id = document.getElementById('select-360-student').value;
+  if (!id) { alert('Please select a cadet first.'); return; }
+  const cadet = cadetList.find(c => c.id === id);
+  if (!cadet) return;
+
+  document.getElementById('print-360-meta').textContent = `Printed on ${new Date().toLocaleString('en-IN')}`;
+  document.getElementById('p360-name').textContent = cadet.name;
+  document.getElementById('p360-batch').textContent = `${cadet.batch} (${cadet.section})`;
+  document.getElementById('p360-course').textContent = cadet.course;
+  document.getElementById('p360-guardian').textContent = cadet.guardian;
+  document.getElementById('p360-phone').textContent = cadet.phone1;
+  document.getElementById('p360-fy').textContent = cadet.currentFinancialYear || cadet.financialYearAdmitted;
+  document.getElementById('p360-status').textContent = cadet.status;
+
+  const photo = document.getElementById('p360-photo');
+  photo.src = cadet.photo || '';
+
+  const cadetAttLogs = attendanceLogs.filter(a => a.cadetId === cadet.id);
+  const presentLogs = cadetAttLogs.filter(a => a.status === 'Present');
+  const rate = cadetAttLogs.length > 0 ? Math.round((presentLogs.length / cadetAttLogs.length) * 100) : 0;
+
+  document.getElementById('p360-att-rate').textContent = `${rate}%`;
+  document.getElementById('p360-total-att').textContent = cadetAttLogs.length;
+  document.getElementById('p360-present-count').textContent = presentLogs.length;
+  document.getElementById('p360-absent-count').textContent = cadetAttLogs.length - presentLogs.length;
+  document.getElementById('p360-dues').textContent = (cadet.outstandingDues || 0).toFixed(2);
+
+  const hist = cadet.history || [];
+  document.getElementById('p360-history-table').innerHTML = hist.map(h => `
+    <div style="border-bottom:1px dotted #ccc; padding:0.25rem 0;">
+      <b>[${h.date}] ${h.event}:</b> ${h.details}
+    </div>
+  `).join('') || 'No recorded history.';
+
+  window.print();
+}
+
+// -------------------------------------------------------------
+// ACADEMICS & ROUTINES
+// -------------------------------------------------------------
+function switchSection(secId) {
+  document.querySelectorAll('nav.main-nav button').forEach(b => b.classList.remove('active'));
+  const activeBtn = Array.from(document.querySelectorAll('nav.main-nav button')).find(b => b.getAttribute('onclick').includes(secId));
+  if (activeBtn) activeBtn.classList.add('active');
+
+  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(secId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchAcademicSubTab(subId) {
+  document.getElementById('sub-routine').style.display = subId === 'sub-routine' ? 'block' : 'none';
+  document.getElementById('sub-exams').style.display = subId === 'sub-exams' ? 'block' : 'none';
+  document.getElementById('sub-units').style.display = subId === 'sub-units' ? 'block' : 'none';
+  document.getElementById('sub-attendance').style.display = subId === 'sub-attendance' ? 'block' : 'none';
+
+  document.getElementById('sub-btn-routine').classList.toggle('active', subId === 'sub-routine');
+  document.getElementById('sub-btn-exams').classList.toggle('active', subId === 'sub-exams');
+  document.getElementById('sub-btn-units').classList.toggle('active', subId === 'sub-units');
+  document.getElementById('sub-btn-attendance').classList.toggle('active', subId === 'sub-attendance');
+}
+
+function loadRoutineForBatch() {
+  const batch = document.getElementById('routine-batch-select').value;
+  const tbody = document.getElementById('routine-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const batchRoutine = (routines && routines[batch]) ? routines[batch] : {};
+  const isEditable = currentUser && (currentUser.role === 'SuperAdmin' || currentUser.role === 'Official' || currentUser.role === 'Faculty');
+  const sessionTimings = batchRoutine.timings || DEFAULT_TIMINGS;
+
+  ['s1', 's2', 's3', 's4'].forEach(s => {
+    const box = document.getElementById(`header-timing-${s}-box`);
+    if (box) {
+      if (isEditable) {
+        box.innerHTML = `<input type="text" id="timing-input-${s}" class="timing-input-header" value="${sessionTimings[s] || DEFAULT_TIMINGS[s]}">`;
+      } else {
+        box.innerHTML = `<span style="color:#38bdf8; font-weight:700; font-size:0.75rem;">${sessionTimings[s] || DEFAULT_TIMINGS[s]}</span>`;
+      }
+    }
+  });
+
+  DAYS.forEach(day => {
+    const dayData = batchRoutine[day] || { s1: '', s2: '', s3: '', s4: '' };
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${day}</b></td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s1" value="${dayData.s1 || ''}">` : `<span>${dayData.s1 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s2" value="${dayData.s2 || ''}">` : `<span>${dayData.s2 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s3" value="${dayData.s3 || ''}">` : `<span>${dayData.s3 || '-'}</span>`}</td>
+      <td>${isEditable ? `<input type="text" class="routine-cell" data-day="${day}" data-session="s4" value="${dayData.s4 || ''}">` : `<span>${dayData.s4 || '-'}</span>`}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function copyCurrentRoutine() {
+  const batch = document.getElementById('routine-batch-select').value;
+  copiedRoutineBuffer = JSON.parse(JSON.stringify((routines && routines[batch]) ? routines[batch] : {}));
+  alert(`Routine copied for ${batch}!`);
+}
+
+function pasteRoutineToCurrent() {
+  if (!copiedRoutineBuffer) { alert('Please copy a routine first.'); return; }
+  const batch = document.getElementById('routine-batch-select').value;
+  routines[batch] = JSON.parse(JSON.stringify(copiedRoutineBuffer));
+  loadRoutineForBatch();
+  alert(`Pasted routine into ${batch}. Save to commit.`);
+}
+
+function saveRoutineChanges() {
+  const batch = document.getElementById('routine-batch-select').value;
+  const updatedBatchRoutine = {
+    timings: {
+      s1: document.getElementById('timing-input-s1')?.value.trim() || DEFAULT_TIMINGS.s1,
+      s2: document.getElementById('timing-input-s2')?.value.trim() || DEFAULT_TIMINGS.s2,
+      s3: document.getElementById('timing-input-s3')?.value.trim() || DEFAULT_TIMINGS.s3,
+      s4: document.getElementById('timing-input-s4')?.value.trim() || DEFAULT_TIMINGS.s4
+    }
+  };
+
+  DAYS.forEach(day => {
+    updatedBatchRoutine[day] = {
+      s1: document.querySelector(`.routine-cell[data-day="${day}"][data-session="s1"]`)?.value.trim() || '',
+      s2: document.querySelector(`.routine-cell[data-day="${day}"][data-session="s2"]`)?.value.trim() || '',
+      s3: document.querySelector(`.routine-cell[data-day="${day}"][data-session="s3"]`)?.value.trim() || '',
+      s4: document.querySelector(`.routine-cell[data-day="${day}"][data-session="s4"]`)?.value.trim() || ''
+    };
+  });
+
+  db.ref('routines/' + batch).set(updatedBatchRoutine).then(() => {
+    alert(`Weekly routine for ${batch} saved!`);
+  });
+}
+
+function handleExamScheduleSubmit(e) {
+  e.preventDefault();
+  const name = document.getElementById('exam-sched-name').value.trim();
+  const dateVal = document.getElementById('exam-sched-date').value;
+  const timeVal = document.getElementById('exam-sched-time').value.trim();
+  const batch = document.getElementById('exam-sched-batch').value;
+  const syllabus = document.getElementById('exam-sched-syllabus').value.trim();
+  const scheduledBy = currentUser ? currentUser.name : 'SuperAdmin';
+
+  db.ref('exam_schedules').push({ name, date: dateVal, time: timeVal, batch, syllabus, scheduledBy, timestamp: Date.now() }).then(() => {
+    alert(`Exam schedule published!`);
+    e.target.reset();
+  });
+}
+
+function renderExamScheduleTable() {
+  const tbody = document.getElementById('exam-schedule-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const isEditable = currentUser && (currentUser.role === 'SuperAdmin' || currentUser.role === 'Official' || currentUser.role === 'Faculty');
+
+  examSchedules.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${item.name}</b></td>
+      <td>${item.date}</td>
+      <td><span style="color:#38bdf8; font-weight:700;">${item.time}</span></td>
+      <td><span class="badge" style="background:#27272a; color:#fff;">${item.batch}</span></td>
+      <td style="max-width: 200px; font-size:0.78rem;">${item.syllabus}</td>
+      <td><small style="color:var(--muted);">${item.scheduledBy}</small></td>
+      <td class="no-print">
+        ${isEditable ? `<button class="btn-action btn-block" onclick="deleteExamSchedule('${item.id}', '${item.name}')">Delete</button>` : `<span style="color:var(--muted); font-size:0.75rem;">View Only</span>`}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function deleteExamSchedule(id, name) {
+  if (!confirm(`Delete schedule for "${name}"?`)) return;
+  db.ref('exam_schedules/' + id).remove().then(() => alert(`Schedule deleted.`));
+}
+
+function renderUnitGrid() {
+  const subject = document.getElementById('unit-subject-select').value;
+  const batch = document.getElementById('unit-batch-select').value;
+  const container = document.getElementById('unit-grid-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const batchUnits = (unitData && unitData[subject] && unitData[subject][batch]) ? unitData[subject][batch] : {};
+  const isEditable = currentUser && (currentUser.role === 'SuperAdmin' || currentUser.role === 'Official' || currentUser.role === 'Faculty');
+
+  for (let i = 1; i <= 84; i++) {
+    const unitKey = 'U' + i;
+    const info = batchUnits[unitKey] || { status: 'unmarked', upcoming: '' };
+    const div = document.createElement('div');
+    div.className = `unit-box ${info.status}`;
+    div.textContent = unitKey;
+
+    if (isEditable) {
+      div.onclick = () => openUnitModal(subject, batch, unitKey, info);
+    } else {
+      div.onclick = () => alert(`${subject} (${batch}) - ${unitKey}\nStatus: ${info.status.toUpperCase()}\nUpcoming: ${info.upcoming || 'Not Specified'}`);
+    }
+    container.appendChild(div);
+  }
+}
+
+function openUnitModal(subject, batch, unitKey, info) {
+  selectedUnitId = { subject, batch, unitKey };
+  document.getElementById('unit-modal-title').textContent = `Unit: ${unitKey} (${subject} - ${batch})`;
+  document.getElementById('modal-unit-status').value = info.status || 'unmarked';
+  document.getElementById('modal-upcoming-unit').value = info.upcoming || '';
+  document.getElementById('unit-modal').style.display = 'flex';
+}
+
+function closeUnitModal() {
+  document.getElementById('unit-modal').style.display = 'none';
+  selectedUnitId = null;
+}
+
+function saveUnitStatus() {
+  if (!selectedUnitId) return;
+  const { subject, batch, unitKey } = selectedUnitId;
+  const status = document.getElementById('modal-unit-status').value;
+  const upcoming = document.getElementById('modal-upcoming-unit').value.trim();
+
+  db.ref(`units/${subject}/${batch}/${unitKey}`).set({
+    status, upcoming, updatedBy: currentUser ? currentUser.name : 'SuperAdmin', date: new Date().toISOString().split('T')[0]
+  }).then(() => {
+    closeUnitModal();
+    alert(`Unit ${unitKey} updated!`);
+  });
+}
+
+function generateAttendanceQRCode() {
+  const sessionType = document.getElementById('qr-session-type').value;
+  const batchTarget = document.getElementById('qr-batch-target').value;
+  const container = document.getElementById('qrcode-container');
+  container.innerHTML = '';
+
+  const token = 'FF-ATT-' + batchTarget + '-' + sessionType + '-' + Date.now();
+  const payloadUrl = window.location.href.split('?')[0] + '?attendance_token=' + token;
+
+  new QRCode(container, {
+    text: payloadUrl,
+    width: 180,
+    height: 180,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  document.getElementById('qr-modal-subtitle').textContent = `Batch: ${batchTarget} | Session: ${sessionType}`;
+  document.getElementById('qr-code-modal').style.display = 'flex';
+
+  let timeLeft = 600;
+  if (qrTimerInterval) clearInterval(qrTimerInterval);
+
+  qrTimerInterval = setInterval(() => {
+    timeLeft--;
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    document.getElementById('qr-timer-display').textContent = `Time Remaining: ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+
+    if (timeLeft <= 0) {
+      clearInterval(qrTimerInterval);
+      markUnmarkedCadetsAbsent(batchTarget, sessionType);
+      alert('Attendance window closed. Unmarked cadets logged as Absent.');
+      closeQrModal();
+    }
+  }, 1000);
+}
+
+function closeQrModal() {
+  if (qrTimerInterval) clearInterval(qrTimerInterval);
+  document.getElementById('qr-code-modal').style.display = 'none';
+}
+
+function markUnmarkedCadetsAbsent(batch, sessionType) {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const batchCadets = cadetList.filter(c => c.section === batch && c.status === 'Active');
+
+  batchCadets.forEach(cadet => {
+    const alreadyLogged = attendanceLogs.some(log => log.cadetId === cadet.id && log.date === todayStr && log.session === sessionType);
+    if (!alreadyLogged) {
+      db.ref('attendance_logs').push({
+        cadetId: cadet.id,
+        cadetName: cadet.name,
+        batch: batch,
+        session: sessionType,
+        status: 'Absent',
+        date: todayStr,
+        timestamp: Date.now()
+      });
+    }
+  });
+}
+
+function renderAttendanceLogTable() {
+  const tbody = document.getElementById('attendance-log-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  attendanceLogs.sort((a, b) => b.timestamp - a.timestamp).forEach(log => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${log.cadetName}</b></td>
+      <td>${log.batch}</td>
+      <td>${log.session}</td>
+      <td><span class="badge ${log.status === 'Present' ? 'badge-active' : 'badge-suspended'}">${log.status}</span></td>
+      <td><small style="color:var(--muted);">${new Date(log.timestamp).toLocaleTimeString()}</small></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// -------------------------------------------------------------
+// STUDENT 360° ENGINE
+// -------------------------------------------------------------
+function populate360Dropdown() {
+  const sel = document.getElementById('select-360-student');
+  if (!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">-- Select Cadet to Monitor --</option>';
+  cadetList.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.name} (${c.batch}-${c.section})`;
+    sel.appendChild(opt);
+  });
+  if (currentVal) sel.value = currentVal;
+}
+
+function renderStudent360View() {
+  const id = document.getElementById('select-360-student').value;
+  const emptyBox = document.getElementById('360-empty-placeholder');
+  const dataBox = document.getElementById('360-data-container');
+
+  if (!id) {
+    emptyBox.style.display = 'block';
+    dataBox.style.display = 'none';
+    return;
+  }
+
+  const cadet = cadetList.find(c => c.id === id);
+  if (!cadet) return;
+
+  emptyBox.style.display = 'none';
+  dataBox.style.display = 'block';
+
+  document.getElementById('360-name').textContent = cadet.name;
+  document.getElementById('360-subline').textContent = `Batch: ${cadet.batch} (${cadet.section}) | Course: ${cadet.course} | Guardian: ${cadet.guardian} | Mobile: ${cadet.phone1}`;
+  document.getElementById('360-physline').textContent = `Height: ${cadet.height || '-'} cm | Chest: ${cadet.chest || '-'} | Weight: ${cadet.weight || '-'} kg`;
+  
+  const photo = document.getElementById('360-photo');
+  photo.src = cadet.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='75' height='90' viewBox='0 0 75 90'><rect width='75' height='90' fill='%2327272a'/><text x='50%25' y='50%25' fill='%2371717a' font-size='10' text-anchor='middle' dy='.3em'>No Photo</text></svg>";
+
+  const cadetAttLogs = attendanceLogs.filter(a => a.cadetId === cadet.id);
+  const presentLogs = cadetAttLogs.filter(a => a.status === 'Present');
+  const rate = cadetAttLogs.length > 0 ? Math.round((presentLogs.length / cadetAttLogs.length) * 100) : 0;
+  
+  document.getElementById('360-stat-att-rate').textContent = `${rate}% (${presentLogs.length}/${cadetAttLogs.length})`;
+
+  let unitsCompletedCount = 0;
+  const subjects = ['ENGLISH', 'MATH', 'GI', 'HINDI', 'GK'];
+  subjects.forEach(sub => {
+    if (unitData[sub] && unitData[sub][cadet.section]) {
+      Object.keys(unitData[sub][cadet.section]).forEach(uKey => {
+        if (unitData[sub][cadet.section][uKey]?.status === 'completed') unitsCompletedCount++;
+      });
+    }
+  });
+  document.getElementById('360-stat-units').textContent = `${unitsCompletedCount} / ${84 * subjects.length}`;
+
+  const batchExams = examSchedules.filter(e => e.batch === 'All Batches' || e.batch === cadet.section);
+  document.getElementById('360-stat-exams').textContent = batchExams.length;
+  document.getElementById('360-stat-dues').textContent = `₹ ${(cadet.outstandingDues || 0).toFixed(2)}`;
+
+  const batchRoutine = routines[cadet.section] || {};
+  let routineHtml = '';
+  DAYS.forEach(d => {
+    const s = batchRoutine[d];
+    if (s && (s.s1 || s.s2 || s.s3 || s.s4)) {
+      routineHtml += `<div><b>${d}:</b> S1: ${s.s1 || '-'} | S2: ${s.s2 || '-'}</div>`;
+    }
+  });
+  document.getElementById('360-routine-preview').innerHTML = routineHtml || 'No customized weekly schedule logged.';
+
+  let unitsHtml = '';
+  subjects.forEach(sub => {
+    let comp = 0;
+    if (unitData[sub] && unitData[sub][cadet.section]) {
+      Object.keys(unitData[sub][cadet.section]).forEach(uKey => {
+        if (unitData[sub][cadet.section][uKey]?.status === 'completed') comp++;
+      });
+    }
+    unitsHtml += `<div><b>${sub}:</b> ${comp} units completed</div>`;
+  });
+  document.getElementById('360-units-preview').innerHTML = unitsHtml;
+
+  const tbody = document.getElementById('360-history-table-body');
+  tbody.innerHTML = '';
+  const hist = cadet.history || [];
+  hist.forEach(h => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${h.date}</td><td><b>${h.event}</b></td><td>Academic</td><td>${h.details}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// -------------------------------------------------------------
+// DIRECTORY & ROSTER HELPERS
+// -------------------------------------------------------------
+function renderCadetRosterTable() {
+  const tbody = document.getElementById('cadet-roster-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const q = (document.getElementById('roster-search')?.value || '').toLowerCase();
+  const currentFY = getFinancialYear(new Date().toISOString().split('T')[0]);
+
+  cadetList.filter(c => c.name.toLowerCase().includes(q) || c.phone1.includes(q) || c.section.toLowerCase().includes(q)).forEach(c => {
+    const isFyCompleted = c.currentFinancialYear !== currentFY;
+    const hasDues = (c.outstandingDues || 0) > 0;
+    const canReAdmit = isFyCompleted && !hasDues;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><img src="${c.photo || ''}" style="width:36px; height:42px; border-radius:4px; object-fit:cover; background:#27272a;"></td>
+      <td><b>${c.name}</b><br><small style="color:var(--muted);">${c.phone1}</small></td>
+      <td><small>H:${c.height || '-'} W:${c.weight || '-'}</small></td>
+      <td><b>${c.section}</b></td>
+      <td>${c.course}</td>
+      <td>${c.currentFinancialYear}</td>
+      <td><span class="badge ${c.status === 'Active' ? 'badge-active' : 'badge-suspended'}">${c.status}</span></td>
+      <td>${hasDues ? `<span class="badge badge-suspended">₹${c.outstandingDues}</span>` : `<span class="badge badge-active">Cleared</span>`}</td>
+      <td class="no-print">
+        <button class="btn-action btn-readmit" ${!canReAdmit ? 'disabled' : ''} onclick="processReAdmission('${c.id}', '${c.name}', '${currentFY}')">Re-Admit</button>
+        <button class="btn-action btn-print" onclick="renderAndPrintSlip(cadetList.find(x=>x.id==='${c.id}'))">Slip</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function processReAdmission(id, name, newFY) {
+  const fee = prompt(`Re-Admission fee for ${name} (FY ${newFY}):`, "2000");
+  if (fee === null) return;
+  const feeAmount = parseFloat(fee) || 0;
+
+  const cadet = cadetList.find(c => c.id === id);
+  if (!cadet) return;
+
+  const history = cadet.history || [];
+  history.push({ event: "Re-Admission Completed", date: new Date().toISOString().split('T')[0], details: `Renewed for FY ${newFY} with fee ₹${feeAmount}` });
+
+  db.ref('cadets/' + id).update({ currentFinancialYear: newFY, history }).then(() => {
+    if (feeAmount > 0) {
+      db.ref('finance').push({
+        type: 'Income',
+        date: new Date().toISOString().split('T')[0],
+        ist: new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        purpose: 'Re admission fees',
+        amount: feeAmount,
+        mode: 'Offline',
+        operator: currentUser ? currentUser.name : 'SuperAdmin',
+        timestamp: Date.now()
+      });
+    }
+    alert(`Cadet ${name} re-admitted!`);
+  });
+}
+
+// -------------------------------------------------------------
+// FINANCE ACTIONS
+// -------------------------------------------------------------
+function updateFinancePurposeDropdown() {
+  const type = document.getElementById('fin-type').value;
+  const sel = document.getElementById('fin-purpose');
+  sel.innerHTML = '';
+  const list = type === 'Income' ? INCOME_PURPOSES : EXPENDITURE_PURPOSES;
+  list.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p;
+    sel.appendChild(opt);
+  });
+}
+
+function handleFinanceSubmit(e) {
+  e.preventDefault();
+  const type = document.getElementById('fin-type').value;
+  const dateVal = document.getElementById('fin-date').value;
+  const purpose = document.getElementById('fin-purpose').value;
+  const amount = parseFloat(document.getElementById('fin-amount').value) || 0;
+  const mode = document.getElementById('fin-mode').value;
+  const istTime = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
+  const operator = currentUser ? currentUser.name : 'SuperAdmin';
+
+  db.ref('finance').push({
+    type, date: dateVal, ist: istTime, purpose, amount, mode, operator, timestamp: Date.now()
+  }).then(() => {
+    alert('Financial Entry recorded successfully!');
+    document.getElementById('fin-amount').value = '';
+  });
+}
+
+function renderFinanceLedger() {
+  const tbody = document.getElementById('finance-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+
+  financeRecords.sort((a, b) => b.timestamp - a.timestamp).forEach(item => {
+    const amt = parseFloat(item.amount) || 0;
+    if (item.type === 'Income') totalIncome += amt;
+    else totalExpense += amt;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.date}</td>
+      <td><small style="color:var(--muted);">${item.ist}</small></td>
+      <td><span class="badge ${item.type === 'Income' ? 'badge-active' : 'badge-suspended'}">${item.type}</span></td>
+      <td><b>${item.purpose}</b></td>
+      <td style="font-weight:700; color:${item.type === 'Income' ? '#4ade80' : '#f87171'};">₹ ${amt.toFixed(2)}</td>
+      <td>${item.mode}</td>
+      <td>${item.operator}</td>
+      <td class="no-print"><button class="btn-action btn-block" onclick="deleteFinanceEntry('${item.id}', '${item.type} ₹${amt}')">Delete</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('fin-stat-income').textContent = `₹ ${totalIncome.toFixed(2)}`;
+  document.getElementById('fin-stat-expense').textContent = `₹ ${totalExpense.toFixed(2)}`;
+  const net = totalIncome - totalExpense;
+  const netEl = document.getElementById('fin-stat-net');
+  netEl.textContent = `₹ ${net.toFixed(2)}`;
+  netEl.style.color = net >= 0 ? '#38bdf8' : '#ef4444';
+}
+
+function deleteFinanceEntry(id, details) {
+  if (!confirm(`Delete record: ${details}?`)) return;
+  db.ref('finance/' + id).remove().then(() => alert('Record deleted.'));
+}
+
+// -------------------------------------------------------------
+// COMMON UTILITIES
+// -------------------------------------------------------------
+function updateSectionDropdown() {
+  const batch = document.getElementById('adm-batch').value;
+  const secSelect = document.getElementById('adm-section');
+  secSelect.innerHTML = '';
+  const sections = batch === 'General' ? ['G1', 'G2', 'G3', 'G4'] : ['H1', 'H2', 'H3', 'H4'];
+  sections.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = `${batch} - Section ${s}`;
+    secSelect.appendChild(opt);
+  });
+}
+
+function toggleStatusCauseField() {
+  const status = document.getElementById('adm-status').value;
+  document.getElementById('status-cause-container').style.display = status !== 'Active' ? 'block' : 'none';
+}
+
+function handleGenderChange() {
+  const gender = document.getElementById('adm-gender').value;
+  const chestBox = document.getElementById('chest-input-container');
+  if (gender === 'Male') chestBox.style.display = 'block';
+  else { chestBox.style.display = 'none'; document.getElementById('adm-chest').value = ''; }
+}
+
+function previewPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedPhotoBase64 = e.target.result;
+    document.getElementById('cadet-photo-preview').src = uploadedPhotoBase64;
+  };
+  reader.readAsDataURL(file);
+}
+
+function getFinancialYear(dateString) {
+  const d = new Date(dateString);
+  const year = d.getFullYear();
+  const month = d.getMonth();
+  if (month >= 3) return `${year}-${year + 1}`;
+  else return `${year - 1}-${year}`;
+}
+
+function populateAdmittedStudentDropdown() {
+  const sel = document.getElementById('select-admitted-student-print');
+  if (!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">-- Choose Student --</option>';
+  cadetList.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.name} (${c.batch}-${c.section})`;
+    sel.appendChild(opt);
+  });
+  if (currentVal) sel.value = currentVal;
+}
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>FAUJI FACTORY | Official Command Portal</title>
 
