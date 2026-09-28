@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FAUJI FACTORY | Official Command Portal</title>
+<title>FAUJI FACTORY | Student & Command Portal</title>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<!-- QRCode.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
   :root {
     --primary: #dc2626;
     --primary-dark: #b91c1c;
-    --primary-gradient: linear-gradient(135deg, #000000 0%, #dc2626 100%);
     --bg: #09090b;
     --card: #18181b;
     --text: #f4f4f5;
     --muted: #a1a1aa;
     --border: #27272a;
-    --danger: #ef4444;
     --success: #22c55e;
     --warning: #f59e0b;
     --radius: 12px;
     --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-  body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
 
   header {
     background: #000000;
@@ -49,10 +49,8 @@
     font-size: 1.1rem;
     padding: 0.4rem 0.8rem;
     border-radius: 8px;
-    letter-spacing: 1px;
   }
-  .app-title { font-size: 1.2rem; font-weight: 900; letter-spacing: 0.5px; color: #ffffff; }
-  .app-sub { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .app-title { font-size: 1.2rem; font-weight: 900; color: #ffffff; }
 
   .user-badge {
     display: flex;
@@ -63,16 +61,6 @@
     padding: 0.4rem 0.85rem;
     border-radius: 20px;
     font-size: 0.82rem;
-  }
-  .header-btn {
-    background: #27272a;
-    color: #ffffff;
-    border: 1px solid #3f3f46;
-    padding: 0.3rem 0.65rem;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 0.72rem;
-    cursor: pointer;
   }
   .logout-btn {
     background: var(--primary);
@@ -106,7 +94,6 @@
     border-radius: 8px;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.15s;
   }
   nav.main-nav button.active {
     background: #000000;
@@ -125,10 +112,9 @@
   }
 
   .app-section { display: none; }
-  .app-section.active { display: block; animation: fadeIn 0.2s ease-in-out; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  .app-section.active { display: block; }
 
-  label { font-size: 0.75rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  label { font-size: 0.75rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 0.35rem; text-transform: uppercase; }
   input, select, textarea {
     width: 100%;
     padding: 0.7rem 0.9rem;
@@ -140,7 +126,7 @@
     color: #ffffff;
     margin-bottom: 1rem;
   }
-  input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+  input:focus, select:focus { border-color: var(--primary); }
 
   .form-grid {
     display: grid;
@@ -157,61 +143,14 @@
     font-weight: 800;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: background 0.15s;
   }
   .btn-submit:hover { background: var(--primary-dark); }
-  .btn-secondary {
-    background: #27272a;
-    color: #ffffff;
-    border: 1px solid #3f3f46;
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-  }
-  .btn-action { padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer; border: none; margin-right: 4px; }
-  .btn-approve { background: #15803d; color: white; }
-  .btn-block { background: #b91c1c; color: white; }
-  .btn-modify { background: #2563eb; color: white; }
-  .btn-readmit { background: #0284c7; color: white; }
-  .btn-readmit:disabled { background: #3f3f46; color: #71717a; cursor: not-allowed; }
 
-  .photo-upload-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    margin-bottom: 1.25rem;
-    background: #000000;
-    padding: 1rem;
-    border-radius: 10px;
-    border: 1px dashed var(--border);
-  }
-  .photo-preview {
-    width: 90px;
-    height: 100px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    object-fit: cover;
-    background: #18181b;
-  }
-
-  .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
-  .badge-active { background: #14532d; color: #bbf7d0; }
-  .badge-inactive { background: #3f3f46; color: #d4d4d8; }
-  .badge-left { background: #713f12; color: #fde047; }
-  .badge-suspended { background: #7f1d1d; color: #fecaca; }
-
-  .table-responsive { overflow-x: auto; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; background: #000000; }
-  th, td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  th { background: #121214; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
-  tr:hover td { background: #18181b; }
-
-  #auth-modal, #admin-mgmt-modal, #change-pin-modal, #forgot-pin-modal, #modify-access-modal, #student-profile-modal, #super-admin-phone-modal {
+  /* Login Modal */
+  #auth-modal {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
@@ -223,257 +162,101 @@
     border: 1px solid var(--border);
     border-radius: 16px;
     width: 92%;
-    max-width: 480px;
+    max-width: 440px;
     padding: 2rem;
-    box-shadow: var(--shadow-lg);
   }
-  .auth-card h2 { color: #ffffff; margin-bottom: 0.3rem; font-size: 1.4rem; font-weight: 900; }
-  .auth-tabs { display: flex; background: #000000; border-radius: 8px; padding: 4px; margin: 1.2rem 0; border: 1px solid var(--border); }
+  .auth-tabs { display: flex; background: #000000; border-radius: 8px; padding: 4px; margin: 1.2rem 0; }
   .auth-tab-btn {
     flex: 1;
     padding: 0.55rem;
     border: none;
     background: none;
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     color: var(--muted);
     cursor: pointer;
     border-radius: 6px;
-    transition: all 0.15s;
   }
   .auth-tab-btn.active { background: var(--primary); color: white; }
 
-  .permission-grid {
+  /* Tables */
+  .table-responsive { overflow-x: auto; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; background: #000000; }
+  th, td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: #121214; color: var(--muted); font-size: 0.75rem; }
+
+  /* Student Portal Widgets */
+  .dashboard-widget-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.75rem;
-    margin: 1.25rem 0;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1rem;
   }
-  .perm-item {
-    background: #000000;
+  .widget-card {
+    background: #121214;
     border: 1px solid var(--border);
-    padding: 0.75rem;
-    border-radius: 8px;
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+  .widget-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 0.85rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
-  .perm-item input[type="checkbox"] { width: auto; margin: 0; }
-  .perm-item label { margin: 0; cursor: pointer; color: #f4f4f5; text-transform: none; font-size: 0.85rem; }
-
-  @media print {
-    body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
-    header, nav.main-nav, .no-print, .btn-action, button, input, select { display: none !important; }
-    .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
-    .card { background: white !important; color: black !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
-    table { width: 100% !important; border: 1px solid #000000 !important; background: white !important; color: black !important; }
-    th, td { border: 1px solid #000000 !important; color: black !important; }
-    th { background: #f4f4f5 !important; }
-    .print-header { display: block !important; text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
+  .qr-box {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    display: inline-block;
+    margin: 0.75rem 0;
   }
-  .print-header { display: none; }
+  .routine-item, .exam-item {
+    background: #000000;
+    border-left: 3px solid var(--primary);
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
 </style>
 </head>
 <body>
 
-<!-- AUTH MODAL WITH 3 LOGINS: CADET, OFFICIAL, SUPER ADMIN -->
+<!-- AUTHENTICATION MODAL -->
 <div id="auth-modal">
   <div class="auth-card">
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;">
       <div class="app-logo-badge">FF</div>
-      <h2>FAUJI FACTORY</h2>
+      <h2 style="color: #fff;">FAUJI FACTORY</h2>
     </div>
-    <p style="font-size: 0.82rem; color: var(--muted);">Unified Identification & Command Desk</p>
-    
+    <p style="font-size: 0.82rem; color: var(--muted);">অফিসিয়াল ও স্টুডেন্ট লগইন পোর্টাল</p>
+
     <div class="auth-tabs">
-      <button class="auth-tab-btn active" id="tab-btn-student" onclick="switchLoginMode('student')">Cadet Login</button>
-      <button class="auth-tab-btn" id="tab-btn-official" onclick="switchLoginMode('official')">Official Login</button>
-      <button class="auth-tab-btn" id="tab-btn-admin" onclick="switchLoginMode('admin')">Super Admin</button>
+      <button class="auth-tab-btn active" onclick="switchLoginMode('student')">👨‍🎓 স্টুডেন্ট লগইন</button>
+      <button class="auth-tab-btn" onclick="switchLoginMode('admin')">👮 সুপার অ্যাডমিন / অফিসিয়াল</button>
     </div>
 
-    <!-- 1. Cadet Login (Mobile + Generated PIN) -->
+    <!-- Student Login -->
     <div id="login-student-view">
-      <label>Registered Mobile Number</label>
-      <input type="tel" id="student-login-phone" placeholder="Enter 10-digit mobile number">
-      <label>Entry PIN (Generated by Admin)</label>
-      <input type="password" id="student-login-pin" placeholder="Enter assigned secret PIN">
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-        <input type="checkbox" id="student-remember-me" style="width: auto; margin: 0;">
-        <label for="student-remember-me" style="margin: 0; font-size: 0.8rem; cursor: pointer; color: #ffffff;">Remember on this device</label>
-      </div>
-      <button class="btn-submit" style="width: 100%;" onclick="handleStudentLogin()">Access Cadet Dashboard</button>
-      <p style="font-size: 0.74rem; color: var(--muted); margin-top: 0.8rem; text-align: center;">Enter using your registered mobile and academy PIN.</p>
+      <label>রেজিস্টার্ড মোবাইল নম্বর</label>
+      <input type="tel" id="stu-login-phone" placeholder="১০ সংখ্যার মোবাইল নম্বর লিখুন">
+
+      <label>স্টুডেন্ট পিন (অফিস থেকে দেওয়া PIN)</label>
+      <input type="password" id="stu-login-pin" placeholder="আপনার স্টুডেন্ট পিন লিখুন">
+
+      <button class="btn-submit" style="width: 100%;" onclick="handleStudentLogin()">লগইন করুন</button>
+      <p style="font-size: 0.72rem; color: var(--muted); margin-top: 0.75rem; text-align: center;">পিন ভুলে গেলে সরাসরি সুপার অ্যাডমিন বা অফিসের সাথে যোগাযোগ করুন।</p>
     </div>
 
-    <!-- 2. Official / Faculty Login -->
-    <div id="login-official-view" style="display: none;">
-      <label>Official Registered Mobile Number</label>
-      <input type="tel" id="official-login-phone" placeholder="Enter registered phone number">
-      <label>Official Password / PIN</label>
-      <input type="password" id="official-login-pin" placeholder="Enter authorized password">
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-        <input type="checkbox" id="official-remember-me" style="width: auto; margin: 0;">
-        <label for="official-remember-me" style="margin: 0; font-size: 0.8rem; cursor: pointer; color: #ffffff;">Remember credentials</label>
-      </div>
-      <button class="btn-submit" style="width: 100%; background: #2563eb;" onclick="handleOfficialLogin()">Log in to Command Desk</button>
-      <div style="margin-top: 0.8rem; text-align: center;">
-        <a href="javascript:void(0)" onclick="openOfficialRegistration()" style="font-size: 0.75rem; color: var(--primary); text-decoration: none;">New Faculty/Official? Register here</a>
-      </div>
-    </div>
-
-    <!-- 3. Super Admin Direct Master PIN Login -->
+    <!-- Official / Super Admin Login -->
     <div id="login-admin-view" style="display: none;">
-      <label>Super Admin Master PIN</label>
-      <input type="password" id="admin-login-pin" placeholder="Enter Master PIN (Default: 1234)">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <input type="checkbox" id="admin-remember-me" style="width: auto; margin: 0;">
-          <label for="admin-remember-me" style="margin: 0; font-size: 0.8rem; cursor: pointer; color: #ffffff;">Remember Master PIN</label>
-        </div>
-        <a href="javascript:void(0)" onclick="openForgotPinModal()" style="font-size: 0.75rem; color: var(--primary); text-decoration: none; font-weight: 700;">Forgot PIN?</a>
-      </div>
-      <button class="btn-submit" style="width: 100%;" onclick="handleSuperAdminLogin()">Enter Super Admin Command</button>
-    </div>
+      <label>অফিসিয়াল পাসওয়ার্ড বা মাস্টার পিন</label>
+      <input type="password" id="admin-login-pin" placeholder="পিন লিখুন (ডিফল্ট: 1234)">
 
-    <!-- Official Self-Registration View -->
-    <div id="register-official-view" style="display: none;">
-      <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.8rem;">Official / Faculty Enrollment</h3>
-      <label>Full Name</label>
-      <input type="text" id="reg-name" placeholder="Full name">
-      <label>Designation</label>
-      <select id="reg-designation">
-        <option value="Official">Command Official</option>
-        <option value="Faculty">Academic Faculty</option>
-        <option value="Instructor">Physical Instructor</option>
-      </select>
-      <label>Mobile Number (Primary ID)</label>
-      <input type="tel" id="reg-phone" placeholder="10-digit mobile number" required>
-      <label>Date of Birth</label>
-      <input type="date" id="reg-dob" required>
-      <div style="display: flex; gap: 0.5rem;">
-        <button class="btn-submit" style="flex: 1;" onclick="submitOfficialRegistration()">Submit for Approval</button>
-        <button class="btn-secondary" style="flex: 1;" onclick="switchLoginMode('official')">Back</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- CHANGE SUPER ADMIN PIN MODAL -->
-<div id="change-pin-modal" style="display: none;">
-  <div class="auth-card">
-    <h2 style="font-size: 1.3rem;">🔐 Change Super Admin Master PIN</h2>
-    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem;">Verify your current PIN to configure a new Master PIN.</p>
-    <label>Current Master PIN</label>
-    <input type="password" id="old-admin-pin" placeholder="Enter old PIN">
-    <label>New Master PIN</label>
-    <input type="password" id="new-admin-pin" placeholder="Enter new PIN">
-    <label>Confirm New Master PIN</label>
-    <input type="password" id="confirm-admin-pin" placeholder="Re-enter new PIN">
-    <div style="display: flex; gap: 0.5rem;">
-      <button class="btn-submit" onclick="processSuperAdminPinChange()">Save Password</button>
-      <button class="btn-submit" style="background: #27272a;" onclick="closeChangePinModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- SUPER ADMIN PHONE MODAL -->
-<div id="super-admin-phone-modal" style="display: none;">
-  <div class="auth-card">
-    <h2 style="font-size: 1.3rem;">📱 Super Admin Notification Number</h2>
-    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem;">All live alerts will be dispatched to this phone.</p>
-    <label>Super Admin Registered Mobile</label>
-    <input type="tel" id="super-admin-current-phone" placeholder="Enter 10-digit phone">
-    <div style="display: flex; gap: 0.5rem;">
-      <button class="btn-submit" onclick="saveSuperAdminPhone()">Save Number</button>
-      <button class="btn-submit" style="background: #27272a;" onclick="closeSuperAdminPhoneModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- FORGOT PIN MODAL -->
-<div id="forgot-pin-modal" style="display: none;">
-  <div class="auth-card">
-    <h2 style="font-size: 1.3rem;">🆘 Super Admin Password Recovery</h2>
-    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem;">Verify registered Super Admin recovery mobile number.</p>
-    <label>Registered Mobile Number</label>
-    <input type="tel" id="recovery-mobile" placeholder="Enter registered number">
-    <label>New Master PIN</label>
-    <input type="password" id="recovery-new-pin" placeholder="Enter new Master PIN">
-    <div style="display: flex; gap: 0.5rem;">
-      <button class="btn-submit" onclick="processPinRecovery()">Verify & Reset</button>
-      <button class="btn-submit" style="background: #27272a;" onclick="closeForgotPinModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODIFY USER ACCESS PERMISSIONS MODAL -->
-<div id="modify-access-modal" style="display: none;">
-  <div class="auth-card" style="max-width: 520px;">
-    <h2 style="font-size: 1.3rem;">⚙️ Modify User Tab Access</h2>
-    <p style="font-size: 0.82rem; color: var(--muted);" id="modify-user-subtitle">Set permissions for user.</p>
-    <div class="permission-grid">
-      <div class="perm-item">
-        <input type="checkbox" id="perm-admission">
-        <label for="perm-admission">📝 Cadet Admission</label>
-      </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-roster">
-        <label for="perm-roster">👥 Cadet Directory</label>
-      </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-routine">
-        <label for="perm-routine">📅 Weekly Routine</label>
-      </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-exams">
-        <label for="perm-exams">📊 Exam Schedule</label>
-      </div>
-      <div class="perm-item">
-        <input type="checkbox" id="perm-finance">
-        <label for="perm-finance">💰 Income & Expenditure</label>
-      </div>
-    </div>
-    <div style="display: flex; gap: 0.5rem;">
-      <button class="btn-submit" onclick="saveUserPermissions()">Save Permissions</button>
-      <button class="btn-submit" style="background: #27272a;" onclick="closeModifyAccessModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- CADET DOSSIER MODAL -->
-<div id="student-profile-modal" style="display: none;">
-  <div class="auth-card" style="max-width: 800px; width: 95%;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h2 style="color: #ffffff;" id="modal-student-name">Cadet Lifetime Dossier</h2>
-      <button class="logout-btn" onclick="closeStudentProfileModal()">✕ Close</button>
-    </div>
-    <div id="modal-student-content" style="max-height: 480px; overflow-y: auto;"></div>
-  </div>
-</div>
-
-<!-- USER ACCESS MANAGEMENT MODAL -->
-<div id="admin-mgmt-modal" style="display: none;">
-  <div class="auth-card" style="max-width: 960px; width: 95%;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h2 style="color: #ffffff;">Super Admin: User Access Management</h2>
-      <button class="logout-btn" onclick="closeSuperAdminPanel()">✕ Close</button>
-    </div>
-    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem;">Authorize official accounts, modify permissions, or revoke entry privileges.</p>
-    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-      <table>
-        <thead>
-          <tr>
-            <th>Name & Pass</th>
-            <th>Designation</th>
-            <th>Registered Mobile</th>
-            <th>Permitted Tabs</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="admin-users-table-body"></tbody>
-      </table>
+      <button class="btn-submit" style="width: 100%;" onclick="handleAdminLogin()">অ্যাডমিন ড্যাশবোর্ডে প্রবেশ করুন</button>
     </div>
   </div>
 </div>
@@ -484,507 +267,206 @@
     <div class="app-logo-badge">FF</div>
     <div>
       <div class="app-title">FAUJI FACTORY</div>
-      <div class="app-sub">Command & Cadet Portal</div>
     </div>
   </div>
-  <div class="user-badge" id="user-display-badge">
-    <span>🔒 Authenticating...</span>
-    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+  <div class="user-badge">
+    <span id="user-display-badge">লগইন করুন</span>
+    <button class="logout-btn" onclick="handleLogout()">লগআউট</button>
   </div>
 </header>
 
-<!-- MAIN NAVIGATION -->
-<nav class="main-nav no-print" id="app-nav" style="display: none;">
-  <button id="nav-btn-admission" class="active" onclick="switchSection('section-admission')">📝 Cadet Admission</button>
-  <button id="nav-btn-roster" onclick="switchSection('section-roster')">👥 Cadet Directory</button>
-  <button id="nav-btn-routine" onclick="switchSection('section-routine')">📅 Weekly Routine</button>
-  <button id="nav-btn-exams" onclick="switchSection('section-exams')">📊 Exam Schedule</button>
-  <button id="nav-btn-finance" onclick="switchSection('section-finance')">💰 Income & Expenditure</button>
+<!-- NAVIGATION (Admin View) -->
+<nav class="main-nav" id="admin-nav" style="display: none;">
+  <button id="nav-btn-adm" class="active" onclick="switchAdminSection('sec-admission')">📝 স্টুডেন্ট অ্যাডমিশন (পিন সেট)</button>
+  <button id="nav-btn-list" onclick="switchAdminSection('sec-student-list')">👥 স্টুডেন্ট তালিকা ও রুটিন/এক্সাম ম্যানেজ</button>
+  <button id="nav-btn-fin" onclick="switchAdminSection('sec-finance')">💰 আয় ও ব্যয়</button>
 </nav>
 
 <div class="container">
 
-  <!-- PRINT HEADER -->
-  <div class="print-header">
-    <h1>FAUJI FACTORY</h1>
-    <h3>OFFICIAL CADET REGISTRATION & ADMISSION RECORD</h3>
-    <p id="print-meta"></p>
-  </div>
-
-  <!-- WAITING / PENDING SCREEN -->
-  <div id="screen-waiting" class="card" style="text-align: center; padding: 3rem 1.5rem; display: none;">
-    <h1 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 0.5rem;">WELCOME TO FAUJI FACTORY</h1>
-    <div style="background: #000000; border: 1px solid var(--primary); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; display: inline-block; max-width: 500px; width: 100%;">
-      <p style="font-size: 1.05rem; font-weight: 700; color: #fde68a; line-height: 1.5;">
-        ⏳ WAIT WHILE THE SUPER ADMIN SETTLE YOUR SCORE AND ACCESS.
-      </p>
-      <p style="font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem;">
-        Your credentials have been submitted for authorization.
-      </p>
-    </div>
-  </div>
-
-  <!-- CADET DASHBOARD (FOR LOGGED-IN STUDENTS) -->
-  <div id="screen-cadet-portal" class="card" style="display: none;">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <h2 style="color: #ffffff; font-size: 1.5rem;" id="cadet-portal-name">Welcome, Cadet</h2>
-        <span class="badge" style="background: #dc2626; color: white; font-weight: 900;" id="cadet-portal-id">ID: FF001</span>
-        <span class="badge badge-active" style="margin-left: 0.5rem;" id="cadet-portal-batch">General - G1</span>
-      </div>
-      <div>
-        <button class="btn-secondary" onclick="viewMyCadetDossier()">📜 View Full Dossier</button>
-      </div>
-    </div>
-
-    <!-- Overview Stats -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-      <div style="background:#000; border:1px solid var(--border); padding:1rem; border-radius:10px;">
-        <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">ENROLLMENT DATE</span>
-        <div id="cadet-portal-adm-date" style="font-size:1.1rem; font-weight:800; color:#fff; margin-top:0.3rem;">-</div>
-      </div>
-      <div style="background:#000; border:1px solid var(--border); padding:1rem; border-radius:10px;">
-        <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">COURSE ENROLLED</span>
-        <div id="cadet-portal-course" style="font-size:1.1rem; font-weight:800; color:#38bdf8; margin-top:0.3rem;">Defence</div>
-      </div>
-      <div style="background:#000; border:1px solid var(--border); padding:1rem; border-radius:10px;">
-        <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">OUTSTANDING DUES</span>
-        <div id="cadet-portal-dues" style="font-size:1.1rem; font-weight:800; color:#4ade80; margin-top:0.3rem;">₹ 0.00</div>
-      </div>
-    </div>
-
-    <!-- Schedules Preview -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-      <div style="background:#000; border:1px solid var(--border); border-radius:10px; padding:1.25rem;">
-        <h3 style="color:#fff; margin-bottom:0.75rem; font-size:1.05rem;">📅 Upcoming Exams</h3>
-        <div id="cadet-portal-exam-list" style="font-size:0.85rem; color:var(--muted);">Checking exam schedule...</div>
-      </div>
-      <div style="background:#000; border:1px solid var(--border); border-radius:10px; padding:1.25rem;">
-        <h3 style="color:#fff; margin-bottom:0.75rem; font-size:1.05rem;">⏰ Today's Training Routine</h3>
-        <div id="cadet-portal-routine-list" style="font-size:0.85rem; color:var(--muted);">Checking daily routine...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DASHBOARD ROOT (FOR SUPER ADMIN AND OFFICIALS) -->
-  <div id="screen-dashboard" style="display: none;">
-
-    <div class="card no-print" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <h2 style="font-size: 1.4rem; color: #ffffff;">Command Terminal</h2>
-        <p style="font-size: 0.82rem; color: var(--muted);">Authorized Role: <span id="dash-access-level" style="color: var(--primary); font-weight: 700;">Standard</span></p>
-      </div>
-      <div id="super-admin-controls" style="display: none; gap: 0.5rem; flex-wrap: wrap;">
-        <button class="btn-secondary" onclick="openSuperAdminPhoneModal()">📱 Super Admin Phone</button>
-        <button class="btn-submit" style="width: auto; padding: 0.55rem 1.1rem;" onclick="openSuperAdminPanel()">⚙️ Manage User Access & Permissions</button>
-      </div>
-    </div>
-
-    <!-- SECTION 1: STUDENT ADMISSION (AUTOMATIC ID GENERATION FF001, FF002...) -->
-    <div id="section-admission" class="app-section active">
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.5rem;">
-          <h2 style="font-size: 1.35rem; color: #ffffff;">📝 Cadet Admission Form</h2>
-          <span class="badge" style="background:#dc2626; color:#ffffff; font-weight:900; font-size:0.85rem;" id="next-cadet-id-badge">Next Assigned ID: FF001</span>
+  <!-- ==================== 1. STUDENT ACADEMIC DASHBOARD ==================== -->
+  <div id="student-dashboard" class="app-section">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+        <div>
+          <h2 style="color: #ffffff;" id="stu-dash-name">ক্যাডেট ড্যাশবোর্ড</h2>
+          <p style="font-size: 0.85rem; color: var(--muted);">ব্যাচ: <span id="stu-dash-batch" style="color:var(--primary); font-weight:700;">-</span> | সেকশন: <span id="stu-dash-sec" style="color:#fff; font-weight:700;">-</span></p>
         </div>
-        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.5rem;">Enrolls new cadet, assigns next sequential ID, and generates entry PIN automatically.</p>
+        <div style="text-align: right;">
+          <span style="font-size: 0.75rem; color: var(--muted);">অ্যাডমিশন আইডি</span>
+          <div style="font-size: 1.1rem; font-weight: 800; color: #fff;" id="stu-dash-id">-</div>
+        </div>
+      </div>
 
-        <form onsubmit="handleStudentAdmission(event)">
-          <div class="photo-upload-wrapper">
-            <img id="cadet-photo-preview" class="photo-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='100' viewBox='0 0 90 100'><rect width='90' height='100' fill='%2327272a'/><text x='50%25' y='50%25' fill='%2371717a' font-size='12' text-anchor='middle' dy='.3em'>No Photo</text></svg>" alt="Cadet Photo">
-            <div style="flex: 1;">
-              <label>1. Cadet Picture (Local Device)</label>
-              <input type="file" id="adm-photo" accept="image/*" onchange="previewPhoto(event)" style="margin-bottom: 0;">
-              <small style="color: var(--muted); font-size: 0.72rem;">Accepts JPG, PNG, WEBP from device storage.</small>
+      <div class="dashboard-widget-grid">
+        <!-- Widget 1: QR Code Card -->
+        <div class="widget-card" style="text-align: center;">
+          <div class="widget-title">📲 স্টুডেন্ট আইডি ও কিউআর কোড</div>
+          <div id="student-qrcode" class="qr-box"></div>
+          <p style="font-size: 0.75rem; color: var(--muted);">ক্লাস অ্যাটেনডেন্স ও গেট পাসের জন্য এই কিউআর স্ক্যান করুন।</p>
+        </div>
+
+        <!-- Widget 2: Class Routine & Upcoming Classes -->
+        <div class="widget-card">
+          <div class="widget-title">📅 আজকের ও আপকামিং ক্লাস রুটিন</div>
+          <div id="routine-list-container">
+            <div class="routine-item">
+              <b>সকাল ০৬:০০ - ০৭:৩০</b><br>
+              <small style="color:var(--muted);">শারীরিক কসরত ও প্যারেড গ্রাউন্ড ড্রিল</small>
+            </div>
+            <div class="routine-item">
+              <b>সকাল ০৯:৩০ - ১১:০০</b><br>
+              <small style="color:var(--muted);">জেনারেল স্টাডিজ ও ডিফেন্স ম্যাথমেটিক্স</small>
+            </div>
+            <div class="routine-item">
+              <b>দুপুর ১২:০০ - ০১:৩০</b><br>
+              <small style="color:var(--muted);">রিজনিং ও জিকে স্পেশাল সেশন</small>
             </div>
           </div>
+        </div>
 
-          <div class="form-grid">
-            <div>
-              <label>2. Full Name</label>
-              <input type="text" id="adm-name" placeholder="Full name of cadet" required>
+        <!-- Widget 3: Upcoming Exams & Unit Tests -->
+        <div class="widget-card">
+          <div class="widget-title">📝 আপকামিং ইউনিট টেস্ট ও এক্সাম</div>
+          <div id="exams-list-container">
+            <div class="exam-item">
+              <div style="display:flex; justify-content:space-between;">
+                <b>ইউনিট টেস্ট - ১ (ম্যাথ ও জিআই)</b>
+                <span style="color:var(--primary); font-weight:700;">রবিবার</span>
+              </div>
+              <small style="color:var(--muted);">পূর্ণমান: ৫০ | সকাল ১০:০০ টা</small>
             </div>
-            <div>
-              <label>3. Father's / Mother's / Husband's Name</label>
-              <input type="text" id="adm-guardian" placeholder="Guardian full name" required>
-            </div>
-            <div>
-              <label>4. Date of Birth (DOB)</label>
-              <input type="date" id="adm-dob" required>
-            </div>
-            <div>
-              <label>5. Primary Mobile Number (Student Login ID)</label>
-              <input type="tel" id="adm-phone1" placeholder="10-digit primary mobile" required>
-            </div>
-            <div>
-              <label>Mobile Number 2 (Optional)</label>
-              <input type="tel" id="adm-phone2" placeholder="Secondary contact (optional)">
-            </div>
-            <div>
-              <label>Cadet Entry PIN / Secret Password</label>
-              <input type="text" id="adm-pin" placeholder="Leave empty for auto-generated PIN">
-            </div>
-            <div>
-              <label>Aadhaar Number</label>
-              <input type="text" id="adm-aadhaar" placeholder="12-digit Aadhaar number" required>
-            </div>
-            <div>
-              <label>6. Reference</label>
-              <input type="text" id="adm-reference" placeholder="Referred by / Source">
-            </div>
-            <div>
-              <label>7. Admission Date</label>
-              <input type="date" id="adm-date" required>
-            </div>
-            <div>
-              <label>8. Admission Fees (₹)</label>
-              <input type="number" step="0.01" id="adm-fee" placeholder="e.g. 5000" required>
-            </div>
-            <div>
-              <label>9. Monthly Fees (₹)</label>
-              <input type="number" step="0.01" id="adm-monthly-fee" placeholder="e.g. 2000" required>
-            </div>
-            <div>
-              <label>10. Hostel Fees (₹)</label>
-              <input type="number" step="0.01" id="adm-hostel-fee" placeholder="e.g. 3500 (if applicable)">
-            </div>
-            <div>
-              <label>11. Batch</label>
-              <select id="adm-batch" onchange="updateSectionDropdown()" required>
-                <option value="General">General</option>
-                <option value="Hostel">Hostel</option>
-              </select>
-            </div>
-            <div>
-              <label>12. Section</label>
-              <select id="adm-section" required></select>
-            </div>
-            <div>
-              <label>13. Course</label>
-              <select id="adm-course" required>
-                <option value="Defence">Defence</option>
-                <option value="Others">Others</option>
-                <option value="Both">Both</option>
-              </select>
-            </div>
-            <div>
-              <label>Status</label>
-              <select id="adm-status" onchange="toggleStatusCauseField()" required>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-                <option value="Left">Left</option>
-                <option value="Suspended">Suspended</option>
-              </select>
-            </div>
-            <div id="status-cause-container" style="display: none;">
-              <label>Cause / Reason for Status</label>
-              <input type="text" id="adm-status-cause" placeholder="Reason for inactive/left/suspension">
-            </div>
-            <div>
-              <label>14. Native Place / City</label>
-              <input type="text" id="adm-place" placeholder="City / District" required>
+            <div class="exam-item">
+              <div style="display:flex; justify-content:space-between;">
+                <b>ফুল মক টেস্ট (ডিফেন্স স্পেশাল)</b>
+                <span style="color:var(--warning); font-weight:700;">১৫ তারিখ</span>
+              </div>
+              <small style="color:var(--muted);">পূর্ণমান: ১০০ | ওএমআর শিট পরীক্ষা</small>
             </div>
           </div>
-
-          <div style="margin-top: 0.5rem;">
-            <label>15. Remarks</label>
-            <textarea id="adm-remarks" rows="2" placeholder="Special remarks..."></textarea>
-          </div>
-
-          <button type="submit" class="btn-submit" style="margin-top: 1rem; width: 100%;">Complete Admission & Issue Cadet ID</button>
-        </form>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- SECTION 2: STUDENT DIRECTORY & LIFETIME AUDIT -->
-    <div id="section-roster" class="app-section">
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+  <!-- ==================== 2. ADMIN: STUDENT ADMISSION (WITH PIN SET) ==================== -->
+  <div id="sec-admission" class="app-section">
+    <div class="card">
+      <h2 style="font-size: 1.3rem; color: #fff; margin-bottom: 0.5rem;">📝 নতুন স্টুডেন্ট অ্যাডমিশন ও পিন নির্ধারণ</h2>
+      <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem;">সুপার অ্যাডমিন বা অফিসিয়াল এখানে স্টুডেন্টের বিস্তারিত তথ্য ও লগইন পিন বসিয়ে দেবেন।</p>
+
+      <form onsubmit="saveStudentAdmission(event)">
+        <div class="form-grid">
           <div>
-            <h2 style="font-size: 1.35rem; color: #ffffff;">👥 Cadet Master Directory</h2>
-            <p style="font-size: 0.82rem; color: var(--muted);">Lifetime ledger, financial year renewal, and dues tracking.</p>
+            <label>স্টুডেন্টের পুরো নাম</label>
+            <input type="text" id="adm-name" placeholder="পুরো নাম লিখুন" required>
           </div>
-          <input type="text" id="roster-search" class="no-print" placeholder="🔍 Search by ID (e.g. FF001), name or phone..." onkeyup="renderCadetRosterTable()" style="max-width: 320px; margin-bottom: 0;">
+          <div>
+            <label>অভিভাবকের নাম (বাবা / মা / স্বামী)</label>
+            <input type="text" id="adm-guardian" placeholder="অভিভাবকের নাম" required>
+          </div>
+          <div>
+            <label>জন্ম তারিখ (DOB)</label>
+            <input type="date" id="adm-dob" required>
+          </div>
+          <div>
+            <label>মোবাইল নম্বর (লগইন আইডি হিসেবে ব্যবহৃত হবে)</label>
+            <input type="tel" id="adm-phone" placeholder="১০ সংখ্যার মোবাইল নম্বর" required>
+          </div>
+          <div>
+            <label style="color: #f87171;">🔑 স্টুডেন্ট লগইন পিন (PIN)</label>
+            <input type="text" id="adm-pin" placeholder="৪ বা ৬ সংখ্যার পিন দিন (যেমন: 1234)" style="border-color: var(--primary);" required>
+          </div>
+          <div>
+            <label>ব্যাচ</label>
+            <select id="adm-batch" onchange="updateSecDropdown()">
+              <option value="General">General</option>
+              <option value="Hostel">Hostel</option>
+            </select>
+          </div>
+          <div>
+            <label>সেকশন</label>
+            <select id="adm-section"></select>
+          </div>
+          <div>
+            <label>কোর্স</label>
+            <select id="adm-course">
+              <option value="Defence">Defence</option>
+              <option value="Others">Others</option>
+              <option value="Both">Both</option>
+            </select>
+          </div>
+          <div>
+            <label>অ্যাডমিশন ফি (₹)</label>
+            <input type="number" id="adm-fee" placeholder="অ্যাডমিশন ফি" required>
+          </div>
+          <div>
+            <label>মাসিক ফি (₹)</label>
+            <input type="number" id="adm-monthly" placeholder="মাসিক ফি" required>
+          </div>
+          <div>
+            <label>স্থান / জেলা</label>
+            <input type="text" id="adm-place" placeholder="শহর বা জেলা" required>
+          </div>
         </div>
 
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Cadet ID</th>
-                <th>Photo</th>
-                <th>Cadet Details & PIN</th>
-                <th>Batch & Sec</th>
-                <th>Course</th>
-                <th>Admitted FY</th>
-                <th>Status</th>
-                <th>Dues Status</th>
-                <th class="no-print">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="cadet-roster-table-body"></tbody>
-          </table>
-        </div>
+        <button type="submit" class="btn-submit" style="width: 100%;">স্টুডেন্ট অ্যাডমিশন ও পিন কনফার্ম করুন</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== 3. ADMIN: STUDENT LIST & PIN MANAGEMENT ==================== -->
+  <div id="sec-student-list" class="app-section">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+        <h2 style="color:#fff; font-size:1.3rem;">👥 রেজিস্টার্ড স্টুডেন্ট তালিকা ও পিন ডিরেক্টরি</h2>
+        <input type="text" id="admin-search-stu" placeholder="🔍 নাম বা মোবাইল দিয়ে খুঁজুন..." onkeyup="renderAdminStudentTable()" style="max-width: 250px; margin-bottom: 0;">
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>নাম</th>
+              <th>মোবাইল নম্বর</th>
+              <th style="color:var(--primary);">লগইন পিন (PIN)</th>
+              <th>ব্যাচ ও সেকশন</th>
+              <th>কোর্স</th>
+              <th>অ্যাকশন</th>
+            </tr>
+          </thead>
+          <tbody id="admin-student-tbody"></tbody>
+        </table>
       </div>
     </div>
+  </div>
 
-    <!-- SECTION 3: WEEKLY ROUTINE -->
-    <div id="section-routine" class="app-section">
-      <div class="card no-print">
-        <h2 style="font-size: 1.35rem; color: #ffffff;">📅 Weekly Routine Schedule</h2>
-        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem;">Customizable time slot schedule per day and batch.</p>
-
-        <form onsubmit="handleRoutineSubmit(event)">
-          <div class="form-grid">
-            <div>
-              <label>Day</label>
-              <select id="rt-day" required>
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
-              </select>
-            </div>
-            <div>
-              <label>Time Slot</label>
-              <select id="rt-time-slot" onchange="toggleCustomTimeField()" required>
-                <option value="06:00 AM - 07:30 AM">⏰ 06:00 AM - 07:30 AM (PT / Drill)</option>
-                <option value="08:00 AM - 09:30 AM">⏰ 08:00 AM - 09:30 AM (Class 1)</option>
-                <option value="10:00 AM - 11:30 AM">⏰ 10:00 AM - 11:30 AM (Class 2)</option>
-                <option value="12:00 PM - 01:30 PM">⏰ 12:00 PM - 01:30 PM (Class 3)</option>
-                <option value="03:00 PM - 04:30 PM">⏰ 03:00 PM - 04:30 PM (Practice / Mock)</option>
-                <option value="05:00 PM - 06:30 PM">⏰ 05:00 PM - 06:30 PM (Study Hour)</option>
-                <option value="07:00 PM - 08:30 PM">⏰ 07:00 PM - 08:30 PM (Night Class)</option>
-                <option value="Custom">✏️ Custom Time...</option>
-              </select>
-            </div>
-            <div id="rt-custom-time-container" style="display: none;">
-              <label>Custom Time Range</label>
-              <input type="text" id="rt-custom-time" placeholder="HH:MM AM/PM - HH:MM AM/PM">
-            </div>
-            <div>
-              <label>Batch & Section</label>
-              <select id="rt-batch-sec" required>
-                <option value="General - G1">General - G1</option>
-                <option value="General - G2">General - G2</option>
-                <option value="General - G3">General - G3</option>
-                <option value="General - G4">General - G4</option>
-                <option value="Hostel - H1">Hostel - H1</option>
-                <option value="Hostel - H2">Hostel - H2</option>
-                <option value="Hostel - H3">Hostel - H3</option>
-                <option value="Hostel - H4">Hostel - H4</option>
-                <option value="All Batches">All Batches</option>
-              </select>
-            </div>
-            <div>
-              <label>Subject / Activity</label>
-              <input type="text" id="rt-subject" placeholder="e.g. Mathematics / Drill / GI" required>
-            </div>
-            <div>
-              <label>Faculty / Instructor</label>
-              <input type="text" id="rt-faculty" placeholder="Faculty / Ustad name" required>
-            </div>
-          </div>
-          <button type="submit" class="btn-submit" style="margin-top: 0.5rem;">Save Routine & Notify Super Admin</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
-          <h2 style="font-size: 1.35rem; color: #ffffff;">📋 Weekly Routine Ledger</h2>
-          <select id="filter-routine-day" onchange="renderRoutineTable()" style="max-width: 200px; margin-bottom: 0;">
-            <option value="All">All Days</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
-          </select>
-        </div>
-
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Day</th>
-                <th>Time Slot</th>
-                <th>Batch / Sec</th>
-                <th>Subject / Activity</th>
-                <th>Faculty / Instructor</th>
-                <th>Assigned By</th>
-                <th class="no-print">Action</th>
-              </tr>
-            </thead>
-            <tbody id="routine-table-body"></tbody>
-          </table>
-        </div>
+  <!-- ==================== 4. ADMIN: FINANCE ==================== -->
+  <div id="sec-finance" class="app-section">
+    <div class="card">
+      <h2 style="color: #fff; margin-bottom: 0.5rem;">💰 আয় ও ব্যয় লেজার</h2>
+      <p style="font-size: 0.82rem; color: var(--muted);">অ্যাডমিশন ও অন্যান্য ফি স্বয়ংক্রিয়ভাবে এখানে যুক্ত হয়।</p>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>তারিখ ও সময়</th>
+              <th>টাইপ</th>
+              <th>বিবরণ</th>
+              <th>টাকার পরিমাণ (₹)</th>
+              <th>অপারেটর</th>
+            </tr>
+          </thead>
+          <tbody id="admin-finance-tbody"></tbody>
+        </table>
       </div>
     </div>
-
-    <!-- SECTION 4: EXAM SCHEDULE -->
-    <div id="section-exams" class="app-section">
-      <div class="card no-print">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.4rem;">
-          <h2 style="font-size: 1.35rem; color: #ffffff;">📊 Prepare Academic Exam Schedule</h2>
-          <span class="badge" style="background:#27272a; color:#f4f4f5; border:1px solid var(--border);" id="exam-total-count">0 Scheduled</span>
-        </div>
-        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem;">
-          Upon submission, schedule is stored and direct WhatsApp dispatch is initiated for registered cadets.
-        </p>
-
-        <form onsubmit="handleExamScheduleSubmit(event)">
-          <div class="form-grid">
-            <div>
-              <label>Name of the Exam</label>
-              <input type="text" id="ex-name" placeholder="e.g. Mock Test 01" required>
-            </div>
-            <div>
-              <label>Date of the Exam</label>
-              <input type="date" id="ex-date" required>
-            </div>
-            <div>
-              <label>Time of the Exam</label>
-              <input type="text" id="ex-time" placeholder="e.g. 10:00 AM - 12:00 PM" required>
-            </div>
-            <div>
-              <label>Target Batch & Section</label>
-              <select id="ex-batch" required>
-                <option value="All Batches">All Batches (All Cadets)</option>
-                <option value="General - All">General (All Sections)</option>
-                <option value="Hostel - All">Hostel (All Sections)</option>
-                <option value="General - G1">General - G1</option>
-                <option value="General - G2">General - G2</option>
-                <option value="General - G3">General - G3</option>
-                <option value="General - G4">General - G4</option>
-                <option value="Hostel - H1">Hostel - H1</option>
-                <option value="Hostel - H2">Hostel - H2</option>
-                <option value="Hostel - H3">Hostel - H3</option>
-                <option value="Hostel - H4">Hostel - H4</option>
-              </select>
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <label>Syllabus of the Exam</label>
-              <textarea id="ex-syllabus" rows="3" placeholder="Enter complete exam syllabus..." required></textarea>
-            </div>
-          </div>
-          <button type="submit" class="btn-submit" style="margin-top: 0.5rem; background: #15803d;">📢 Save & Broadcast Schedule</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
-          <h2 style="font-size: 1.35rem; color: #ffffff;">📋 Academic Exam Schedule Ledger</h2>
-          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-            <input type="text" id="search-exam-schedule" placeholder="🔍 Search exam or syllabus..." onkeyup="renderExamScheduleTable()" style="max-width: 250px; margin-bottom: 0;">
-            <button class="btn-secondary no-print" onclick="window.print()">🖨️ Print Schedule</button>
-          </div>
-        </div>
-
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Name of the Exam</th>
-                <th>Date of Exam</th>
-                <th>Time of Exam</th>
-                <th>Syllabus</th>
-                <th>Target Cadets</th>
-                <th>Scheduled By</th>
-                <th class="no-print">Action</th>
-              </tr>
-            </thead>
-            <tbody id="exam-schedule-table-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 5: INCOME & EXPENDITURE -->
-    <div id="section-finance" class="app-section">
-      <div class="card">
-        <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.4rem;">💰 Income & Expenditure Management</h2>
-        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem;">Automated balance sheet and financial ledger.</p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-          <div style="background:#000; border:1px solid var(--border); border-top: 4px solid var(--success); padding: 1rem; border-radius: 10px; text-align: center;">
-            <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">TOTAL INCOME</span>
-            <div id="fin-stat-income" style="font-size:1.4rem; font-weight:900; color:#4ade80; margin-top:0.25rem;">₹ 0.00</div>
-          </div>
-          <div style="background:#000; border:1px solid var(--border); border-top: 4px solid var(--danger); padding: 1rem; border-radius: 10px; text-align: center;">
-            <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">TOTAL EXPENDITURE</span>
-            <div id="fin-stat-expense" style="font-size:1.4rem; font-weight:900; color:#f87171; margin-top:0.25rem;">₹ 0.00</div>
-          </div>
-          <div style="background:#000; border:1px solid var(--border); border-top: 4px solid #38bdf8; padding: 1rem; border-radius: 10px; text-align: center;">
-            <span style="font-size:0.75rem; color:var(--muted); font-weight:700;">NET BALANCE</span>
-            <div id="fin-stat-net" style="font-size:1.4rem; font-weight:900; color:#38bdf8; margin-top:0.25rem;">₹ 0.00</div>
-          </div>
-        </div>
-
-        <div class="no-print" style="background: #000; border:1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
-          <h3 style="color:#fff; font-size:1rem; margin-bottom:0.75rem;">Log Financial Record</h3>
-          <form onsubmit="handleFinanceSubmit(event)">
-            <div class="form-grid">
-              <div>
-                <label>Type</label>
-                <select id="fin-type" onchange="updateFinancePurposeDropdown()" required>
-                  <option value="Income">🟢 Income</option>
-                  <option value="Expenditure">🔴 Expenditure</option>
-                </select>
-              </div>
-              <div>
-                <label>Date</label>
-                <input type="date" id="fin-date" required>
-              </div>
-              <div>
-                <label>Purpose</label>
-                <select id="fin-purpose" required></select>
-              </div>
-              <div>
-                <label>Amount (₹)</label>
-                <input type="number" step="0.01" id="fin-amount" placeholder="Amount" required>
-              </div>
-              <div>
-                <label>Payment Mode</label>
-                <select id="fin-mode" required>
-                  <option value="Offline">Offline</option>
-                  <option value="Online">Online</option>
-                </select>
-              </div>
-            </div>
-            <button type="submit" class="btn-submit">Record & Notify Super Admin</button>
-          </form>
-        </div>
-
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>IST</th>
-                <th>Type</th>
-                <th>Purpose</th>
-                <th>Amount (₹)</th>
-                <th>Mode</th>
-                <th>Operator</th>
-                <th class="no-print">Action</th>
-              </tr>
-            </thead>
-            <tbody id="finance-table-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
   </div>
 
 </div>
 
 <script>
+// --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
   apiKey: "AIzaSyD8-XRYgu51zF0mHOfSZ7M3boOVKJ9KIM4",
   authDomain: "classroom-ca026.firebaseapp.com",
@@ -997,938 +479,226 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let usersList = [];
-let cadetList = [];
-let routineList = [];
-let examScheduleList = [];
-let financeRecords = [];
-let currentUser = null;
+let cadets = [];
+let financeLogs = [];
+let loggedInUser = null;
 let superAdminPin = '1234';
-let superAdminRecoveryPhone = '9876543210';
-let modifyingUserId = null;
-let uploadedPhotoBase64 = "";
 
-const INCOME_PURPOSES = [
-  "Admission Fees", "Re admission fees", "Monthly Fees", "Hostel fees",
-  "Book and Dress fees", "One time fees", "Previous due", "Penalty fees",
-  "Other fees", "Donation"
-];
-const EXPENDITURE_PURPOSES = [
-  "Vegetable", "Grocery", "Stationery", "Water",
-  "Photocopy", "Wages", "Entertainment", "Miscellaneous"
-];
-
-// Firebase Listeners
-db.ref('settings/superAdminPin').on('value', snap => {
-  const val = snap.val();
-  if (val) superAdminPin = val.toString();
-});
-db.ref('settings/superAdminPhone').on('value', snap => {
-  const val = snap.val();
-  if (val) {
-    superAdminRecoveryPhone = val.toString();
-    const phoneInput = document.getElementById('super-admin-current-phone');
-    if (phoneInput) phoneInput.value = superAdminRecoveryPhone;
-  }
-});
-
-db.ref('fauji_users').on('value', snapshot => {
-  const data = snapshot.val();
-  usersList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
-  if (currentUser && currentUser.role !== 'SuperAdmin' && currentUser.role !== 'Cadet') {
-    const latest = usersList.find(u => u.id === currentUser.id);
-    if (latest) { currentUser = latest; evaluateUserAccessState(); }
-  }
-  renderSuperAdminTable();
-});
-
+// Realtime Sync
 db.ref('cadets').on('value', snapshot => {
   const data = snapshot.val();
-  cadetList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
-  updateNextCadetIdBadge();
-  renderCadetRosterTable();
-  if (currentUser && currentUser.role === 'Cadet') {
-    const updatedCadet = cadetList.find(c => c.id === currentUser.id);
-    if (updatedCadet) {
-      currentUser = { ...updatedCadet, role: 'Cadet' };
-      renderCadetPortal();
-    }
-  }
-});
-
-db.ref('weekly_routine').on('value', snapshot => {
-  const data = snapshot.val();
-  routineList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
-  renderRoutineTable();
-  if (currentUser && currentUser.role === 'Cadet') renderCadetPortal();
-});
-
-db.ref('exam_schedules').on('value', snapshot => {
-  const data = snapshot.val();
-  examScheduleList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
-  renderExamScheduleTable();
-  if (currentUser && currentUser.role === 'Cadet') renderCadetPortal();
+  cadets = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderAdminStudentTable();
 });
 
 db.ref('finance').on('value', snapshot => {
   const data = snapshot.val();
-  financeRecords = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
-  renderFinanceLedger();
+  financeLogs = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  renderFinanceTable();
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-  const todayStr = new Date().toISOString().split('T')[0];
-  document.getElementById('adm-date').value = todayStr;
-  document.getElementById('fin-date').value = todayStr;
-  document.getElementById('ex-date').value = todayStr;
-  document.getElementById('super-admin-current-phone').value = superAdminRecoveryPhone;
-  updateSectionDropdown();
-  updateFinancePurposeDropdown();
-
-  // Auto-login from local storage if saved
-  const savedSession = localStorage.getItem('ff_saved_session');
-  if (savedSession) {
-    try {
-      const parsed = JSON.parse(savedSession);
-      if (parsed.role === 'SuperAdmin') {
-        currentUser = { name: 'Super Admin', designation: 'SuperAdmin', role: 'SuperAdmin', phone: superAdminRecoveryPhone, permissions: { admission: true, roster: true, routine: true, exams: true, finance: true } };
-        finalizeLogin(false);
-      } else if (parsed.role === 'Cadet') {
-        const found = cadetList.find(c => c.phone1 === parsed.phone && (c.pin === parsed.pin || c.generatedPin === parsed.pin));
-        if (found) {
-          currentUser = { ...found, role: 'Cadet' };
-          finalizeLogin(false);
-        }
-      }
-    } catch(e) {}
-  }
+  updateSecDropdown();
 });
 
-// Calculate Next Sequential Cadet ID (FF001, FF002, ...)
-function getNextCadetId() {
-  if (cadetList.length === 0) return 'FF001';
-  let maxNum = 0;
-  cadetList.forEach(c => {
-    if (c.cadetId && c.cadetId.startsWith('FF')) {
-      const num = parseInt(c.cadetId.replace('FF', ''));
-      if (!isNaN(num) && num > maxNum) maxNum = num;
-    }
-  });
-  const nextNum = maxNum + 1;
-  return 'FF' + String(nextNum).padStart(3, '0');
-}
-
-function updateNextCadetIdBadge() {
-  const nextId = getNextCadetId();
-  const badge = document.getElementById('next-cadet-id-badge');
-  if (badge) badge.textContent = `Next Assigned ID: ${nextId}`;
-}
-
-// Switching Login Modes
 function switchLoginMode(mode) {
   document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('login-student-view').style.display = 'none';
-  document.getElementById('login-official-view').style.display = 'none';
-  document.getElementById('login-admin-view').style.display = 'none';
-  document.getElementById('register-official-view').style.display = 'none';
-
+  event.target.classList.add('active');
   if (mode === 'student') {
-    document.getElementById('tab-btn-student').classList.add('active');
     document.getElementById('login-student-view').style.display = 'block';
-  } else if (mode === 'official') {
-    document.getElementById('tab-btn-official').classList.add('active');
-    document.getElementById('login-official-view').style.display = 'block';
-  } else if (mode === 'admin') {
-    document.getElementById('tab-btn-admin').classList.add('active');
+    document.getElementById('login-admin-view').style.display = 'none';
+  } else {
+    document.getElementById('login-student-view').style.display = 'none';
     document.getElementById('login-admin-view').style.display = 'block';
   }
 }
 
-function openOfficialRegistration() {
-  document.getElementById('login-official-view').style.display = 'none';
-  document.getElementById('register-official-view').style.display = 'block';
-}
-
-// 1. Cadet / Student Login Handler (Mobile + Generated PIN)
+// Student Login by Phone & Super Admin Set PIN
 function handleStudentLogin() {
-  const phone = document.getElementById('student-login-phone').value.replace(/[^0-9]/g, '').trim();
-  const pin = document.getElementById('student-login-pin').value.trim();
-  const remember = document.getElementById('student-remember-me').checked;
+  const phone = document.getElementById('stu-login-phone').value.trim();
+  const pin = document.getElementById('stu-login-pin').value.trim();
 
   if (!phone || !pin) {
-    alert('Please enter your 10-digit mobile number and assigned entry PIN.');
+    alert('দয়া করে আপনার মোবাইল নম্বর এবং অফিস থেকে দেওয়া পিন লিখুন।');
     return;
   }
 
-  const cadet = cadetList.find(c => c.phone1 === phone && (c.pin === pin || c.generatedPin === pin));
-  if (cadet) {
-    if (cadet.status === 'Suspended' || cadet.status === 'Left') {
-      alert(`Access Restricted: Cadet status is marked as "${cadet.status}". Please contact administration.`);
-      return;
-    }
-    currentUser = { ...cadet, role: 'Cadet' };
-    if (remember) {
-      localStorage.setItem('ff_saved_session', JSON.stringify({ role: 'Cadet', phone: phone, pin: pin }));
-    }
-    finalizeLogin(remember);
+  const found = cadets.find(c => c.phone === phone && String(c.pin).trim() === pin);
+  if (found) {
+    loggedInUser = { ...found, role: 'Student' };
+    document.getElementById('auth-modal').style.display = 'none';
+    loadStudentDashboard(found);
   } else {
-    alert('Invalid credentials. Check mobile number or secret entry PIN.');
+    alert('ভুল মোবাইল নম্বর অথবা পিন! আপনার সঠিক পিন জানতে অফিস বা সুপার অ্যাডমিনের সাথে যোগাযোগ করুন।');
   }
 }
 
-// 2. Official / Faculty Login Handler
-function handleOfficialLogin() {
-  const phone = document.getElementById('official-login-phone').value.replace(/[^0-9]/g, '').trim();
-  const pin = document.getElementById('official-login-pin').value.trim();
-  const remember = document.getElementById('official-remember-me').checked;
-
-  if (!phone || !pin) {
-    alert('Please enter your official mobile number and PIN.');
-    return;
-  }
-
-  const official = usersList.find(u => u.phone === phone && (u.password === pin || u.pin === pin));
-  if (official) {
-    if (official.status === 'Blocked') {
-      alert('Access Denied: Your account is suspended by Super Admin.');
-      return;
-    }
-    currentUser = official;
-    finalizeLogin(remember);
-  } else {
-    alert('Official account not found or pending Super Admin authorization.');
-  }
-}
-
-// 3. Super Admin Master PIN Login Handler
-function handleSuperAdminLogin() {
+// Admin Login
+function handleAdminLogin() {
   const pin = document.getElementById('admin-login-pin').value.trim();
-  const remember = document.getElementById('admin-remember-me').checked;
-
   if (pin === superAdminPin) {
-    currentUser = {
-      name: 'Super Admin',
-      designation: 'SuperAdmin',
-      role: 'SuperAdmin',
-      phone: superAdminRecoveryPhone,
-      permissions: { admission: true, roster: true, routine: true, exams: true, finance: true }
-    };
-    if (remember) {
-      localStorage.setItem('ff_saved_session', JSON.stringify({ role: 'SuperAdmin' }));
-    }
-    finalizeLogin(remember);
+    loggedInUser = { role: 'SuperAdmin', name: 'Super Admin' };
+    document.getElementById('auth-modal').style.display = 'none';
+    loadAdminDashboard();
   } else {
-    alert('Incorrect Super Admin Master PIN.');
+    alert('ভুল অ্যাডমিন পিন!');
   }
 }
 
-function finalizeLogin(remember) {
-  document.getElementById('auth-modal').style.display = 'none';
-  evaluateUserAccessState();
+function loadStudentDashboard(student) {
+  document.getElementById('user-display-badge').innerHTML = `👨‍🎓 <b>${student.name}</b>`;
+  document.getElementById('admin-nav').style.display = 'none';
+  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('student-dashboard').classList.add('active');
+
+  document.getElementById('stu-dash-name').textContent = student.name;
+  document.getElementById('stu-dash-batch').textContent = student.batch;
+  document.getElementById('stu-dash-sec').textContent = student.section;
+  document.getElementById('stu-dash-id').textContent = `FF-${student.phone.slice(-4)}`;
+
+  // Generate QR Code
+  const qrContainer = document.getElementById('student-qrcode');
+  qrContainer.innerHTML = '';
+  new QRCode(qrContainer, {
+    text: `FAUJI-FACTORY:${student.phone}:${student.name}:${student.batch}-${student.section}`,
+    width: 120,
+    height: 120,
+    colorDark : "#000000",
+    colorLight : "#ffffff"
+  });
 }
 
-function evaluateUserAccessState() {
-  const badge = document.getElementById('user-display-badge');
-  const waiting = document.getElementById('screen-waiting');
-  const dash = document.getElementById('screen-dashboard');
-  const cadetPortal = document.getElementById('screen-cadet-portal');
-  const appNav = document.getElementById('app-nav');
-  const adminCtrl = document.getElementById('super-admin-controls');
-
-  if (currentUser.role === 'SuperAdmin') {
-    badge.innerHTML = `👤 <b>Super Admin (${superAdminRecoveryPhone})</b> <button class="header-btn" onclick="openChangePinModal()">🔑 PIN</button> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
-    waiting.style.display = 'none';
-    cadetPortal.style.display = 'none';
-    dash.style.display = 'block';
-    appNav.style.display = 'flex';
-    adminCtrl.style.display = 'flex';
-    document.getElementById('dash-access-level').textContent = 'Super Admin (Full Access)';
-    document.getElementById('nav-btn-admission').style.display = 'inline-block';
-    document.getElementById('nav-btn-roster').style.display = 'inline-block';
-    document.getElementById('nav-btn-routine').style.display = 'inline-block';
-    document.getElementById('nav-btn-exams').style.display = 'inline-block';
-    document.getElementById('nav-btn-finance').style.display = 'inline-block';
-    switchSection('section-admission');
-  } else if (currentUser.role === 'Cadet') {
-    badge.innerHTML = `🎓 <b>${currentUser.name} (${currentUser.cadetId})</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
-    waiting.style.display = 'none';
-    dash.style.display = 'none';
-    appNav.style.display = 'none';
-    cadetPortal.style.display = 'block';
-    renderCadetPortal();
-  } else if (currentUser.status === 'Approved') {
-    badge.innerHTML = `👤 <b>${currentUser.name} (${currentUser.phone})</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
-    waiting.style.display = 'none';
-    cadetPortal.style.display = 'none';
-    dash.style.display = 'block';
-    appNav.style.display = 'flex';
-    adminCtrl.style.display = 'none';
-    document.getElementById('dash-access-level').textContent = currentUser.designation;
-
-    const perms = currentUser.permissions || {};
-    document.getElementById('nav-btn-admission').style.display = perms.admission ? 'inline-block' : 'none';
-    document.getElementById('nav-btn-roster').style.display = perms.roster ? 'inline-block' : 'none';
-    document.getElementById('nav-btn-routine').style.display = perms.routine ? 'inline-block' : 'none';
-    document.getElementById('nav-btn-exams').style.display = perms.exams ? 'inline-block' : 'none';
-    document.getElementById('nav-btn-finance').style.display = perms.finance ? 'inline-block' : 'none';
-
-    if (perms.admission) switchSection('section-admission');
-    else if (perms.roster) switchSection('section-roster');
-    else if (perms.routine) switchSection('section-routine');
-    else if (perms.exams) switchSection('section-exams');
-    else if (perms.finance) switchSection('section-finance');
-  } else {
-    badge.innerHTML = `👤 <b>${currentUser.name} (Pending)</b> <button class="logout-btn" onclick="handleLogout()">Logout</button>`;
-    waiting.style.display = 'block';
-    cadetPortal.style.display = 'none';
-    dash.style.display = 'none';
-    adminCtrl.style.display = 'none';
-    appNav.style.display = 'none';
-  }
+function loadAdminDashboard() {
+  document.getElementById('user-display-badge').innerHTML = `👮 <b>সুপার অ্যাডমিন</b>`;
+  document.getElementById('admin-nav').style.display = 'flex';
+  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-admission').classList.add('active');
 }
 
-// Render Individual Cadet Portal
-function renderCadetPortal() {
-  if (!currentUser || currentUser.role !== 'Cadet') return;
-  document.getElementById('cadet-portal-name').textContent = `Welcome, Cadet ${currentUser.name}`;
-  document.getElementById('cadet-portal-id').textContent = `ID: ${currentUser.cadetId || 'FF001'}`;
-  document.getElementById('cadet-portal-batch').textContent = `${currentUser.batch} - ${currentUser.section}`;
-  document.getElementById('cadet-portal-adm-date').textContent = currentUser.admissionDate || '-';
-  document.getElementById('cadet-portal-course').textContent = currentUser.course || 'Defence';
-
-  const dues = currentUser.outstandingDues || 0;
-  const duesElem = document.getElementById('cadet-portal-dues');
-  duesElem.textContent = `₹ ${dues.toFixed(2)}`;
-  duesElem.style.color = dues > 0 ? '#ef4444' : '#4ade80';
-
-  // Exams
-  const examContainer = document.getElementById('cadet-portal-exam-list');
-  const relevantExams = examScheduleList.filter(e => e.batch === 'All Batches' || e.batch.includes(currentUser.batch));
-  if (relevantExams.length === 0) {
-    examContainer.innerHTML = '<p>No upcoming exams scheduled.</p>';
-  } else {
-    examContainer.innerHTML = relevantExams.slice(0, 3).map(e => `
-      <div style="border-bottom:1px solid #27272a; padding:0.5rem 0;">
-        <b style="color:#fff;">${e.name}</b> (${e.date} at ${e.time})<br>
-        <span style="font-size:0.75rem; color:#a1a1aa;">${e.syllabus}</span>
-      </div>
-    `).join('');
-  }
-
-  // Routine
-  const routineContainer = document.getElementById('cadet-portal-routine-list');
-  const relevantRoutines = routineList.filter(r => r.batchSec === 'All Batches' || r.batchSec.includes(currentUser.section) || r.batchSec.includes(currentUser.batch));
-  if (relevantRoutines.length === 0) {
-    routineContainer.innerHTML = '<p>No training routines scheduled.</p>';
-  } else {
-    routineContainer.innerHTML = relevantRoutines.slice(0, 3).map(r => `
-      <div style="border-bottom:1px solid #27272a; padding:0.5rem 0;">
-        <b style="color:#fff;">${r.day}: ${r.timeSlot}</b><br>
-        <span style="font-size:0.8rem; color:#38bdf8;">${r.subject}</span> (${r.faculty})
-      </div>
-    `).join('');
-  }
+function switchAdminSection(secId) {
+  document.querySelectorAll('nav.main-nav button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(secId).classList.add('active');
 }
 
-function viewMyCadetDossier() {
-  if (currentUser && currentUser.id) openStudentProfileModal(currentUser.id);
+function updateSecDropdown() {
+  const batch = document.getElementById('adm-batch').value;
+  const sec = document.getElementById('adm-section');
+  sec.innerHTML = '';
+  const list = batch === 'General' ? ['G1', 'G2', 'G3', 'G4'] : ['H1', 'H2', 'H3', 'H4'];
+  list.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = `${batch} - ${s}`;
+    sec.appendChild(opt);
+  });
 }
 
-function handleLogout() {
-  currentUser = null;
-  localStorage.removeItem('ff_saved_session');
-  document.getElementById('auth-modal').style.display = 'flex';
-  document.getElementById('app-nav').style.display = 'none';
-  document.getElementById('screen-waiting').style.display = 'none';
-  document.getElementById('screen-dashboard').style.display = 'none';
-  document.getElementById('screen-cadet-portal').style.display = 'none';
-  switchLoginMode('student');
-}
-
-// Student Admission with Auto ID and PIN
-function handleStudentAdmission(e) {
+// Save Student with Login PIN
+function saveStudentAdmission(e) {
   e.preventDefault();
   const name = document.getElementById('adm-name').value.trim();
-  const phone1 = document.getElementById('adm-phone1').value.replace(/[^0-9]/g, '').trim();
-  const admDate = document.getElementById('adm-date').value;
-  const fy = getFinancialYear(admDate);
-  const admFee = parseFloat(document.getElementById('adm-fee').value) || 0;
-  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
+  const phone = document.getElementById('adm-phone').value.trim();
+  const pin = document.getElementById('adm-pin').value.trim();
+  const fee = parseFloat(document.getElementById('adm-fee').value) || 0;
 
-  // 1. Generate Next Cadet Sequential ID
-  const cadetId = getNextCadetId();
-
-  // 2. Generate or assign PIN
-  let assignedPin = document.getElementById('adm-pin').value.trim();
-  if (!assignedPin) {
-    assignedPin = 'FF-' + Math.floor(1000 + Math.random() * 9000);
+  if (cadets.some(c => c.phone === phone)) {
+    alert('এই মোবাইল নম্বরে ইতিমধ্যে একজন স্টুডেন্ট নথিভুক্ত রয়েছে!');
+    return;
   }
 
   const cadetData = {
-    cadetId: cadetId,
-    photo: uploadedPhotoBase64 || "",
     name: name,
     guardian: document.getElementById('adm-guardian').value.trim(),
     dob: document.getElementById('adm-dob').value,
-    phone1: phone1,
-    phone2: document.getElementById('adm-phone2').value.trim(),
-    pin: assignedPin,
-    generatedPin: assignedPin,
-    aadhaar: document.getElementById('adm-aadhaar').value.trim(),
-    reference: document.getElementById('adm-reference').value.trim(),
-    admissionDate: admDate,
-    financialYearAdmitted: fy,
-    currentFinancialYear: fy,
-    admissionFee: admFee,
-    monthlyFee: parseFloat(document.getElementById('adm-monthly-fee').value) || 0,
-    hostelFee: parseFloat(document.getElementById('adm-hostel-fee').value) || 0,
+    phone: phone,
+    pin: pin, // সুপার অ্যাডমিন সরাসরি এখানে পিন সেট করে দিচ্ছেন
     batch: document.getElementById('adm-batch').value,
     section: document.getElementById('adm-section').value,
     course: document.getElementById('adm-course').value,
-    status: document.getElementById('adm-status').value,
-    statusCause: document.getElementById('adm-status-cause')?.value.trim() || "",
+    fee: fee,
+    monthly: parseFloat(document.getElementById('adm-monthly').value) || 0,
     place: document.getElementById('adm-place').value.trim(),
-    remarks: document.getElementById('adm-remarks').value.trim(),
-    outstandingDues: 0,
-    enrolledBy: operator,
-    history: [
-      { event: "Admission Cleared", date: admDate, details: `Assigned ID ${cadetId}. FY ${fy}, Section ${document.getElementById('adm-section').value}, Entry PIN: ${assignedPin}` }
-    ]
+    admittedOn: new Date().toISOString().split('T')[0]
   };
 
   db.ref('cadets').push(cadetData).then(() => {
-    if (admFee > 0) {
-      const istTime = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
+    // Add Admission fee to income
+    if (fee > 0) {
       db.ref('finance').push({
         type: 'Income',
-        date: admDate,
-        ist: istTime,
-        purpose: 'Admission Fees',
-        amount: admFee,
-        mode: 'Offline',
-        operator: operator,
-        timestamp: Date.now()
+        purpose: `Admission Fee (${name})`,
+        amount: fee,
+        date: new Date().toLocaleString('en-IN'),
+        operator: 'Super Admin'
       });
     }
 
-    notifySuperAdminAction(`[NEW CADET ADMISSION]\nCadet ID: ${cadetId}\nName: ${name}\nPhone: ${phone1}\nPIN: ${assignedPin}\nBatch: ${cadetData.batch} (${cadetData.section})`);
-    alert(`Cadet ${name} successfully enrolled!\n\nAssigned ID: ${cadetId}\nLogin PIN: ${assignedPin}\nMobile: ${phone1}`);
+    alert(`স্টুডেন্ট অ্যাডমিশন সম্পন্ন হয়েছে!\nস্টুডেন্টের লগইন পিন: ${pin}\nস্টুডেন্টকে এই পিন ও মোবাইল নম্বর দিয়ে লগইন করতে বলুন।`);
     e.target.reset();
-    document.getElementById('cadet-photo-preview').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='100' viewBox='0 0 90 100'><rect width='90' height='100' fill='%2327272a'/><text x='50%25' y='50%25' fill='%2371717a' font-size='12' text-anchor='middle' dy='.3em'>No Photo</text></svg>";
-    uploadedPhotoBase64 = "";
-    updateNextCadetIdBadge();
-    switchSection('section-roster');
+    updateSecDropdown();
+    switchAdminSection('sec-student-list');
   });
 }
 
-function renderCadetRosterTable() {
-  const tbody = document.getElementById('cadet-roster-table-body');
+// Render Admin Student Table with Quick PIN Edit
+function renderAdminStudentTable() {
+  const tbody = document.getElementById('admin-student-tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
 
-  const q = (document.getElementById('roster-search')?.value || '').toLowerCase();
-  const currentFY = getFinancialYear(new Date().toISOString().split('T')[0]);
-
-  const filtered = cadetList.filter(c => 
-    (c.cadetId && c.cadetId.toLowerCase().includes(q)) ||
-    c.name.toLowerCase().includes(q) || 
-    c.phone1.includes(q) || 
-    c.section.toLowerCase().includes(q) || 
-    c.batch.toLowerCase().includes(q)
-  );
+  const q = (document.getElementById('admin-search-stu')?.value || '').toLowerCase();
+  const filtered = cadets.filter(c => c.name.toLowerCase().includes(q) || c.phone.includes(q));
 
   filtered.forEach(c => {
-    const isFyCompleted = c.currentFinancialYear !== currentFY;
-    const hasDues = (c.outstandingDues || 0) > 0;
-    const canReAdmit = isFyCompleted && !hasDues;
-
-    let duesBadge = `<span class="badge badge-active">All Dues Cleared</span>`;
-    if (hasDues) duesBadge = `<span class="badge badge-suspended">Pending: ₹${c.outstandingDues}</span>`;
-
-    let statusClass = 'badge-active';
-    if (c.status === 'Inactive') statusClass = 'badge-inactive';
-    if (c.status === 'Left') statusClass = 'badge-left';
-    if (c.status === 'Suspended') statusClass = 'badge-suspended';
-
-    const photoSrc = c.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='45' viewBox='0 0 40 45'><rect width='40' height='45' fill='%2327272a'/></svg>";
-
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><span class="badge" style="background:#dc2626; color:#ffffff; font-weight:900;">${c.cadetId || 'FF001'}</span></td>
-      <td><img src="${photoSrc}" style="width:40px; height:46px; border-radius:4px; object-fit:cover;"></td>
-      <td>
-        <b>${c.name}</b><br>
-        <small style="color:var(--muted);">📞 ${c.phone1} | 🔑 PIN: <b style="color:#fde68a;">${c.pin || c.generatedPin}</b></small>
-      </td>
-      <td><b>${c.batch}</b><br><small style="color:var(--primary); font-weight:700;">${c.section}</small></td>
+      <td><b>${c.name}</b></td>
+      <td>📞 ${c.phone}</td>
+      <td><span style="background:#27272a; padding:4px 8px; border-radius:4px; font-weight:800; color:#f87171;">${c.pin}</span></td>
+      <td>${c.batch} (${c.section})</td>
       <td>${c.course}</td>
-      <td><b>${c.currentFinancialYear}</b></td>
-      <td><span class="badge ${statusClass}">${c.status}</span></td>
-      <td>${duesBadge}</td>
-      <td class="no-print">
-        <button class="btn-action btn-readmit" ${!canReAdmit ? 'disabled' : ''} onclick="processReAdmission('${c.id}', '${c.name}', '${currentFY}')">
-          🔄 Re-Admission
-        </button>
-        <button class="btn-action btn-modify" onclick="openStudentProfileModal('${c.id}')">Dossier</button>
+      <td>
+        <button class="logout-btn" style="background:#2563eb;" onclick="changeStudentPin('${c.id}', '${c.name}', '${c.pin}')">পিন পরিবর্তন</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
+}
 
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--muted); padding:2rem;">No cadet records found.</td></tr>`;
+function changeStudentPin(id, name, oldPin) {
+  const newPin = prompt(`${name}-এর নতুন পিন লিখুন:`, oldPin);
+  if (newPin && newPin.trim()) {
+    db.ref('cadets/' + id).update({ pin: newPin.trim() }).then(() => {
+      alert(`${name}-এর নতুন পিন সফলভাবে আপডেট করা হয়েছে: ${newPin}`);
+    });
   }
 }
 
-// Official Self-Registration Handler
-function submitOfficialRegistration() {
-  const name = document.getElementById('reg-name').value.trim();
-  const phone = document.getElementById('reg-phone').value.replace(/[^0-9]/g, '').trim();
-  const desig = document.getElementById('reg-designation').value;
-  const dob = document.getElementById('reg-dob').value;
-
-  if (!name || phone.length < 10) {
-    alert('Please enter full name and valid 10-digit mobile number.');
-    return;
-  }
-
-  const generatedPass = 'FF-' + Math.floor(1000 + Math.random() * 9000);
-  const data = {
-    name: name,
-    designation: desig,
-    phone: phone,
-    dob: dob,
-    password: generatedPass,
-    pin: generatedPass,
-    status: 'Pending',
-    permissions: { admission: false, roster: false, routine: false, exams: false, finance: false },
-    dateRegistered: new Date().toISOString().split('T')[0]
-  };
-
-  db.ref('fauji_users').push(data).then(() => {
-    notifySuperAdminAction(`[OFFICIAL REGISTRATION]\nName: ${name} (${desig})\nPhone: ${phone}\nGenerated PIN: ${generatedPass}`);
-    alert(`Registration request submitted!\nAssigned temporary PIN: ${generatedPass}\nPlease wait for Super Admin approval.`);
-    switchLoginMode('official');
-  });
-}
-
-function switchSection(secId) {
-  document.querySelectorAll('nav.main-nav button').forEach(b => b.classList.remove('active'));
-  const activeBtn = Array.from(document.querySelectorAll('nav.main-nav button')).find(b => b.getAttribute('onclick').includes(secId));
-  if (activeBtn) activeBtn.classList.add('active');
-
-  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
-  document.getElementById(secId).classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function updateSectionDropdown() {
-  const batch = document.getElementById('adm-batch').value;
-  const secSelect = document.getElementById('adm-section');
-  secSelect.innerHTML = '';
-  const sections = batch === 'General' ? ['G1', 'G2', 'G3', 'G4'] : ['H1', 'H2', 'H3', 'H4'];
-  sections.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s;
-    opt.textContent = `${batch} - Section ${s}`;
-    secSelect.appendChild(opt);
-  });
-}
-
-function toggleStatusCauseField() {
-  const status = document.getElementById('adm-status').value;
-  document.getElementById('status-cause-container').style.display = status !== 'Active' ? 'block' : 'none';
-}
-
-function toggleCustomTimeField() {
-  const val = document.getElementById('rt-time-slot').value;
-  const customBox = document.getElementById('rt-custom-time-container');
-  if (val === 'Custom') {
-    customBox.style.display = 'block';
-    document.getElementById('rt-custom-time').setAttribute('required', 'true');
-  } else {
-    customBox.style.display = 'none';
-    document.getElementById('rt-custom-time').removeAttribute('required');
-  }
-}
-
-function previewPhoto(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    uploadedPhotoBase64 = e.target.result;
-    document.getElementById('cadet-photo-preview').src = uploadedPhotoBase64;
-  };
-  reader.readAsDataURL(file);
-}
-
-function getFinancialYear(dateString) {
-  const d = new Date(dateString);
-  const year = d.getFullYear();
-  const month = d.getMonth();
-  if (month >= 3) return `${year}-${year + 1}`;
-  else return `${year - 1}-${year}`;
-}
-
-function openStudentProfileModal(id) {
-  const cadet = cadetList.find(c => c.id === id);
-  if (!cadet) return;
-
-  document.getElementById('modal-student-name').textContent = `Dossier: ${cadet.name} (${cadet.cadetId || 'FF001'})`;
-  const hist = cadet.history || [];
-
-  let historyHtml = hist.map(h => `
-    <div style="background:#000; border:1px solid var(--border); border-left:3px solid var(--primary); padding:0.75rem; border-radius:6px; margin-bottom:0.5rem;">
-      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted);">
-        <b>${h.event}</b>
-        <span>${h.date}</span>
-      </div>
-      <p style="font-size:0.85rem; color:#fff; margin-top:0.25rem;">${h.details}</p>
-    </div>
-  `).join('');
-
-  document.getElementById('modal-student-content').innerHTML = `
-    <div style="display:flex; gap:1.25rem; align-items:center; background:#000; border:1px solid var(--border); padding:1rem; border-radius:8px; margin-bottom:1rem;">
-      <img src="${cadet.photo || ''}" style="width:70px; height:80px; border-radius:6px; object-fit:cover; background:#27272a;">
-      <div>
-        <h3 style="color:#fff;">${cadet.name} <span class="badge" style="background:#dc2626; color:#fff; margin-left:0.5rem;">${cadet.cadetId || 'FF001'}</span></h3>
-        <p style="font-size:0.8rem; color:var(--muted);">Guardian: ${cadet.guardian} | DOB: ${cadet.dob}</p>
-        <p style="font-size:0.8rem; color:var(--muted);">Mobile: ${cadet.phone1} | Secret Entry PIN: <b style="color:#fde68a;">${cadet.pin || cadet.generatedPin}</b></p>
-        <p style="font-size:0.8rem; color:var(--primary); font-weight:700;">Aadhaar Number: ${cadet.aadhaar}</p>
-      </div>
-    </div>
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:0.5rem; margin-bottom:1rem; font-size:0.82rem;">
-      <div style="background:#000; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><b>Batch:</b> ${cadet.batch} (${cadet.section})</div>
-      <div style="background:#000; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><b>Course:</b> ${cadet.course}</div>
-      <div style="background:#000; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><b>Admitted:</b> ${cadet.admissionDate}</div>
-      <div style="background:#000; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><b>Monthly Fee:</b> ₹${cadet.monthlyFee}</div>
-    </div>
-    <h4 style="color:#fff; margin:1rem 0 0.5rem 0;">Lifetime Event & Financial Log</h4>
-    ${historyHtml || '<p style="color:var(--muted); font-size:0.85rem;">No log history recorded.</p>'}
-  `;
-
-  document.getElementById('student-profile-modal').style.display = 'flex';
-}
-
-function closeStudentProfileModal() {
-  document.getElementById('student-profile-modal').style.display = 'none';
-}
-
-function handleRoutineSubmit(e) {
-  e.preventDefault();
-  const day = document.getElementById('rt-day').value;
-  let timeSlot = document.getElementById('rt-time-slot').value;
-  if (timeSlot === 'Custom') {
-    timeSlot = document.getElementById('rt-custom-time').value.trim();
-  }
-
-  const batchSec = document.getElementById('rt-batch-sec').value;
-  const subject = document.getElementById('rt-subject').value.trim();
-  const faculty = document.getElementById('rt-faculty').value.trim();
-  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
-
-  const routineData = {
-    day: day,
-    timeSlot: timeSlot,
-    batchSec: batchSec,
-    subject: subject,
-    faculty: faculty,
-    operator: operator,
-    timestamp: Date.now()
-  };
-
-  db.ref('weekly_routine').push(routineData).then(() => {
-    notifySuperAdminAction(`[WEEKLY ROUTINE UPDATED]\nDay: ${day}\nTime Slot: ${timeSlot}\nBatch/Sec: ${batchSec}\nSubject: ${subject}\nFaculty: ${faculty}`);
-    alert('Weekly routine updated & Super Admin notified!');
-    e.target.reset();
-    document.getElementById('rt-custom-time-container').style.display = 'none';
-  });
-}
-
-function deleteRoutineEntry(id, info) {
-  if (!confirm(`Delete routine entry: ${info}?`)) return;
-  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
-  db.ref('weekly_routine/' + id).remove().then(() => {
-    notifySuperAdminAction(`[ROUTINE ENTRY DELETED]\nEntry: ${info}\nDeleted by: ${operator}`);
-    alert('Routine entry removed.');
-  });
-}
-
-function renderRoutineTable() {
-  const tbody = document.getElementById('routine-table-body');
+function renderFinanceTable() {
+  const tbody = document.getElementById('admin-finance-tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
-
-  const filterDay = document.getElementById('filter-routine-day')?.value || 'All';
-  let filtered = routineList;
-  if (filterDay !== 'All') filtered = filtered.filter(r => r.day === filterDay);
-
-  filtered.sort((a, b) => b.timestamp - a.timestamp);
-
-  filtered.forEach(r => {
+  financeLogs.reverse().forEach(f => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><b>${r.day}</b></td>
-      <td><span class="badge" style="background:#27272a; color:#f4f4f5; border:1px solid var(--border);">⏰ ${r.timeSlot}</span></td>
-      <td><b>${r.batchSec}</b></td>
-      <td>${r.subject}</td>
-      <td>${r.faculty}</td>
-      <td><small style="color:var(--muted);">${r.operator}</small></td>
-      <td class="no-print">
-        <button class="btn-action btn-block" onclick="deleteRoutineEntry('${r.id}', '${r.day} ${r.timeSlot} - ${r.subject}')">Delete</button>
-      </td>
+      <td>${f.date}</td>
+      <td><span style="color:${f.type === 'Income' ? '#4ade80' : '#f87171'}; font-weight:700;">${f.type}</span></td>
+      <td>${f.purpose}</td>
+      <td><b>₹ ${f.amount}</b></td>
+      <td>${f.operator}</td>
     `;
     tbody.appendChild(tr);
   });
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:2rem;">No routine scheduled.</td></tr>`;
-  }
 }
 
-function handleExamScheduleSubmit(e) {
-  e.preventDefault();
-  const exName = document.getElementById('ex-name').value.trim();
-  const exDate = document.getElementById('ex-date').value;
-  const exTime = document.getElementById('ex-time').value.trim();
-  const exSyllabus = document.getElementById('ex-syllabus').value.trim();
-  const exBatch = document.getElementById('ex-batch').value;
-  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
-
-  const examData = {
-    name: exName,
-    date: exDate,
-    time: exTime,
-    syllabus: exSyllabus,
-    batch: exBatch,
-    operator: operator,
-    timestamp: Date.now()
-  };
-
-  db.ref('exam_schedules').push(examData).then(() => {
-    notifySuperAdminAction(`[EXAM SCHEDULED]\nExam: ${exName}\nDate: ${exDate}\nTime: ${exTime}\nBatch: ${exBatch}`);
-    broadcastExamToAllStudents(examData);
-    alert(`Exam Schedule "${exName}" saved and broadcast initiated!`);
-    e.target.reset();
-  });
-}
-
-function broadcastExamToAllStudents(exam) {
-  const broadcastText = `🎖️ *FAUJI FACTORY - OFFICIAL EXAM NOTICE*\n\n` +
-    `📝 *Exam Name:* ${exam.name}\n` +
-    `📅 *Date:* ${exam.date}\n` +
-    `⏰ *Time:* ${exam.time}\n` +
-    `🎯 *Cadets:* ${exam.batch}\n\n` +
-    `📚 *Syllabus:* \n${exam.syllabus}\n\n` +
-    `Login Portal: https://aspiration-centre.github.io/fauji-factory/\n` +
-    `- Command Desk, Fauji Factory`;
-
-  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(broadcastText)}`, '_blank');
-}
-
-function deleteExamSchedule(id, details) {
-  if (!confirm(`Delete this exam schedule?\n${details}`)) return;
-  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
-  db.ref('exam_schedules/' + id).remove().then(() => {
-    notifySuperAdminAction(`[EXAM SCHEDULE DELETED]\nExam: ${details}\nAction By: ${operator}`);
-    alert('Exam schedule deleted.');
-  });
-}
-
-function renderExamScheduleTable() {
-  const tbody = document.getElementById('exam-schedule-table-body');
-  const countBadge = document.getElementById('exam-total-count');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  const q = (document.getElementById('search-exam-schedule')?.value || '').toLowerCase();
-  let filtered = examScheduleList;
-
-  if (countBadge) countBadge.textContent = `${examScheduleList.length} Scheduled`;
-
-  if (q) {
-    filtered = filtered.filter(item => 
-      item.name.toLowerCase().includes(q) || 
-      (item.syllabus && item.syllabus.toLowerCase().includes(q)) || 
-      (item.date && item.date.includes(q))
-    );
-  }
-
-  filtered.sort((a, b) => b.timestamp - a.timestamp);
-
-  filtered.forEach(item => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><b>${item.name}</b></td>
-      <td><b>${item.date}</b></td>
-      <td><span class="badge" style="background:#27272a; color:#f4f4f5; border:1px solid var(--border);">⏰ ${item.time}</span></td>
-      <td><small style="color:#d4d4d8; line-height:1.4; display:block; max-width:280px; white-space:pre-wrap;">${item.syllabus}</small></td>
-      <td><span class="badge" style="background:#18181b; color:#a1a1aa;">${item.batch}</span></td>
-      <td><small style="color:var(--muted);">${item.operator}</small></td>
-      <td class="no-print">
-        <button class="btn-action btn-block" onclick="deleteExamSchedule('${item.id}', '${item.name} (${item.date})')">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:2rem;">No exam schedule records found.</td></tr>`;
-  }
-}
-
-function updateFinancePurposeDropdown() {
-  const type = document.getElementById('fin-type').value;
-  const sel = document.getElementById('fin-purpose');
-  sel.innerHTML = '';
-  const list = type === 'Income' ? INCOME_PURPOSES : EXPENDITURE_PURPOSES;
-  list.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p;
-    opt.textContent = p;
-    sel.appendChild(opt);
-  });
-}
-
-function handleFinanceSubmit(e) {
-  e.preventDefault();
-  const type = document.getElementById('fin-type').value;
-  const dateVal = document.getElementById('fin-date').value;
-  const purpose = document.getElementById('fin-purpose').value;
-  const amount = parseFloat(document.getElementById('fin-amount').value) || 0;
-  const mode = document.getElementById('fin-mode').value;
-  const istTime = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
-  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
-
-  db.ref('finance').push({
-    type: type,
-    date: dateVal,
-    ist: istTime,
-    purpose: purpose,
-    amount: amount,
-    mode: mode,
-    operator: operator,
-    timestamp: Date.now()
-  }).then(() => {
-    notifySuperAdminAction(`[FINANCIAL ENTRY LOGGED]\nType: ${type}\nPurpose: ${purpose}\nAmount: ₹${amount.toFixed(2)}\nMode: ${mode}\nDate/Time: ${dateVal} ${istTime}\nOperator: ${operator}`);
-    alert('Transaction saved & Super Admin notified!');
-    document.getElementById('fin-amount').value = '';
-  });
-}
-
-function deleteFinanceEntry(id, details) {
-  if (!confirm(`Are you sure you want to delete this record?\n${details}`)) return;
-  const operator = currentUser ? (currentUser.name + ' [' + (currentUser.phone || 'SuperAdmin') + ']') : 'SuperAdmin';
-  
-  db.ref('finance/' + id).remove().then(() => {
-    notifySuperAdminAction(`[FINANCIAL RECORD DELETED]\nDeleted Entry: ${details}\nAction By: ${operator}\nTime: ${new Date().toLocaleTimeString('en-IN')}`);
-    alert('Record deleted and Super Admin notified.');
-  });
-}
-
-function renderFinanceLedger() {
-  const tbody = document.getElementById('finance-table-body');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  let totalIncome = 0;
-  let totalExpense = 0;
-
-  financeRecords.sort((a, b) => b.timestamp - a.timestamp).forEach(item => {
-    const amt = parseFloat(item.amount) || 0;
-    if (item.type === 'Income') totalIncome += amt;
-    else totalExpense += amt;
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${item.date}</td>
-      <td><small style="color:var(--muted);">${item.ist}</small></td>
-      <td><span class="badge ${item.type === 'Income' ? 'badge-active' : 'badge-suspended'}">${item.type}</span></td>
-      <td><b>${item.purpose}</b></td>
-      <td style="font-weight:700; color:${item.type === 'Income' ? '#4ade80' : '#f87171'};">₹ ${amt.toFixed(2)}</td>
-      <td>${item.mode}</td>
-      <td>${item.operator}</td>
-      <td class="no-print">
-        <button class="btn-action btn-block" onclick="deleteFinanceEntry('${item.id}', '${item.type} ₹${amt} for ${item.purpose}')">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById('fin-stat-income').textContent = `₹ ${totalIncome.toFixed(2)}`;
-  document.getElementById('fin-stat-expense').textContent = `₹ ${totalExpense.toFixed(2)}`;
-  const net = totalIncome - totalExpense;
-  const netEl = document.getElementById('fin-stat-net');
-  netEl.textContent = `₹ ${net.toFixed(2)}`;
-  netEl.style.color = net >= 0 ? '#38bdf8' : '#ef4444';
-}
-
-function notifySuperAdminAction(text) {
-  const istTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-  const fullAlertMessage = `🚨 *FAUJI FACTORY COMMAND NOTIFICATION*\n\n${text}\n\nTime: ${istTime}`;
-
-  db.ref('command_logs').push({
-    message: text,
-    timestamp: Date.now(),
-    dateStr: istTime,
-    superAdminPhone: superAdminRecoveryPhone
-  });
-
-  const cleanPhone = superAdminRecoveryPhone.replace(/[^0-9]/g, '');
-  if (cleanPhone && cleanPhone.length >= 10) {
-    const formattedPhone = cleanPhone.length === 10 ? ('91' + cleanPhone) : cleanPhone;
-    const alertUrl = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(fullAlertMessage)}`;
-    window.open(alertUrl, '_blank');
-  }
-}
-
-function openSuperAdminPhoneModal() {
-  document.getElementById('super-admin-current-phone').value = superAdminRecoveryPhone;
-  document.getElementById('super-admin-phone-modal').style.display = 'flex';
-}
-function closeSuperAdminPhoneModal() {
-  document.getElementById('super-admin-phone-modal').style.display = 'none';
-}
-function saveSuperAdminPhone() {
-  const ph = document.getElementById('super-admin-current-phone').value.replace(/[^0-9]/g, '').trim();
-  if (ph.length < 10) {
-    alert('Please enter a valid 10-digit mobile number.');
-    return;
-  }
-  db.ref('settings/superAdminPhone').set(ph).then(() => {
-    superAdminRecoveryPhone = ph;
-    alert(`Super Admin notification phone number set to: ${ph}`);
-    closeSuperAdminPhoneModal();
-  });
-}
-
-function openChangePinModal() { document.getElementById('change-pin-modal').style.display = 'flex'; }
-function closeChangePinModal() { document.getElementById('change-pin-modal').style.display = 'none'; }
-function processSuperAdminPinChange() {
-  const oldPin = document.getElementById('old-admin-pin').value.trim();
-  const newPin = document.getElementById('new-admin-pin').value.trim();
-  if (oldPin !== superAdminPin) { alert('Incorrect old PIN'); return; }
-  db.ref('settings/superAdminPin').set(newPin).then(() => {
-    superAdminPin = newPin;
-    notifySuperAdminAction(`[MASTER PIN CHANGED]\nSuper Admin PIN successfully updated.`);
-    alert('Master PIN updated');
-    closeChangePinModal();
-  });
-}
-
-function openForgotPinModal() { document.getElementById('forgot-pin-modal').style.display = 'flex'; }
-function closeForgotPinModal() { document.getElementById('forgot-pin-modal').style.display = 'none'; }
-function processPinRecovery() {
-  const ph = document.getElementById('recovery-mobile').value.replace(/[^0-9]/g, '');
-  const newPin = document.getElementById('recovery-new-pin').value.trim();
-  if (ph !== superAdminRecoveryPhone) { alert('Recovery mobile mismatch'); return; }
-  db.ref('settings/superAdminPin').set(newPin).then(() => {
-    superAdminPin = newPin;
-    notifySuperAdminAction(`[MASTER PIN RECOVERED & RESET]\nReset completed via mobile: ${ph}`);
-    alert('PIN reset successful!');
-    closeForgotPinModal();
-  });
+function handleLogout() {
+  loggedInUser = null;
+  document.getElementById('auth-modal').style.display = 'flex';
+  document.getElementById('student-dashboard').classList.remove('active');
+  document.getElementById('sec-admission').classList.remove('active');
+  document.getElementById('admin-nav').style.display = 'none';
 }
 </script>
 
